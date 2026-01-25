@@ -33,10 +33,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Admin ürünleri ekleyebilir, düzenleyebilir, resim yükleyebilir ve stok güncelleyebilir
   6. Admin bayi ekleyebilir, gruplara atayabilir, grup iskonto/minimum tutarlarını belirleyebilir ve bayiye özel fiyat tanımlayabilir
 
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- TBD after phase planning
+- [ ] 01-01-PLAN.md — Project setup, Supabase clients, database schema
+- [ ] 01-02-PLAN.md — Authentication (login, password reset, session management)
+- [ ] 01-03-PLAN.md — Admin product management (CRUD, images, stock)
+- [ ] 01-04-PLAN.md — Admin dealer management (groups, pricing overrides)
+- [ ] 01-05-PLAN.md — Dealer catalog with group pricing and filters
+- [ ] 01-06-PLAN.md — Shopping cart and basic order creation
 
 ---
 
@@ -91,9 +96,9 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Basic Ordering | 0/TBD | Not started | - |
+| 1. Foundation & Basic Ordering | 0/6 | Planned | - |
 | 2. Order Management & Tracking | 0/TBD | Not started | - |
 | 3. Insights & Mobile | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-01-25*
+*Last updated: 2026-01-26*
