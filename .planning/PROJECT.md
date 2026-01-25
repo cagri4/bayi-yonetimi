@@ -39,7 +39,6 @@ Bayilerin mesai saatlerinden bağımsız, anlık stok ve fiyat bilgisiyle sipari
 ### Out of Scope
 
 - ERP entegrasyonu (Logo/Netsis) — MVP sonrası, Faz 2'de
-- Bayiye özel fiyatlandırma — MVP'de grup bazlı, sonra bireysel
 - Ödeme sistemi entegrasyonu — Mevcut ödeme süreçleri devam edecek
 - Canlı chat / destek sistemi — İlk versiyonda yok
 - Çoklu dil desteği — Sadece Türkçe
@@ -67,8 +66,9 @@ Bayilerin mesai saatlerinden bağımsız, anlık stok ve fiyat bilgisiyle sipari
 
 ## Constraints
 
-- **Platform**: Web portal + React Native mobil uygulama (iOS & Android)
-- **Backend**: Node.js
+- **Platform**: Web portal (Next.js) + Mobil uygulama (Expo/React Native)
+- **Backend**: Next.js API Routes + Supabase (Auth, Database, Realtime, Storage)
+- **Deployment**: Vercel
 - **Data**: MVP'de demo data kullanılacak, gerçek ERP entegrasyonu Faz 2'de
 - **Dil**: Sadece Türkçe
 
@@ -76,10 +76,11 @@ Bayilerin mesai saatlerinden bağımsız, anlık stok ve fiyat bilgisiyle sipari
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Bayi grupları ile başlama | Bayiye özel fiyat karmaşıklığı MVP için fazla, grup bazlı iskonto yeterli | — Pending |
-| React Native seçimi | Tek codebase ile iOS + Android, web ile kod paylaşım potansiyeli | — Pending |
+| Supabase + Next.js stack | Ayrı backend yerine Supabase ile auth/db/realtime tek yerden, daha hızlı geliştirme | — Pending |
+| Bayi grubu + bayiye özel fiyat | Hem grup bazlı iskonto hem de bayiye özel fiyat override desteği | — Pending |
+| Expo (React Native) seçimi | Tek codebase ile iOS + Android, Supabase client desteği, hızlı geliştirme | — Pending |
 | Demo data ile MVP | ERP entegrasyonu karmaşık, önce temel akışı doğrulamak önemli | — Pending |
 | Sepet + hızlı sipariş | Hem detaylı sipariş hem de sık kullanım senaryoları desteklenmeli | — Pending |
 
 ---
-*Last updated: 2025-01-25 after initialization*
+*Last updated: 2025-01-25 after requirements definition*
