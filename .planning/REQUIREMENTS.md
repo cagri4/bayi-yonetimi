@@ -123,54 +123,59 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | TBD | Pending |
-| AUTH-02 | TBD | Pending |
-| AUTH-03 | TBD | Pending |
-| PROD-01 | TBD | Pending |
-| PROD-02 | TBD | Pending |
-| PROD-03 | TBD | Pending |
-| PROD-04 | TBD | Pending |
-| PRIC-01 | TBD | Pending |
-| PRIC-02 | TBD | Pending |
-| PRIC-03 | TBD | Pending |
-| ORDR-01 | TBD | Pending |
-| ORDR-02 | TBD | Pending |
-| ORDR-03 | TBD | Pending |
-| ORDR-04 | TBD | Pending |
-| ORDR-05 | TBD | Pending |
-| ORDR-06 | TBD | Pending |
-| TRAC-01 | TBD | Pending |
-| TRAC-02 | TBD | Pending |
-| APRD-01 | TBD | Pending |
-| APRD-02 | TBD | Pending |
-| APRD-03 | TBD | Pending |
-| APRD-04 | TBD | Pending |
-| APRD-05 | TBD | Pending |
-| ADLR-01 | TBD | Pending |
-| ADLR-02 | TBD | Pending |
-| ADLR-03 | TBD | Pending |
-| ADLR-04 | TBD | Pending |
-| ADLR-05 | TBD | Pending |
-| ADLR-06 | TBD | Pending |
-| AORD-01 | TBD | Pending |
-| AORD-02 | TBD | Pending |
-| AORD-03 | TBD | Pending |
-| AORD-04 | TBD | Pending |
-| ARPT-01 | TBD | Pending |
-| ARPT-02 | TBD | Pending |
-| ARPT-03 | TBD | Pending |
-| ARPT-04 | TBD | Pending |
-| MOBL-01 | TBD | Pending |
-| MOBL-02 | TBD | Pending |
-| MOBL-03 | TBD | Pending |
-| MOBL-04 | TBD | Pending |
-| MOBL-05 | TBD | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| PROD-01 | Phase 1 | Pending |
+| PROD-02 | Phase 1 | Pending |
+| PROD-03 | Phase 1 | Pending |
+| PROD-04 | Phase 1 | Pending |
+| PRIC-01 | Phase 1 | Pending |
+| PRIC-02 | Phase 1 | Pending |
+| PRIC-03 | Phase 1 | Pending |
+| ORDR-01 | Phase 1 | Pending |
+| ORDR-02 | Phase 1 | Pending |
+| ORDR-03 | Phase 1 | Pending |
+| ORDR-04 | Phase 2 | Pending |
+| ORDR-05 | Phase 2 | Pending |
+| ORDR-06 | Phase 2 | Pending |
+| TRAC-01 | Phase 2 | Pending |
+| TRAC-02 | Phase 2 | Pending |
+| APRD-01 | Phase 1 | Pending |
+| APRD-02 | Phase 1 | Pending |
+| APRD-03 | Phase 1 | Pending |
+| APRD-04 | Phase 1 | Pending |
+| APRD-05 | Phase 1 | Pending |
+| ADLR-01 | Phase 1 | Pending |
+| ADLR-02 | Phase 1 | Pending |
+| ADLR-03 | Phase 1 | Pending |
+| ADLR-04 | Phase 1 | Pending |
+| ADLR-05 | Phase 1 | Pending |
+| ADLR-06 | Phase 1 | Pending |
+| AORD-01 | Phase 2 | Pending |
+| AORD-02 | Phase 2 | Pending |
+| AORD-03 | Phase 2 | Pending |
+| AORD-04 | Phase 2 | Pending |
+| ARPT-01 | Phase 3 | Pending |
+| ARPT-02 | Phase 3 | Pending |
+| ARPT-03 | Phase 3 | Pending |
+| ARPT-04 | Phase 3 | Pending |
+| MOBL-01 | Phase 3 | Pending |
+| MOBL-02 | Phase 3 | Pending |
+| MOBL-03 | Phase 3 | Pending |
+| MOBL-04 | Phase 3 | Pending |
+| MOBL-05 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 38 total
-- Mapped to phases: 0
-- Unmapped: 38 ⚠️
+- Mapped to phases: 38
+- Unmapped: 0 ✓
+
+**Phase Distribution:**
+- Phase 1 (Foundation & Basic Ordering): 23 requirements
+- Phase 2 (Order Management & Tracking): 9 requirements
+- Phase 3 (Insights & Mobile): 9 requirements
 
 ---
 *Requirements defined: 2025-01-25*
-*Last updated: 2025-01-25 after initial definition*
+*Last updated: 2026-01-25 after roadmap creation*
