@@ -12,7 +12,7 @@ Bu roadmap bayilerin 7/24 sipariş verebilmesini sağlayan B2B platformunu, teme
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Basic Ordering** - Auth, ürün kataloğu, fiyatlandırma, bayi yönetimi ve temel sipariş verme
+- [x] **Phase 1: Foundation & Basic Ordering** - Auth, ürün kataloğu, fiyatlandırma, bayi yönetimi ve temel sipariş verme
 - [ ] **Phase 2: Order Management & Tracking** - Sipariş takibi, geçmiş, bildirimler ve admin sipariş yönetimi
 - [ ] **Phase 3: Insights & Mobile** - Raporlama ve mobil uygulama
 
@@ -36,12 +36,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 6 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project setup, Supabase clients, database schema
-- [ ] 01-02-PLAN.md — Authentication (login, password reset, session management)
-- [ ] 01-03-PLAN.md — Admin product management (CRUD, images, stock)
-- [ ] 01-04-PLAN.md — Admin dealer management (groups, pricing overrides)
-- [ ] 01-05-PLAN.md — Dealer catalog with group pricing and filters
-- [ ] 01-06-PLAN.md — Shopping cart and basic order creation
+- [x] 01-01-PLAN.md — Project setup, Supabase clients, database schema
+- [x] 01-02-PLAN.md — Authentication (login, password reset, session management)
+- [x] 01-03-PLAN.md — Admin product management (CRUD, images, stock)
+- [x] 01-04-PLAN.md — Admin dealer management (groups, pricing overrides)
+- [x] 01-05-PLAN.md — Dealer catalog with group pricing and filters
+- [x] 01-06-PLAN.md — Shopping cart and basic order creation
 
 ---
 
@@ -96,7 +96,7 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Basic Ordering | 0/6 | Planned | - |
+| 1. Foundation & Basic Ordering | 6/6 | ✓ Complete | 2026-01-26 |
 | 2. Order Management & Tracking | 0/TBD | Not started | - |
 | 3. Insights & Mobile | 0/TBD | Not started | - |
 
