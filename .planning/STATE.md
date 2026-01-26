@@ -11,28 +11,28 @@ See: .planning/PROJECT.md (updated 2025-01-25)
 ## Current Position
 
 Phase: 1 of 3 (Foundation & Basic Ordering)
-Plan: 3 of 6 (01-03-PLAN.md complete)
+Plan: 4 of 6 (01-05-PLAN.md complete)
 Status: In progress
-Last activity: 2026-01-26 — Completed 01-03-PLAN.md (Admin Product Management)
+Last activity: 2026-01-26 — Completed 01-05-PLAN.md (Dealer Product Catalog)
 
-Progress: [███░░░░░░░] 50% (3/6 plans)
+Progress: [████░░░░░░] 67% (4/6 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 8 min
-- Total execution time: 0.4 hours
+- Total execution time: 0.5 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-basic-ordering | 3 | 24min | 8min |
+| 01-foundation-basic-ordering | 4 | 30min | 8min |
 
 **Recent Trend:**
-- Last 5 plans: 13min, 4min, 7min
-- Trend: Improving (8min avg)
+- Last 5 plans: 4min, 7min, 6min
+- Trend: Excellent (6min avg)
 
 *Updated after each plan completion*
 
@@ -78,6 +78,14 @@ Recent decisions affecting current work:
 - Custom pricing uses upsert for dealer-specific product prices
 - Client-side filtering for better UX in dealer list
 
+**From 01-05 (Dealer Product Catalog):**
+- Zustand with localStorage persistence for cart state (survives page refresh)
+- Server component for product grid, client component for interactive card
+- URL params for filters enables shareable catalog links
+- 300ms debounce on search prevents excessive re-renders
+- Dealer price calculation: custom override > group discount > base price
+- Stock status logic prevents orders for unavailable products
+
 ### Pending Todos
 
 None yet.
@@ -103,9 +111,9 @@ None blocking immediate development work.
 
 ## Session Continuity
 
-Last session: 2026-01-26 00:08:54 UTC
-Stopped at: Completed 01-03-PLAN.md - Admin Product Management
+Last session: 2026-01-26 00:18:08 UTC
+Stopped at: Completed 01-05-PLAN.md - Dealer Product Catalog
 Resume file: None
 
 ---
-*Next step: Execute remaining plans in phase (01-05, 01-06)*
+*Next step: Execute remaining plans in phase (01-06)*
