@@ -1,12 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { createClient } from '@/lib/supabase/server'
+import { getProducts } from '@/lib/actions/products'
+import { getDealers } from '@/lib/actions/dealers'
 
 export default async function AdminDashboard() {
-  const supabase = await createClient()
-
-  const [productsResult, dealersResult] = await Promise.all([
-    supabase.from('products').select('id', { count: 'exact' }),
-    supabase.from('dealers').select('id', { count: 'exact' }),
+  const [products, dealers] = await Promise.all([
+    getProducts().catch(() => []),
+    getDealers().catch(() => []),
   ])
 
   return (
@@ -22,7 +21,7 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {productsResult.count || 0}
+              {products.length}
             </div>
           </CardContent>
         </Card>
@@ -35,7 +34,7 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dealersResult.count || 0}
+              {dealers.length}
             </div>
           </CardContent>
         </Card>

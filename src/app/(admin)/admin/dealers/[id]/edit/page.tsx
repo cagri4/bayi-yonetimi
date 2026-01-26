@@ -9,14 +9,16 @@ interface EditDealerPageProps {
 export default async function EditDealerPage({ params }: EditDealerPageProps) {
   const { id } = await params
 
-  const [dealer, groups] = await Promise.all([
+  const [dealerResult, groups] = await Promise.all([
     getDealer(id).catch(() => null),
     getDealerGroups(),
   ])
 
-  if (!dealer) {
+  if (!dealerResult) {
     notFound()
   }
+
+  const dealer = dealerResult
 
   return (
     <div className="space-y-6">

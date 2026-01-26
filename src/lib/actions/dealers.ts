@@ -11,6 +11,38 @@ export type ActionState = {
   errors?: Record<string, string[]>
 }
 
+export interface DealerGroup {
+  id: string
+  name: string
+  discount_percent: number
+  min_order_amount: number
+  is_active: boolean
+}
+
+export interface Dealer {
+  id: string
+  company_name: string
+  email: string
+  phone: string | null
+  address: string | null
+  dealer_group_id: string | null
+  is_active: boolean
+  user_id: string | null
+  created_at: string
+  updated_at: string
+  dealer_group: { id: string; name: string; discount_percent: number } | null
+}
+
+export interface DealerPrice {
+  id: string
+  dealer_id: string
+  product_id: string
+  custom_price: number
+  created_at: string
+  updated_at: string
+  product: { id: string; code: string; name: string; base_price: number } | null
+}
+
 // ============ DEALER GROUPS ============
 
 export async function getDealerGroups() {
@@ -58,7 +90,7 @@ export async function createDealerGroup(
 
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('dealer_groups')
     .insert(validatedFields.data)
 
@@ -94,7 +126,7 @@ export async function updateDealerGroup(
 
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('dealer_groups')
     .update(validatedFields.data)
     .eq('id', id)
@@ -109,7 +141,7 @@ export async function updateDealerGroup(
 
 // ============ DEALERS ============
 
-export async function getDealers() {
+export async function getDealers(): Promise<Dealer[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -121,10 +153,10 @@ export async function getDealers() {
     .order('company_name')
 
   if (error) throw error
-  return data
+  return data as Dealer[]
 }
 
-export async function getDealer(id: string) {
+export async function getDealer(id: string): Promise<Dealer> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -137,7 +169,7 @@ export async function getDealer(id: string) {
     .single()
 
   if (error) throw error
-  return data
+  return data as Dealer
 }
 
 export async function createDealer(
@@ -175,7 +207,7 @@ export async function createDealer(
     }
   }
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('dealers')
     .insert(validatedFields.data)
 
@@ -224,7 +256,7 @@ export async function updateDealer(
     }
   }
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('dealers')
     .update(validatedFields.data)
     .eq('id', id)
@@ -243,7 +275,7 @@ export async function toggleDealerActive(
 ): Promise<ActionState> {
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('dealers')
     .update({ is_active: isActive })
     .eq('id', id)
@@ -258,7 +290,7 @@ export async function toggleDealerActive(
 
 // ============ DEALER PRICES ============
 
-export async function getDealerPrices(dealerId: string) {
+export async function getDealerPrices(dealerId: string): Promise<DealerPrice[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -271,7 +303,7 @@ export async function getDealerPrices(dealerId: string) {
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  return data
+  return data as DealerPrice[]
 }
 
 export async function setDealerPrice(
@@ -294,7 +326,7 @@ export async function setDealerPrice(
   const supabase = await createClient()
 
   // Upsert - update if exists, insert if not
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('dealer_prices')
     .upsert(validatedFields.data, {
       onConflict: 'dealer_id,product_id',

@@ -43,11 +43,13 @@ export async function login(
   // Check if user has a profile and determine redirect
   const { data: { user } } = await supabase.auth.getUser()
   if (user) {
-    const { data: profile } = await supabase
+    const result = await supabase
       .from('users')
       .select('role')
       .eq('id', user.id)
       .single()
+
+    const profile = result.data as { role: 'admin' | 'dealer' } | null
 
     revalidatePath('/', 'layout')
 
@@ -66,6 +68,29 @@ export async function logout(): Promise<void> {
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
   redirect('/login')
+}
+
+export async function getCurrentUser() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
+}
+
+export async function getUserRole(): Promise<'admin' | 'dealer' | null> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const result = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  const profile = result.data as { role: 'admin' | 'dealer' } | null
+
+  return profile?.role || null
 }
 
 export async function forgotPassword(

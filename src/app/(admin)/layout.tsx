@@ -1,7 +1,6 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { logout } from '@/lib/actions/auth'
+import { logout, getCurrentUser, getUserRole } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
 
 export default async function AdminLayout({
@@ -9,20 +8,15 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   if (!user) {
     redirect('/login')
   }
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+  const role = await getUserRole()
 
-  if (profile?.role !== 'admin') {
+  if (role !== 'admin') {
     redirect('/catalog')
   }
 

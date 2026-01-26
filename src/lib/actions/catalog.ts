@@ -39,7 +39,7 @@ export async function getDealerInfo(): Promise<DealerInfo | null> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data: dealer } = await supabase
+  const result = await supabase
     .from('dealers')
     .select(`
       id,
@@ -54,7 +54,30 @@ export async function getDealerInfo(): Promise<DealerInfo | null> {
     .eq('user_id', user.id)
     .single()
 
-  return dealer
+  return result.data as DealerInfo | null
+}
+
+interface DealerForPricing {
+  id: string
+  dealer_group: { discount_percent: number } | null
+}
+
+interface ProductFromDB {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  base_price: number
+  stock_quantity: number
+  low_stock_threshold: number
+  image_url: string | null
+  category: { id: string; name: string; slug: string } | null
+  brand: { id: string; name: string; slug: string } | null
+}
+
+interface DealerPriceRow {
+  product_id: string
+  custom_price: number
 }
 
 export async function getCatalogProducts(
@@ -66,7 +89,7 @@ export async function getCatalogProducts(
   if (!user) return []
 
   // Get dealer info for pricing
-  const { data: dealer } = await supabase
+  const dealerResult = await supabase
     .from('dealers')
     .select(`
       id,
@@ -77,6 +100,7 @@ export async function getCatalogProducts(
     .eq('user_id', user.id)
     .single()
 
+  const dealer = dealerResult.data as DealerForPricing | null
   if (!dealer) return []
 
   // Get products with categories and brands
@@ -110,18 +134,22 @@ export async function getCatalogProducts(
     query = query.or(`name.ilike.%${filters.search}%,code.ilike.%${filters.search}%`)
   }
 
-  const { data: products, error } = await query
+  const { data: productsData, error } = await query
 
-  if (error || !products) return []
+  if (error || !productsData) return []
+
+  const products = productsData as ProductFromDB[]
 
   // Get dealer-specific prices
-  const { data: dealerPrices } = await supabase
+  const pricesResult = await supabase
     .from('dealer_prices')
     .select('product_id, custom_price')
     .eq('dealer_id', dealer.id)
 
+  const dealerPrices = (pricesResult.data as DealerPriceRow[] | null) || []
+
   const priceMap = new Map(
-    dealerPrices?.map((dp) => [dp.product_id, dp.custom_price]) || []
+    dealerPrices.map((dp) => [dp.product_id, dp.custom_price])
   )
 
   // Calculate dealer prices
@@ -143,7 +171,13 @@ export async function getCatalogProducts(
   })
 }
 
-export async function getCategories() {
+interface CategoryBrandItem {
+  id: string
+  name: string
+  slug: string
+}
+
+export async function getCategories(): Promise<CategoryBrandItem[]> {
   const supabase = await createClient()
 
   const { data } = await supabase
@@ -152,10 +186,10 @@ export async function getCategories() {
     .eq('is_active', true)
     .order('name')
 
-  return data || []
+  return (data as CategoryBrandItem[] | null) || []
 }
 
-export async function getBrands() {
+export async function getBrands(): Promise<CategoryBrandItem[]> {
   const supabase = await createClient()
 
   const { data } = await supabase
@@ -164,5 +198,5 @@ export async function getBrands() {
     .eq('is_active', true)
     .order('name')
 
-  return data || []
+  return (data as CategoryBrandItem[] | null) || []
 }

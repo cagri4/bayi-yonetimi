@@ -1,20 +1,15 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { getCurrentUser, getUserRole } from '@/lib/actions/auth'
 import { LoginForm } from './login-form'
 
 export default async function LoginPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   if (user) {
     // Get user role and redirect appropriately
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    const role = await getUserRole()
 
-    if (profile?.role === 'admin') {
+    if (role === 'admin') {
       redirect('/admin')
     } else {
       redirect('/catalog')

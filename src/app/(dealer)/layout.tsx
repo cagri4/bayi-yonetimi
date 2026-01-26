@@ -1,7 +1,6 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { logout } from '@/lib/actions/auth'
+import { logout, getCurrentUser, getUserRole } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
 import { getDealerInfo } from '@/lib/actions/catalog'
 import { CartIndicator } from '@/components/cart/cart-indicator'
@@ -11,8 +10,7 @@ export default async function DealerLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   if (!user) {
     redirect('/login')
@@ -22,13 +20,9 @@ export default async function DealerLayout({
 
   if (!dealer) {
     // User exists but no dealer record - might be admin
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    const role = await getUserRole()
 
-    if (profile?.role === 'admin') {
+    if (role === 'admin') {
       redirect('/admin')
     }
 

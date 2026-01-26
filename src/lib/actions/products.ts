@@ -11,7 +11,25 @@ export type ActionState = {
   errors?: Record<string, string[]>
 }
 
-export async function getProducts() {
+export interface Product {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  base_price: number
+  stock_quantity: number
+  low_stock_threshold: number
+  image_url: string | null
+  category_id: string | null
+  brand_id: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+  category: { id: string; name: string } | null
+  brand: { id: string; name: string } | null
+}
+
+export async function getProducts(): Promise<Product[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -24,10 +42,10 @@ export async function getProducts() {
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  return data
+  return data as Product[]
 }
 
-export async function getProduct(id: string) {
+export async function getProduct(id: string): Promise<Product> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -41,7 +59,7 @@ export async function getProduct(id: string) {
     .single()
 
   if (error) throw error
-  return data
+  return data as Product
 }
 
 export async function getCategories() {
@@ -107,7 +125,7 @@ export async function createProduct(
     }
   }
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('products')
     .insert(validatedFields.data)
 
@@ -160,7 +178,7 @@ export async function updateProduct(
     }
   }
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('products')
     .update(validatedFields.data)
     .eq('id', id)
@@ -179,7 +197,7 @@ export async function toggleProductActive(
 ): Promise<ActionState> {
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('products')
     .update({ is_active: isActive })
     .eq('id', id)
@@ -210,7 +228,7 @@ export async function updateStock(
 
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('products')
     .update({ stock_quantity: validatedFields.data.stock_quantity })
     .eq('id', validatedFields.data.product_id)
@@ -262,7 +280,7 @@ export async function uploadProductImage(
     .from('product-images')
     .getPublicUrl(filePath)
 
-  const { error: updateError } = await supabase
+  const { error: updateError } = await (supabase as any)
     .from('products')
     .update({ image_url: publicUrl })
     .eq('id', productId)
@@ -278,7 +296,7 @@ export async function uploadProductImage(
 export async function deleteProduct(id: string): Promise<ActionState> {
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('products')
     .delete()
     .eq('id', id)

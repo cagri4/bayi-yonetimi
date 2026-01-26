@@ -11,6 +11,23 @@ export type OrderActionState = {
   errors?: Record<string, string[]>
 }
 
+interface DealerForOrder {
+  id: string
+  dealer_group: {
+    id: string
+    min_order_amount: number
+  } | null
+}
+
+interface OrderFromDB {
+  id: string
+  order_number: string
+}
+
+interface StatusRow {
+  id: string
+}
+
 export async function createOrder(
   items: Array<{
     productId: string
@@ -30,7 +47,7 @@ export async function createOrder(
   }
 
   // Get dealer info
-  const { data: dealer } = await supabase
+  const dealerResult = await supabase
     .from('dealers')
     .select(`
       id,
@@ -42,6 +59,7 @@ export async function createOrder(
     .eq('user_id', user.id)
     .single()
 
+  const dealer = dealerResult.data as DealerForOrder | null
   if (!dealer) {
     return { message: 'Bayi kaydı bulunamadı' }
   }
@@ -61,12 +79,13 @@ export async function createOrder(
   }
 
   // Get pending status ID
-  const { data: pendingStatus } = await supabase
+  const statusResult = await supabase
     .from('order_statuses')
     .select('id')
     .eq('code', 'pending')
     .single()
 
+  const pendingStatus = statusResult.data as StatusRow | null
   if (!pendingStatus) {
     return { message: 'Siparis durumu bulunamadi' }
   }
@@ -78,7 +97,7 @@ export async function createOrder(
   const orderNumber = orderNumberResult || `ORD-${Date.now()}`
 
   // Create order
-  const { data: order, error: orderError } = await supabase
+  const orderResult = await (supabase as any)
     .from('orders')
     .insert({
       order_number: orderNumber,
@@ -92,8 +111,11 @@ export async function createOrder(
     .select()
     .single()
 
-  if (orderError) {
-    return { message: 'Siparis olusturulurken hata olustu: ' + orderError.message }
+  const order = orderResult.data as OrderFromDB | null
+  const orderError = orderResult.error
+
+  if (orderError || !order) {
+    return { message: 'Siparis olusturulurken hata olustu: ' + (orderError?.message || 'Bilinmeyen hata') }
   }
 
   // Create order items
@@ -107,18 +129,18 @@ export async function createOrder(
     total_price: item.price * item.quantity,
   }))
 
-  const { error: itemsError } = await supabase
+  const { error: itemsError } = await (supabase as any)
     .from('order_items')
     .insert(orderItems)
 
   if (itemsError) {
     // Rollback order if items fail
-    await supabase.from('orders').delete().eq('id', order.id)
+    await (supabase as any).from('orders').delete().eq('id', order.id)
     return { message: 'Siparis kalemleri olusturulurken hata olustu' }
   }
 
   // Create initial status history
-  await supabase
+  await (supabase as any)
     .from('order_status_history')
     .insert({
       order_id: order.id,
@@ -137,18 +159,23 @@ export async function createOrder(
   }
 }
 
+interface DealerIdRow {
+  id: string
+}
+
 export async function getDealerOrders() {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data: dealer } = await supabase
+  const dealerResult = await supabase
     .from('dealers')
     .select('id')
     .eq('user_id', user.id)
     .single()
 
+  const dealer = dealerResult.data as DealerIdRow | null
   if (!dealer) return []
 
   const { data: orders } = await supabase
