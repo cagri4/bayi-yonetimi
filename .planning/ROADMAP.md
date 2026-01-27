@@ -84,10 +84,14 @@ Plans:
   5. Bayi mobil uygulamadan siparis verebilir ve siparislerini takip edebilir
   6. Bayi mobil uygulamada siparis guncellemeleri icin push notification alabilir
 
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- TBD after phase planning
+- [ ] 03-01-PLAN.md - Admin sales reporting dashboard with time-series charts
+- [ ] 03-02-PLAN.md - Top products report, dealer performance report, CSV export
+- [ ] 03-03-PLAN.md - Expo mobile app foundation with authentication
+- [ ] 03-04-PLAN.md - Mobile product catalog with dealer pricing and cart
+- [ ] 03-05-PLAN.md - Mobile orders, checkout, and push notifications
 
 ---
 
@@ -100,7 +104,7 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. Foundation & Basic Ordering | 6/6 | Complete | 2026-01-26 |
 | 2. Order Management & Tracking | 3/3 | Complete | 2026-01-27 |
-| 3. Insights & Mobile | 0/TBD | Not started | - |
+| 3. Insights & Mobile | 0/5 | Not started | - |
 
 ---
 *Last updated: 2026-01-27*
