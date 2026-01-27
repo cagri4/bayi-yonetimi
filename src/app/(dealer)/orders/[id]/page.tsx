@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/table'
 import { ArrowLeft } from 'lucide-react'
 import { OrderRealtimeWrapper } from './order-realtime-wrapper'
+import { ReorderButton } from '@/components/orders/reorder-button'
 
 // Types for order data
 interface OrderStatus {
@@ -129,7 +130,10 @@ export default async function OrderDetailPage({ params }: PageProps) {
             </p>
           </div>
         </div>
-        {order.status && <OrderStatusBadge status={order.status} />}
+        <div className="flex items-center gap-3">
+          {order.status && <OrderStatusBadge status={order.status} />}
+          <ReorderButton orderId={order.id} />
+        </div>
       </div>
 
       {/* Realtime subscription wrapper */}
