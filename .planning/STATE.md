@@ -120,4 +120,4 @@ Stopped at: Completed Phase 2 (02-03-PLAN.md)
 Resume file: None
 
 ---
-*Next step: Begin Phase 3 (Mobile API & Expo App)*
+*Next step: Plan Phase 3 with `/gsd:discuss-phase 3` or `/gsd:plan-phase 3`*

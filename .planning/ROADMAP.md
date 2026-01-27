@@ -13,7 +13,7 @@ Bu roadmap bayilerin 7/24 siparis verebilmesini saglayan B2B platformunu, temel 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Basic Ordering** - Auth, urun katalogu, fiyatlandirma, bayi yonetimi ve temel siparis verme
-- [ ] **Phase 2: Order Management & Tracking** - Siparis takibi, gecmis, bildirimler ve admin siparis yonetimi
+- [x] **Phase 2: Order Management & Tracking** - Siparis takibi, gecmis, bildirimler ve admin siparis yonetimi
 - [ ] **Phase 3: Insights & Mobile** - Raporlama ve mobil uygulama
 
 ## Phase Details
@@ -63,9 +63,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md - Dealer order history, detail page, realtime status tracking
-- [ ] 02-02-PLAN.md - Admin order list with filters, detail view, status updates, cancellation
-- [ ] 02-03-PLAN.md - Quick order form with SKU search, frequent products, reorder from history
+- [x] 02-01-PLAN.md - Dealer order history, detail page, realtime status tracking
+- [x] 02-02-PLAN.md - Admin order list with filters, detail view, status updates, cancellation
+- [x] 02-03-PLAN.md - Quick order form with SKU search, frequent products, reorder from history
 
 ---
 
@@ -99,7 +99,7 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Basic Ordering | 6/6 | Complete | 2026-01-26 |
-| 2. Order Management & Tracking | 0/3 | Not started | - |
+| 2. Order Management & Tracking | 3/3 | Complete | 2026-01-27 |
 | 3. Insights & Mobile | 0/TBD | Not started | - |
 
 ---

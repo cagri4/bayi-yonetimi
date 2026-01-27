@@ -136,11 +136,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORDR-01 | Phase 1 | Complete |
 | ORDR-02 | Phase 1 | Complete |
 | ORDR-03 | Phase 1 | Complete |
-| ORDR-04 | Phase 2 | Pending |
-| ORDR-05 | Phase 2 | Pending |
-| ORDR-06 | Phase 2 | Pending |
-| TRAC-01 | Phase 2 | Pending |
-| TRAC-02 | Phase 2 | Pending |
+| ORDR-04 | Phase 2 | Complete |
+| ORDR-05 | Phase 2 | Complete |
+| ORDR-06 | Phase 2 | Complete |
+| TRAC-01 | Phase 2 | Complete |
+| TRAC-02 | Phase 2 | Complete |
 | APRD-01 | Phase 1 | Complete |
 | APRD-02 | Phase 1 | Complete |
 | APRD-03 | Phase 1 | Complete |
@@ -152,10 +152,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADLR-04 | Phase 1 | Complete |
 | ADLR-05 | Phase 1 | Complete |
 | ADLR-06 | Phase 1 | Complete |
-| AORD-01 | Phase 2 | Pending |
-| AORD-02 | Phase 2 | Pending |
-| AORD-03 | Phase 2 | Pending |
-| AORD-04 | Phase 2 | Pending |
+| AORD-01 | Phase 2 | Complete |
+| AORD-02 | Phase 2 | Complete |
+| AORD-03 | Phase 2 | Complete |
+| AORD-04 | Phase 2 | Complete |
 | ARPT-01 | Phase 3 | Pending |
 | ARPT-02 | Phase 3 | Pending |
 | ARPT-03 | Phase 3 | Pending |
@@ -178,4 +178,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2025-01-25*
-*Last updated: 2026-01-26 after Phase 1 completion*
+*Last updated: 2026-01-27 after Phase 2 completion*
