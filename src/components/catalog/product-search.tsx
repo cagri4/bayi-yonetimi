@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { useDebounce } from '@/hooks/use-debounce'
@@ -8,11 +8,19 @@ import { useDebounce } from '@/hooks/use-debounce'
 export function ProductSearch() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [search, setSearch] = useState(searchParams.get('search') || '')
+  const initialSearch = searchParams.get('search') || ''
+  const [search, setSearch] = useState(initialSearch)
+  const isFirstRender = useRef(true)
 
   const debouncedSearch = useDebounce(search, 300)
 
   useEffect(() => {
+    // Skip first render to avoid unnecessary navigation
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+
     const params = new URLSearchParams(searchParams.toString())
 
     if (debouncedSearch) {
@@ -22,7 +30,7 @@ export function ProductSearch() {
     }
 
     router.push(`/catalog?${params.toString()}`)
-  }, [debouncedSearch, router, searchParams])
+  }, [debouncedSearch]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Input

@@ -7,14 +7,15 @@ import { useCartStore } from '@/store/cart'
 import { useEffect, useState } from 'react'
 
 export function CartIndicator() {
-  const getTotalItems = useCartStore((state) => state.getTotalItems)
+  // Subscribe to items array directly so component re-renders on changes
+  const items = useCartStore((state) => state.items)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const itemCount = mounted ? getTotalItems() : 0
+  const itemCount = mounted ? items.reduce((sum, item) => sum + item.quantity, 0) : 0
 
   return (
     <Link href="/cart">
