@@ -4,6 +4,7 @@ import { logout, getCurrentUser, getUserRole } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
 import { getDealerInfo } from '@/lib/actions/catalog'
 import { CartIndicator } from '@/components/cart/cart-indicator'
+import { Zap } from 'lucide-react'
 
 export default async function DealerLayout({
   children,
@@ -49,6 +50,13 @@ export default async function DealerLayout({
                   className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 >
                   Urunler
+                </Link>
+                <Link
+                  href="/quick-order"
+                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium gap-1"
+                >
+                  <Zap className="h-4 w-4" />
+                  Hizli Siparis
                 </Link>
                 <Link
                   href="/orders"
