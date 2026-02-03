@@ -1,4 +1,8 @@
-# Roadmap: B2B Bayi Siparis Yonetim Sistemi
+# Milestone v1: MVP
+
+**Status:** SHIPPED 2026-02-03
+**Phases:** 1-3
+**Total Plans:** 14
 
 ## Overview
 
@@ -6,19 +10,8 @@ Bu roadmap bayilerin 7/24 siparis verebilmesini saglayan B2B platformunu, temel 
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
-
-Decimal phases appear between their surrounding integers in numeric order.
-
-- [x] **Phase 1: Foundation & Basic Ordering** - Auth, urun katalogu, fiyatlandirma, bayi yonetimi ve temel siparis verme
-- [x] **Phase 2: Order Management & Tracking** - Siparis takibi, gecmis, bildirimler ve admin siparis yonetimi
-- [x] **Phase 3: Insights & Mobile** - Raporlama ve mobil uygulama
-
-## Phase Details
-
 ### Phase 1: Foundation & Basic Ordering
+
 **Goal**: Bayiler portal uzerinden giris yapabilir, urun katalogunu grup fiyatlariyla goruntuleyebilir ve temel siparis verebilir. Admin urunleri, bayileri ve fiyatlandirmayi yonetebilir.
 
 **Depends on**: Nothing (first phase)
@@ -43,9 +36,12 @@ Plans:
 - [x] 01-05-PLAN.md - Dealer catalog with group pricing and filters
 - [x] 01-06-PLAN.md - Shopping cart and basic order creation
 
+**Completed:** 2026-01-26
+
 ---
 
 ### Phase 2: Order Management & Tracking
+
 **Goal**: Bayiler siparislerinin durumunu takip edebilir, gecmis siparislerini goruntuleyebilir ve anlik bildirimler alabilir. Admin siparisleri yonetebilir ve durum degistirebilir.
 
 **Depends on**: Phase 1
@@ -67,9 +63,12 @@ Plans:
 - [x] 02-02-PLAN.md - Admin order list with filters, detail view, status updates, cancellation
 - [x] 02-03-PLAN.md - Quick order form with SKU search, frequent products, reorder from history
 
+**Completed:** 2026-01-27
+
 ---
 
 ### Phase 3: Insights & Mobile
+
 **Goal**: Admin donemsel raporlama ve analiz yapabilir. Bayiler mobil uygulama uzerinden tum portal yeteneklerini kullanabilir ve push notification alabilir.
 
 **Depends on**: Phase 1, Phase 2
@@ -93,12 +92,11 @@ Plans:
 - [x] 03-04-PLAN.md - Mobile product catalog with dealer pricing and cart
 - [x] 03-05-PLAN.md - Mobile orders, checkout, and push notifications
 
+**Completed:** 2026-02-03
+
 ---
 
 ## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -107,4 +105,24 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | 3. Insights & Mobile | 5/5 | Complete | 2026-02-03 |
 
 ---
-*Last updated: 2026-02-03*
+
+## Milestone Summary
+
+**Key Decisions:**
+- Supabase + Next.js stack — unified auth/db/realtime, 9 days to MVP
+- Zustand + localStorage cart — client-side simplicity, responsive UX
+- Expo for mobile — shared Supabase client, single codebase iOS/Android
+- Edge Function for push — server-triggered, secure and scalable
+
+**Issues Resolved:**
+- Mobile cart-to-checkout flow break (fixed in commit 0b3ba65)
+- Supabase RPC type inference issues (workaround with type casting)
+
+**Technical Debt:**
+- Push notification webhook requires manual Supabase configuration
+- Expo project ID must be added to mobile/.env
+
+---
+
+*Archived: 2026-02-03 as part of v1 milestone completion*
+*For current project status, see .planning/ROADMAP.md (created for next milestone)*

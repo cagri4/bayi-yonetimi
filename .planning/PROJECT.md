@@ -1,86 +1,110 @@
-# B2B Bayi Sipariş Yönetim Sistemi
+# B2B Bayi Siparis Yonetim Sistemi
 
 ## What This Is
 
-Üretici firmanın bayilerine 7/24 sipariş verebilme imkanı sunan B2B sipariş yönetim platformu. Web portal ve mobil uygulama üzerinden bayiler ürün kataloğunu görebilir, stok durumunu kontrol edebilir, kendi grup fiyatlarını görebilir ve sipariş verebilir. Admin panelden ürünler, bayiler ve siparişler yönetilir.
+Uretici firmanin bayilerine 7/24 siparis verebilme imkani sunan B2B siparis yonetim platformu. Web portal ve mobil uygulama uzerinden bayiler urun katalogunu gorebilir, stok durumunu kontrol edebilir, kendi grup fiyatlarini gorebilir ve siparis verebilir. Admin panelden urunler, bayiler ve siparisler yonetilir.
 
 ## Core Value
 
-Bayilerin mesai saatlerinden bağımsız, anlık stok ve fiyat bilgisiyle sipariş verebilmesi — "siparişim nerede?" sorusuna son.
+Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis verebilmesi — "siparisim nerede?" sorusuna son.
+
+## Current State
+
+**v1 MVP shipped: 2026-02-03**
+
+- Web portal: Next.js 14 App Router + Supabase
+- Mobile app: Expo/React Native
+- 13,200 LOC TypeScript/TSX
+- 215 files across 3 phases, 14 plans
+
+**Deployed capabilities:**
+- Dealer auth with session persistence
+- Product catalog with group pricing (Altin/Gumus/Bronz)
+- Shopping cart with minimum order validation
+- Order creation with status tracking
+- Realtime order updates via Supabase Realtime
+- Quick order form with SKU search
+- Reorder from history
+- Admin product/dealer/order management
+- Sales reporting with CSV export
+- Mobile app with push notifications
 
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+**Bayi Portali:**
+- [x] Urun katalogu goruntuleme (resimler, stok durumu) — v1
+- [x] Bayi grubuna gore fiyat goruntuleme (Altin/Gumus/Bronz iskonto) — v1
+- [x] Sepete urun ekleme ve toplu siparis verme — v1
+- [x] Hizli siparis (sik alinan urunler icin) — v1
+- [x] Siparis gecmisi ve durum takibi — v1
+- [x] Push notification (siparis durumu degisimlerinde) — v1
+- [x] Email + sifre ile giris — v1
+
+**Admin Paneli:**
+- [x] Urun yonetimi (ekleme, duzenleme, stok guncelleme, resim yukleme) — v1
+- [x] Bayi yonetimi (ekleme, grup atama, aktif/pasif) — v1
+- [x] Bayi grubu yonetimi (iskonto oranlari, minimum siparis tutari) — v1
+- [x] Siparis yonetimi (goruntuleme, durum degistirme, iptal) — v1
+- [x] Temel raporlama (satis, bayi performansi) — v1
+
+**Siparis Akisi:**
+- [x] Siparis durumlari: Beklemede -> Onaylandi -> Hazirlaniyor -> Kargoya Verildi -> Teslim Edildi — v1
+- [x] Minimum siparis tutari kontrolu (bayi grubuna gore) — v1
 
 ### Active
 
-**Bayi Portalı:**
-- [ ] Ürün kataloğu görüntüleme (resimler, stok durumu)
-- [ ] Bayi grubuna göre fiyat görüntüleme (Altın/Gümüş/Bronz iskonto)
-- [ ] Sepete ürün ekleme ve toplu sipariş verme
-- [ ] Hızlı sipariş (sık alınan ürünler için)
-- [ ] Sipariş geçmişi ve durum takibi
-- [ ] Push notification (sipariş durumu değişimlerinde)
-- [ ] Email + şifre ile giriş
-
-**Admin Paneli:**
-- [ ] Ürün yönetimi (ekleme, düzenleme, stok güncelleme, resim yükleme)
-- [ ] Bayi yönetimi (ekleme, grup atama, aktif/pasif)
-- [ ] Bayi grubu yönetimi (iskonto oranları, minimum sipariş tutarı)
-- [ ] Sipariş yönetimi (görüntüleme, durum değiştirme, iptal)
-- [ ] Temel raporlama (satış, bayi performansı)
-
-**Sipariş Akışı:**
-- [ ] Sipariş durumları: Beklemede → Onaylandı → Hazırlanıyor → Kargoya Verildi → Teslim Edildi
-- [ ] Minimum sipariş tutarı kontrolü (bayi grubuna göre)
+(None — planning next milestone)
 
 ### Out of Scope
 
-- ERP entegrasyonu (Logo/Netsis) — MVP sonrası, Faz 2'de
-- Ödeme sistemi entegrasyonu — Mevcut ödeme süreçleri devam edecek
-- Canlı chat / destek sistemi — İlk versiyonda yok
-- Çoklu dil desteği — Sadece Türkçe
-- Offline mobil çalışma — İnternet bağlantısı gerekli
+- ERP entegrasyonu (Logo/Netsis) — MVP sonrasi, v2'de
+- Odeme sistemi entegrasyonu — Mevcut odeme surecleri devam edecek
+- Canli chat / destek sistemi — Ilk versiyonda yok
+- Coklu dil destegi — Sadece Turkce
+- Offline mobil calisma — Internet baglantisi gerekli
 
 ## Context
 
-**Mevcut Durum:**
-- Siparişler telefon, WhatsApp ve Excel ile alınıyor
-- Manuel ERP girişi yapılıyor (hata ve zaman kaybı)
-- Mesai saatleri dışında sipariş alınamıyor
-- Bayiler stok ve fiyat için her seferinde aramak zorunda
-- Sipariş takibi yok, "siparişim nerede?" soruları çok fazla
+**Onceki Durum (v1 oncesi):**
+- Siparisler telefon, WhatsApp ve Excel ile aliniyordu
+- Manuel ERP girisi yapiliyordu (hata ve zaman kaybi)
+- Mesai saatleri disinda siparis alinamiyordu
+- Bayiler stok ve fiyat icin her seferinde aramak zorundaydi
+- Siparis takibi yoktu, "siparisim nerede?" sorulari cok fazlaydi
 
-**İş Ölçeği:**
-- ~700 kayıtlı bayi (~50 aktif kullanıcı hedefi başlangıçta)
+**Is Olcegi:**
+- ~700 kayitli bayi (~50 aktif kullanici hedefi baslangiçta)
 - 10-15 marka
-- ~500 ürün
-- Günde 20-30 sipariş beklentisi
+- ~500 urun
+- Gunde 20-30 siparis beklentisi
 
-**Bayi Grupları:**
-- Altın, Gümüş, Bronz gibi gruplar
-- Her grubun farklı iskonto oranı
-- Her grubun farklı minimum sipariş tutarı olabilir
+**Bayi Gruplari:**
+- Altin, Gumus, Bronz gibi gruplar
+- Her grubun farkli iskonto orani
+- Her grubun farkli minimum siparis tutari olabilir
 
 ## Constraints
 
 - **Platform**: Web portal (Next.js) + Mobil uygulama (Expo/React Native)
 - **Backend**: Next.js API Routes + Supabase (Auth, Database, Realtime, Storage)
-- **Deployment**: Vercel
-- **Data**: MVP'de demo data kullanılacak, gerçek ERP entegrasyonu Faz 2'de
-- **Dil**: Sadece Türkçe
+- **Deployment**: Vercel (web), Expo EAS (mobile)
+- **Data**: Demo data ile baslandi, ERP entegrasyonu v2'de
+- **Dil**: Sadece Turkce
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Supabase + Next.js stack | Ayrı backend yerine Supabase ile auth/db/realtime tek yerden, daha hızlı geliştirme | — Pending |
-| Bayi grubu + bayiye özel fiyat | Hem grup bazlı iskonto hem de bayiye özel fiyat override desteği | — Pending |
-| Expo (React Native) seçimi | Tek codebase ile iOS + Android, Supabase client desteği, hızlı geliştirme | — Pending |
-| Demo data ile MVP | ERP entegrasyonu karmaşık, önce temel akışı doğrulamak önemli | — Pending |
-| Sepet + hızlı sipariş | Hem detaylı sipariş hem de sık kullanım senaryoları desteklenmeli | — Pending |
+| Supabase + Next.js stack | Ayri backend yerine Supabase ile auth/db/realtime tek yerden, daha hizli gelistirme | Good — 9 gunde MVP tamamlandi |
+| Bayi grubu + bayiye ozel fiyat | Hem grup bazli iskonto hem de bayiye ozel fiyat override destegi | Good — get_dealer_price RPC ile tutarli fiyatlama |
+| Expo (React Native) secimi | Tek codebase ile iOS + Android, Supabase client destegi, hizli gelistirme | Good — Ayni is mantigi web ve mobile'da calisiyor |
+| Demo data ile MVP | ERP entegrasyonu karmasik, once temel akisi dogrulamak onemli | Good — Hizli iterasyon sagladi |
+| Sepet + hizli siparis | Hem detayli siparis hem de sik kullanim senaryolari desteklenmeli | Good — Iki farkli UX pattern yeterliligi kanitladi |
+| Zustand + localStorage cart | Server-side cart yerine client-side basitlik | Good — Hizli ve responsive UX |
+| Supabase Realtime for orders | WebSocket yerine Supabase postgres_changes | Good — Minimum setup ile realtime calisiyor |
+| Edge Function for push | Client-side push yerine server-triggered | Good — Guvenli ve olceklenebilir |
 
 ---
-*Last updated: 2025-01-25 after requirements definition*
+*Last updated: 2026-02-03 after v1 milestone*
