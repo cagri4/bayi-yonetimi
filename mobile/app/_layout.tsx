@@ -71,6 +71,7 @@ function RootLayoutNav() {
         ) : (
           <>
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="checkout" options={{ headerShown: true, title: 'Siparis Onayi' }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', headerShown: true }} />
           </>
         )}

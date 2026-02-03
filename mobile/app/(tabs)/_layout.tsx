@@ -47,10 +47,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="orders"
         options={{
           title: 'Siparislerim',
           tabBarIcon: ({ color }) => <TabBarIcon name="list-alt" color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
