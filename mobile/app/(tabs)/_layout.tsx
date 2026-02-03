@@ -1,11 +1,12 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs } from 'expo-router';
+import { Pressable, Alert } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { useSession } from '@/components/SessionProvider';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -17,6 +18,18 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { signOut } = useSession();
+
+  const handleSignOut = () => {
+    Alert.alert(
+      'Cikis Yap',
+      'Hesabinizdan cikis yapmak istediginize emin misiniz?',
+      [
+        { text: 'Iptal', style: 'cancel' },
+        { text: 'Cikis Yap', onPress: signOut, style: 'destructive' },
+      ]
+    );
+  };
 
   return (
     <Tabs
@@ -29,29 +42,34 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          title: 'Katalog',
+          tabBarIcon: ({ color }) => <TabBarIcon name="th-large" color={color} />,
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Siparislerim',
+          tabBarIcon: ({ color }) => <TabBarIcon name="list-alt" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profil',
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          headerRight: () => (
+            <Pressable onPress={handleSignOut}>
+              {({ pressed }) => (
+                <FontAwesome
+                  name="sign-out"
+                  size={22}
+                  color={Colors[colorScheme ?? 'light'].text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
+          ),
         }}
       />
     </Tabs>
