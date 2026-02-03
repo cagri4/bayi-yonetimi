@@ -3,12 +3,19 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { SessionProvider, useSession } from '@/components/SessionProvider';
+import {
+  registerForPushNotificationsAsync,
+  savePushTokenToDatabase,
+  setupNotificationResponseListener,
+  setupNotificationReceivedListener,
+  getLastNotificationResponse,
+} from '@/lib/notifications';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -54,6 +61,60 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { session, loading } = useSession();
+  const notificationListenerRef = useRef<(() => void) | null>(null);
+  const responseListenerRef = useRef<(() => void) | null>(null);
+
+  // Register for push notifications when user is logged in
+  useEffect(() => {
+    if (!session) {
+      // Clean up listeners when logged out
+      if (notificationListenerRef.current) {
+        notificationListenerRef.current();
+        notificationListenerRef.current = null;
+      }
+      if (responseListenerRef.current) {
+        responseListenerRef.current();
+        responseListenerRef.current = null;
+      }
+      return;
+    }
+
+    // Register for push notifications
+    const registerPushNotifications = async () => {
+      const token = await registerForPushNotificationsAsync();
+      if (token) {
+        await savePushTokenToDatabase(token);
+      }
+    };
+
+    registerPushNotifications();
+
+    // Set up notification listeners
+    notificationListenerRef.current = setupNotificationReceivedListener();
+    responseListenerRef.current = setupNotificationResponseListener();
+
+    // Check if app was opened from a notification
+    const checkInitialNotification = async () => {
+      const response = await getLastNotificationResponse();
+      if (response) {
+        const data = response.notification.request.content.data;
+        // Navigation will be handled by the response listener
+        console.log('App opened from notification:', data);
+      }
+    };
+
+    checkInitialNotification();
+
+    // Cleanup on unmount
+    return () => {
+      if (notificationListenerRef.current) {
+        notificationListenerRef.current();
+      }
+      if (responseListenerRef.current) {
+        responseListenerRef.current();
+      }
+    };
+  }, [session]);
 
   if (loading) {
     return (
