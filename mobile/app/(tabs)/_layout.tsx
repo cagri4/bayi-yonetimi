@@ -1,12 +1,14 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { Pressable, Alert } from 'react-native';
+import { Pressable, Alert, View, Text, StyleSheet } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useSession } from '@/components/SessionProvider';
+import { useCartStore } from '@/lib/cart';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -15,6 +17,41 @@ function TabBarIcon(props: {
 }) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
+
+function CartTabIcon({ color }: { color: string }) {
+  const itemCount = useCartStore((state) => state.getItemCount());
+
+  return (
+    <View>
+      <Ionicons name="cart-outline" size={28} color={color} style={{ marginBottom: -3 }} />
+      {itemCount > 0 && (
+        <View style={tabIconStyles.badge}>
+          <Text style={tabIconStyles.badgeText}>{itemCount > 99 ? '99+' : itemCount}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const tabIconStyles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    right: -10,
+    top: -5,
+    backgroundColor: '#f00',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+});
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -44,6 +81,13 @@ export default function TabLayout() {
         options={{
           title: 'Katalog',
           tabBarIcon: ({ color }) => <TabBarIcon name="th-large" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="cart"
+        options={{
+          title: 'Sepet',
+          tabBarIcon: ({ color }) => <CartTabIcon color={color} />,
         }}
       />
       <Tabs.Screen
