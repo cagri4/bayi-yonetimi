@@ -11,11 +11,13 @@ import { router, useLocalSearchParams } from 'expo-router'
 
 import { Text, View } from '@/components/Themed'
 import { createOrder, CartItem } from '@/lib/queries'
+import { useCartStore } from '@/lib/cart'
 
 export default function CheckoutScreen() {
   const params = useLocalSearchParams<{ items?: string }>()
   const [notes, setNotes] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const clearCart = useCartStore((state) => state.clearCart)
 
   // Parse cart items from params
   const cartItems: CartItem[] = params.items ? JSON.parse(params.items) : []
@@ -37,6 +39,8 @@ export default function CheckoutScreen() {
       const result = await createOrder(cartItems, notes.trim() || undefined)
 
       if (result.success) {
+        // Clear the cart after successful order
+        clearCart()
         Alert.alert(
           'Basarili',
           `Siparisiniz olusturuldu.\nSiparis No: ${result.orderNumber}`,

@@ -7,8 +7,18 @@ export default function CartScreen() {
   const { items, updateQuantity, removeItem, getTotal } = useCartStore()
 
   const handleCheckout = () => {
-    // Navigate to order confirmation (will be implemented in 03-05)
-    router.push('/checkout')
+    // Transform cart items to checkout format (productCode/price instead of sku/unitPrice)
+    const checkoutItems = items.map((item) => ({
+      productId: item.productId,
+      productCode: item.sku,
+      productName: item.productName,
+      quantity: item.quantity,
+      price: item.unitPrice,
+    }))
+    router.push({
+      pathname: '/checkout',
+      params: { items: JSON.stringify(checkoutItems) },
+    })
   }
 
   const renderItem = ({ item }: { item: CartItem }) => (
