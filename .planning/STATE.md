@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2025-01-25)
 
 **Core value:** Bayilerin mesai saatlerinden bağımsız, anlık stok ve fiyat bilgisiyle sipariş verebilmesi — "siparişim nerede?" sorusuna son.
 
-**Current focus:** Phase 3 In Progress — Insights & Mobile
+**Current focus:** Phase 3 Complete — Insights & Mobile
 
 ## Current Position
 
 Phase: 3 of 3 (Insights & Mobile)
-Plan: 4 of 5 complete (03-01, 03-02, 03-03, 03-04)
-Status: In progress
-Last activity: 2026-02-03 — Completed 03-04-PLAN.md (Mobile Catalog)
+Plan: 5 of 5 complete (03-01, 03-02, 03-03, 03-04, 03-05)
+Status: Phase complete
+Last activity: 2026-02-03 — Completed 03-05-PLAN.md (Mobile Orders & Push Notifications)
 
-Progress: [████████░░] 80% (Phase 3)
-Overall: [█████████░] 90% (2 phases + 4/5 plans complete)
+Progress: [██████████] 100% (Phase 3)
+Overall: [██████████] 100% (All 3 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 11 min
-- Total execution time: 2.7 hours
+- Total plans completed: 15
+- Average duration: 15 min
+- Total execution time: ~7 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Overall: [█████████░] 90% (2 phases + 4/5 plans complete)
 |-------|-------|-------|----------|
 | 01-foundation-basic-ordering | 6 | 42min | 7min |
 | 02-order-management-tracking | 3 | 38min | 13min |
-| 03-insights-mobile | 4 | 87min | 22min |
+| 03-insights-mobile | 5 | ~5h | ~60min |
 
 **Recent Trend:**
-- Last 5 plans: 15min, 15min, 23min, 26min, 8min
-- Trend: Moderate (17min avg)
+- Last 5 plans: 23min, 26min, 8min, ~4h (with checkpoint)
+- Trend: Variable (checkpoint plans take longer)
 
 *Updated after each plan completion*
 
@@ -118,6 +118,15 @@ Recent decisions affecting current work:
 - Product queries use get_dealer_price RPC for dealer-specific pricing
 - Catalog uses index.tsx as default tab route
 
+*Plan 05 - Mobile Orders & Push Notifications:*
+- Mobile order creation with checkout screen and minimum amount validation
+- Order history list with status badges and pull-to-refresh
+- Order detail with items, totals, and status timeline
+- Expo push notifications with token stored in users table
+- Supabase Edge Function for push via Expo API
+- Notification tap deep links to order detail
+- Nested tab routing for orders (/orders, /orders/[id])
+
 ### Pending Todos
 
 None yet.
@@ -135,7 +144,8 @@ None yet.
 - ✅ Admin dashboard with sales reports (Phase 3 Plan 01)
 - ✅ Mobile app foundation with auth (Phase 3 Plan 03)
 - ✅ Mobile catalog with cart (Phase 3 Plan 04)
-- API versioning (/api/v1/) may be needed for mobile
+- ✅ Mobile orders with push notifications (Phase 3 Plan 05)
+- API versioning (/api/v1/) may be needed for future mobile updates
 
 **User setup required:**
 - Supabase project must be created and configured with .env.local credentials
@@ -146,14 +156,17 @@ None yet.
 - Supabase Storage 'product-images' bucket must be created for image upload
 - Supabase Realtime publication must include orders and order_status_history tables
 - Mobile app requires EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in mobile/.env
+- Push notifications require EXPO_PUBLIC_PROJECT_ID from Expo Dashboard
+- Supabase Database Webhook needed for push notifications (order_status_history INSERT -> Edge Function)
+- Edge Function must be deployed: `supabase functions deploy push-notification`
 
 None blocking immediate development work.
 
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 03-04-PLAN.md (Mobile Catalog)
+Stopped at: Completed 03-05-PLAN.md (Mobile Orders & Push Notifications)
 Resume file: None
 
 ---
-*Next step: Execute 03-05-PLAN.md (Mobile Orders) with `/gsd:execute-phase`*
+*PROJECT COMPLETE: All 3 phases (15 plans) executed successfully*
