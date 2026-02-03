@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { logout, getCurrentUser, getUserRole } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
+import { BarChart3 } from 'lucide-react'
 
 export default async function AdminLayout({
   children,
@@ -47,6 +48,13 @@ export default async function AdminLayout({
                   className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 >
                   Bayiler
+                </Link>
+                <Link
+                  href="/admin/reports"
+                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium gap-1"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  Raporlar
                 </Link>
               </div>
             </div>
