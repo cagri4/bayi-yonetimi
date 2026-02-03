@@ -11,12 +11,12 @@ See: .planning/PROJECT.md (updated 2025-01-25)
 ## Current Position
 
 Phase: 3 of 3 (Insights & Mobile)
-Plan: 3 of 5 complete
+Plan: 2 of 5 complete (03-02, 03-03)
 Status: In progress
-Last activity: 2026-02-03 — Completed 03-03-PLAN.md (Mobile App Foundation)
+Last activity: 2026-02-03 — Completed 03-02-PLAN.md (Top Products & Dealer Reports)
 
-Progress: [██████░░░░] 60% (Phase 3)
-Overall: [████████░░] 80% (2 phases + 3/5 plans complete)
+Progress: [████░░░░░░] 40% (Phase 3)
+Overall: [███████░░░] 73% (2 phases + 2/5 plans complete)
 
 ## Performance Metrics
 
@@ -95,9 +95,13 @@ Recent decisions affecting current work:
 - DateRangePicker with preset ranges (today, week, month, year)
 - CSV export for reports via server actions
 
-*Plan 02 - Database Functions for Reports:*
-- get_top_products function with configurable limit
-- get_dealer_performance aggregates by dealer with order count and total
+*Plan 02 - Top Products & Dealer Reports:*
+- get_top_products SQL function with RANK() window function for quantity/revenue
+- get_dealer_performance SQL function with sales ranking and percentage
+- get_sales_report SQL function for period-based aggregation (daily/weekly/monthly)
+- CSV export via csv-stringify with Turkish column headers
+- Report page pattern: DateRangeFilter + Table + ExportButton components
+- Reports index page with card links to three report types
 
 *Plan 03 - Mobile App Foundation:*
 - expo-sqlite for session persistence (Supabase recommended pattern)
@@ -139,8 +143,8 @@ None blocking immediate development work.
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 03-03-PLAN.md (Mobile App Foundation)
+Stopped at: Completed 03-02-PLAN.md (Top Products & Dealer Reports)
 Resume file: None
 
 ---
-*Next step: Execute 03-04-PLAN.md (Mobile Catalog) with `/gsd:execute-phase`*
+*Next step: Execute 03-01-PLAN.md (Admin Dashboard) or 03-04-PLAN.md (Mobile Catalog) with `/gsd:execute-phase`*
