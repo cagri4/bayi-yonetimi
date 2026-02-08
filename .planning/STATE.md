@@ -11,12 +11,12 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 4 of 7 (Favorites Quick Win)
-Plan: 1 of TBD in phase 4 complete
+Plan: 2 of TBD in phase 4 complete
 Status: Phase 4 in progress
-Last activity: 2026-02-08 — Completed 04-01-PLAN.md
+Last activity: 2026-02-08 — Completed 04-02-PLAN.md
 
-Progress: [███████████████░░░░░] 65% (15/23 total plans complete)
-Overall: v1 shipped (14 plans), v2.0 in progress (1 plan complete)
+Progress: [████████████████░░░░] 70% (16/23 total plans complete)
+Overall: v1 shipped (14 plans), v2.0 in progress (2 plans complete)
 
 ## Milestones
 
@@ -47,8 +47,8 @@ Overall: v1 shipped (14 plans), v2.0 in progress (1 plan complete)
 - Requirements: 36/36 mapped
 
 **Current Phase (04-favorites-quick-win):**
-- Plans completed: 1
-- Duration so far: 17min
+- Plans completed: 2
+- Duration so far: 27min
 
 ## Accumulated Context
 
@@ -79,6 +79,9 @@ Overall: v1 shipped (14 plans), v2.0 in progress (1 plan complete)
 | RLS-wrapped-auth | Use wrapped (SELECT auth.uid()) in RLS policies | 94-99% performance improvement per Supabase docs | 04-01 | 2026-02-08 |
 | composite-index | Composite index on (dealer_id, product_id) for favorites | 10x faster toggle checks vs. separate indexes | 04-01 | 2026-02-08 |
 | pricing-consistency | Reuse exact pricing logic from getCatalogProducts | Consistent dealer pricing across all features | 04-01 | 2026-02-08 |
+| set-based-favorites | Use Set<string> for favoriteIds in Zustand store | O(1) lookup performance vs. O(n) with arrays | 04-02 | 2026-02-08 |
+| optimistic-ui-pattern | React 19 useOptimistic for instant feedback | Built-in optimistic UI with auto-revert on error | 04-02 | 2026-02-08 |
+| three-layer-updates | Optimistic state + Zustand + Server Action | Instant UI + cross-component sync + persistence | 04-02 | 2026-02-08 |
 
 Recent decisions from PROJECT.md affecting v2.0:
 - v1 established Supabase RLS multi-tenant pattern (extends to financial tables)
@@ -87,18 +90,19 @@ Recent decisions from PROJECT.md affecting v2.0:
 
 ### Pending Todos
 
-None yet (v2.0 just started).
+- Integrate getFavoriteIds() into catalog page for initial favorite state hydration
+- Consider favorites count badge in navigation (e.g., "Favorilerim (5)")
 
 ### Blockers/Concerns
 
-None yet. Research flagged critical pitfalls but all have known prevention patterns.
+None. Research flagged critical pitfalls but all have known prevention patterns.
 
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 04-01-PLAN.md (favorites database foundation)
+Stopped at: Completed 04-02-PLAN.md (favorites UI and client state)
 Resume file: None
 
 ---
 *Last updated: 2026-02-08*
-*Next: Plan 04-02 (Favorites UI)*
+*Next: Catalog hydration or continue phase 04*
