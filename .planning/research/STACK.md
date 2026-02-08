@@ -1,392 +1,735 @@
-# Technology Stack Research
+# Technology Stack Research - v2.0 Features
 
-**Project:** B2B Dealer Order Management System
-**Researched:** 2026-01-25
-**Scale:** ~500 products, ~700 dealers, 20-30 orders/day
-**Architecture:** Web portal + React Native mobile app + Node.js backend
+**Project:** B2B Dealer Order Management System (Bayi Yönetimi)
+**Research Scope:** v2.0 milestone additions (Dashboard, Financial Tracking, Favorites, Campaigns, Support)
+**Original Research:** 2026-01-25
+**v2.0 Update:** 2026-02-08
+**Current Stack:** Next.js 16.1.4 + Supabase (Auth, Database, Realtime, Storage) + Expo + Zustand + Recharts
+
+---
 
 ## Executive Summary
 
-For a B2B dealer order management system in 2025, the recommended stack prioritizes **type safety, developer experience, and proven scalability**. The architecture uses NestJS for structured backend development, PostgreSQL with Prisma for transactional data integrity, Next.js 15 App Router for the web portal, and React Native with Expo Router for mobile. This stack balances modern best practices with battle-tested stability, appropriate for the 700-dealer, 20-30 orders/day scale.
+**v2.0 requires MINIMAL stack additions** to the existing Next.js 14 + Supabase foundation. The current stack already provides most needed capabilities through Supabase's integrated services (Auth, Database, Realtime, Storage).
+
+**Key Additions:**
+1. **PDF Generation**: `@react-pdf/renderer` for invoices/reports (web only)
+2. **UI Components**: Additional Radix UI primitives (accordion, tabs, popover)
+3. **Mobile Documents**: `expo-document-picker` for file selection, WebView for PDF display
+4. **Everything Else**: Leverage existing Supabase services (Realtime for messaging, Storage for files, Database for features)
+
+**Philosophy:** Extend existing capabilities rather than introduce new platforms. Total new dependencies: 5 required + 2 optional.
 
 ---
 
-## Recommended Stack
+## Current Stack (v1.0 - DO NOT CHANGE)
 
-### Backend Framework
+### Backend & Database
+- **Supabase**: Auth, PostgreSQL Database, Realtime, Storage, Row Level Security
+- **@supabase/ssr** (^0.8.0): Server-side Supabase client for Next.js
+- **@supabase/supabase-js** (^2.91.1): JavaScript client library
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **NestJS** | ^11.1.0 | Backend framework | Enterprise-grade architecture, built-in TypeScript support, excellent for complex B2B logic with dependency injection and modular structure. Dominates B2B/enterprise space in 2025. |
-| **Fastify** | ^5.2.0 | HTTP adapter (optional) | Can replace Express under NestJS for 2-3x better performance. Use `@nestjs/platform-fastify` for high-throughput scenarios. |
-| **TypeScript** | ^5.7.0 | Type system | Required for NestJS, provides compile-time safety critical for order/pricing logic. |
+### Frontend (Web)
+- **Next.js** (16.1.4): App Router, Server Components, Server Actions
+- **React** (19.2.3): UI library
+- **TypeScript** (^5): Type safety throughout
+- **Tailwind CSS** (^4): Utility-first styling
+- **Radix UI**: Dialog, Select, Switch, Label, Slot (already installed)
+- **Zustand** (^5.0.10): Client state management
+- **React Hook Form** (^7.71.1): Form handling and validation
+- **Recharts** (^2.15.4): Charts and data visualization
+- **Sonner** (^2.0.7): Toast notifications
+- **next-themes** (^0.4.6): Dark/light mode
 
-**Rationale:**
-- NestJS is the clear winner for B2B order management systems in 2025, providing the structure needed for complex business logic (dealer groups, tiered pricing, order workflows)
-- Built-in dependency injection, modules, and decorators keep code maintainable as features grow
-- Can use Fastify adapter for performance without sacrificing NestJS architecture
-- Express is too minimal for this complexity; raw Fastify lacks the architectural patterns NestJS provides
+### Frontend (Mobile)
+- **Expo**: React Native development platform
+- **Zustand**: State management (shared with web)
 
-**Sources:**
-- [Express.js vs Fastify vs NestJS for Backend Development [2026 Comparison]](https://www.index.dev/skill-vs-skill/backend-nestjs-vs-expressjs-vs-fastify)
-- [Express vs NestJS vs Fastify – Which Node.js Framework Should You Choose in 2025](https://jeuxdevelopers.com/Blogs/Express-vs-NestJS-vs-Fastify-Which-Node.js-Framework-Should-You-Choose-in-2025)
-- [NestJS vs. Express.js: Choosing the Best Node Framework for 2026](https://swovo.com/blog/nestjs-vs-express/)
-
----
-
-### Database
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **PostgreSQL** | 16.x | Primary database | ACID compliance critical for order transactions, strong support for complex queries (dealer-group pricing), excellent JSON support (JSONB) for flexible product attributes. |
-| **Prisma** | ^7.3.0 | ORM | Best-in-class TypeScript integration, schema-first approach, auto-generated type-safe client. Superior developer experience over Drizzle/TypeORM for new projects. |
-| **node-postgres (pg)** | ^8.17.0 | PostgreSQL driver | Industry standard, used by Prisma internally. |
-
-**Rationale:**
-- PostgreSQL over MongoDB: B2B order management requires **ACID transactions** for orders, payments, and inventory. PostgreSQL provides relational integrity (orders → line items → products) while JSONB handles flexible product catalogs
-- Prisma over Drizzle/TypeORM: While Drizzle has better performance, Prisma's developer experience, schema migrations, and type generation are unmatched for rapid development. At 20-30 orders/day, performance difference is negligible
-- PostgreSQL JSONB gives flexibility for product attributes without sacrificing transactional guarantees
-
-**Alternative considered:**
-- **MongoDB**: Only if product catalog had extremely variable schemas. Rejected due to lack of multi-document ACID transactions and relational complexity of dealer-group-pricing-order relationships
-- **Drizzle ORM**: Better performance but requires more SQL knowledge. Choose if team is SQL-fluent and performance becomes critical
-- **TypeORM**: Legacy choice, spotty maintenance in 2025
-
-**Sources:**
-- [PostgreSQL vs. MongoDB in 2025: Which Database Should Power Your Next Project?](https://dev.to/hamzakhan/postgresql-vs-mongodb-in-2025-which-database-should-power-your-next-project-2h97)
-- [MongoDB vs PostgreSQL in 2025: What Should You Choose?](https://www.sevensquaretech.com/mongodb-vs-postgresql/)
-- [Node.js ORMs in 2025: Choosing Between Prisma, Drizzle, TypeORM, and Beyond](https://thedataguy.pro/blog/2025/12/nodejs-orm-comparison-2025/)
-- [Best ORM for NestJS in 2025: Drizzle ORM vs TypeORM vs Prisma](https://dev.to/sasithwarnakafonseka/best-orm-for-nestjs-in-2025-drizzle-orm-vs-typeorm-vs-prisma-229c)
+### Utilities
+- **date-fns** (^4.1.0): Date manipulation
+- **Zod** (^4.3.6): Schema validation
+- **Lucide React** (^0.563.0): Icon library
 
 ---
 
-### Mobile (React Native)
+## New Dependencies for v2.0
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **React Native** | ^0.83.0 | Mobile framework | Cross-platform iOS/Android from single codebase. Mature ecosystem for e-commerce apps. |
-| **Expo** | ^54.0.0 | Development platform | Simplifies build/deploy, provides unified APIs for native features. Recommended for new RN projects in 2025. |
-| **Expo Router** | ^4.1.0 | Navigation | File-based routing (like Next.js), built on React Navigation. Default for new Expo projects. |
-| **Gluestack UI** | ^2.0.0 | UI component library | Modern replacement for NativeBase, responsive components across iOS/Android. |
-| **React Native Paper** | ^5.15.0 | Material Design UI | Alternative/complement to Gluestack, Material Design patterns. |
+### PDF Generation (Web Only)
 
-**React Native Libraries for E-commerce:**
+#### `@react-pdf/renderer` (^4.1.10) — REQUIRED
+**Purpose:** Generate invoice PDFs and dealer reports server-side
+**Why Needed:** v2.0 requires downloadable invoices (Finansal Bilgiler) and export reports (Bayi Raporları)
+**Why This Library:**
+- React-based declarative API (matches existing stack patterns)
+- Works in Next.js App Router with Server Actions
+- Fast rendering (lighter than Puppeteer, 1.2M weekly downloads)
+- Compatible with Next.js 16 + React 19 (confirmed)
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| **React Navigation** | ^7.1.0 | Navigation (alternative) | If not using Expo Router, component-based navigation |
-| **React Native Gesture Handler** | ^2.24.0 | Gestures | Swipeable carts, pull-to-refresh (included with Expo) |
-| **React Native Reanimated** | ^3.18.0 | Animations | Smooth UI animations (included with Expo) |
-| **React Native Fast Image** | ^8.6.3 | Image caching | Optimized product image loading and caching |
-| **react-native-image-crop-picker** | ^0.43.0 | Image upload | Dealer profile pictures, product images |
+**Integration Pattern:**
+```typescript
+// app/api/invoices/[id]/pdf/route.ts
+import { renderToBuffer } from '@react-pdf/renderer';
 
-**Rationale:**
-- Expo is the standard way to build React Native apps in 2025, eliminating native build complexity during development
-- Expo Router over React Navigation: File-based routing is clearer for large apps, matches Next.js mental model for web developers
-- Gluestack UI: Modern, actively maintained, better TypeScript support than older libraries
+export async function GET(req, { params }) {
+  const supabase = createClient();
+  const { data: invoice } = await supabase
+    .from('orders')
+    .select('*, dealer:dealers(*), items:order_items(*)')
+    .eq('id', params.id)
+    .single();
 
-**Sources:**
-- [Top 10 React Libraries to Use in 2025](https://strapi.io/blog/top-react-libraries)
-- [Best React Native UI Component Libraries in 2025](https://www.eitbiz.com/blog/best-react-native-ui-component-libraries/)
-- [React Navigation 7 vs Expo Router: Complete Comparison Guide for 2025](https://viewlytics.ai/blog/react-navigation-7-vs-expo-router)
-- [Introduction to Expo Router - Expo Documentation](https://docs.expo.dev/router/introduction/)
+  const pdfBuffer = await renderToBuffer(<InvoicePDF invoice={invoice} />);
 
----
+  // Upload to Supabase Storage for archival
+  await supabase.storage
+    .from('invoices')
+    .upload(`${params.id}.pdf`, pdfBuffer, {
+      contentType: 'application/pdf',
+      upsert: true
+    });
 
-### Web Frontend
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **Next.js** | ^16.1.0 | Web framework | React framework with SSR, App Router for file-based routing, server components. Industry standard for 2025. |
-| **React** | ^19.0.0 | UI library | Next.js 16 supports React 19. |
-| **TypeScript** | ^5.7.0 | Type system | Type safety across frontend/backend. |
-| **TailwindCSS** | ^4.1.0 | Styling | Utility-first CSS, rapid UI development, excellent with Next.js. |
-| **shadcn/ui** | latest | Component library | Copy-paste components built on Radix UI + Tailwind, highly customizable. |
-
-**State Management:**
-
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| **TanStack Query** | ^5.90.0 | Server state | API data fetching, caching, synchronization. Replaces Redux for API calls. |
-| **Zustand** | ^5.0.10 | Client state | Lightweight global state (cart, UI state). Use for non-server state. |
-
-**Rationale:**
-- Next.js 15/16 App Router is the forward-looking choice in 2025. Server Components reduce client JavaScript, faster page loads critical for B2B users
-- State management: **TanStack Query + Zustand** replaces Redux. TanStack Query handles all server/API state (products, orders), Zustand handles client state (cart, filters). This is the 2025 standard
-- Do NOT use Redux for new projects unless you have massive, complex state dependencies (you don't at this scale)
-- shadcn/ui over MUI/Ant Design: More modern, better performance, full control over component code
-
-**Sources:**
-- [Goodbye Redux? Meet TanStack Query & Zustand in 2025](https://www.bugragulculer.com/blog/good-bye-redux-how-react-query-and-zustand-re-wired-state-management-in-25)
-- [State Management Trends in React 2025](https://makersden.io/blog/react-state-management-in-2025)
-- [Redux Toolkit vs React Query vs Zustand: Which One Should You Use in 2025?](https://medium.com/@vishalthakur2463/redux-toolkit-vs-react-query-vs-zustand-which-one-should-you-use-in-2025-048c1d3915f4)
-- [Next.js Routing: App Router vs. Pages Router (2025)](https://kitemetric.com/blogs/next-js-routing-in-2025-app-router-vs-pages-router)
-
----
-
-### Authentication
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **jsonwebtoken** | ^9.0.3 | JWT signing/verification | Industry standard for stateless auth tokens. |
-| **bcrypt** | ^5.1.1 | Password hashing | Secure password storage. |
-| **@nestjs/passport** | ^11.0.0 | Auth middleware | Passport.js integration for NestJS. |
-| **passport-jwt** | ^4.0.1 | JWT strategy | JWT authentication strategy for Passport. |
-
-**Strategy:**
-- **Access tokens:** Short-lived (15-30 minutes), stored in memory (web) or secure storage (mobile)
-- **Refresh tokens:** Long-lived (7 days), stored in HTTP-only cookies (web) or secure storage (mobile)
-- **Token rotation:** Rotate refresh tokens on each use to prevent replay attacks
-
-**Security Best Practices (2025):**
-1. Use HTTP-only cookies for refresh tokens (web)
-2. Set appropriate token expiration times (15-30 min access, 7 days refresh)
-3. Store secrets in environment variables, never hardcode
-4. Use HTTPS in production
-5. Implement token rotation/revocation
-6. Use bcrypt rounds of 10-12 for password hashing
-
-**Rationale:**
-- JWT is the standard for B2B applications requiring mobile + web auth
-- Session-based auth requires server-side storage, complicates horizontal scaling
-- Refresh token rotation prevents long-lived token theft
-
-**Alternative considered:**
-- **Session-based auth**: Simpler but requires Redis/database for session storage. Rejected due to mobile app complexity
-- **Auth0/Clerk**: SaaS auth providers. Rejected for MVP to maintain control, consider for production
-
-**Sources:**
-- [5 JWT authentication best practices for Node.js apps](https://medium.com/deno-the-complete-reference/5-jwt-authentication-best-practices-for-node-js-apps-f1aaceda3f81)
-- [JWT Authentication In Node.js](https://www.geeksforgeeks.org/node-js/jwt-authentication-with-node-js/)
-- [How to Secure JWT Authentication in a Node.js API?](https://github.com/orgs/community/discussions/147581)
-
----
-
-### Push Notifications
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **Firebase Cloud Messaging (FCM)** | latest | Push delivery | Free, supports iOS/Android, industry standard for 2025. |
-| **expo-notifications** | ~0.30.0 | RN integration | Unified API for push notifications in Expo apps. |
-| **@react-native-firebase/messaging** | ^21.11.0 | Native FCM (if not Expo) | Direct FCM integration for bare React Native. |
-
-**Strategy:**
-- Use **Expo Push Notifications** for MVP (simplest setup, free)
-- Migrate to **FCM** for production (more control, analytics, better deliverability)
-- Store push tokens in database linked to dealer accounts
-- Send notifications for: order status updates, new product announcements, price changes
-
-**Rationale:**
-- Expo Notifications is fastest to implement for MVP, no certificate/API key setup needed
-- FCM is free and the most widely adopted solution in 2025
-- OneSignal is better if you need advanced segmentation/A-B testing, but adds complexity and cost for your scale
-
-**Alternative considered:**
-- **OneSignal**: Better analytics and marketing features, but overkill for 700 dealers. Consider post-MVP
-- **Apple/Google native**: Too complex, FCM abstracts both
-
-**Sources:**
-- [Top 5 Push Notification Services for Expo/React Native in 2025](https://pushbase.dev/blog/top-5-push-notification-services-for-expo-react-native-in-2025)
-- [React Native Push Notifications: FCM, Expo & Production Guide](https://www.courier.com/blog/react-native-push-notifications-fcm-expo-guide)
-- [Expo Push Notification Setup - Expo Documentation](https://docs.expo.dev/push-notifications/push-notifications-setup/)
-
----
-
-### Image/File Storage & CDN
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **Cloudinary** | ^2.9.0 | Image storage/CDN | Automatic optimization, transformations, built-in CDN. Best DX for image-heavy apps. |
-| **cloudinary-build-url** | ^0.2.4 | URL builder | Generate optimized image URLs with transformations. |
-
-**Strategy:**
-- **Product images:** Upload to Cloudinary, serve via CDN with automatic WebP/AVIF conversion
-- **Transformations:** Generate thumbnails, mobile-optimized versions on-the-fly
-- **Free tier:** 25GB storage, 25GB bandwidth/month (sufficient for MVP with 500 products)
-- **Cost optimization:** Migrate old/unused images to AWS S3 for long-term storage if needed
-
-**Rationale:**
-- Cloudinary provides automatic image optimization (WebP, compression, responsive sizing) without manual work
-- Built-in CDN for global delivery
-- Node.js SDK is mature and well-documented
-- For 500 products, free tier is sufficient; upgrade only when scaling past 700 dealers
-
-**Alternative considered:**
-- **AWS S3 + CloudFront**: More cost-effective at very high scale (100k+ images) but requires manual optimization pipeline (Sharp, Lambda@Edge). Rejected for MVP due to complexity
-- **Hybrid approach**: Use Cloudinary for active products (30 days), archive to S3. Consider post-MVP
-
-**Sources:**
-- [Media Hosting in AWS S3 vs Cloudinary](https://praveenax.medium.com/media-hosting-in-aws-s3-vs-cloudinary-e9a42b001111)
-- [Cloudinary vs. S3: Choosing the Right Solution for Media Optimization](https://cloudinary.com/guides/ecosystems/cloudinary-vs-s3)
-- [Handling File Uploads in MERN: Cloudinary, AWS S3, or Firebase?](https://dev.to/nadim_ch0wdhury/handling-file-uploads-in-mern-cloudinary-aws-s3-or-firebase-3j3n)
-
----
-
-### Additional Backend Libraries
-
-| Library | Version | Purpose |
-|---------|---------|---------|
-| **class-validator** | ^0.14.1 | DTO validation (NestJS) |
-| **class-transformer** | ^0.5.1 | DTO transformation (NestJS) |
-| **@nestjs/config** | ^3.4.0 | Environment configuration |
-| **@nestjs/swagger** | ^8.0.11 | API documentation (OpenAPI) |
-| **helmet** | ^8.1.0 | Security headers |
-| **cors** | ^2.8.5 | CORS configuration |
-| **compression** | ^1.7.5 | Response compression |
-
----
-
-### Development Tools
-
-| Tool | Version | Purpose |
-|------|---------|---------|
-| **ESLint** | ^9.20.0 | Linting |
-| **Prettier** | ^3.4.2 | Code formatting |
-| **Husky** | ^10.1.1 | Git hooks |
-| **lint-staged** | ^15.5.0 | Pre-commit linting |
-| **Jest** | ^29.7.0 | Testing framework |
-| **Supertest** | ^7.1.0 | API testing |
-
----
-
-## What NOT to Use
-
-### Anti-Recommendations
-
-| Technology | Why Avoid | Use Instead |
-|------------|-----------|-------------|
-| **Express (standalone)** | Too minimal for complex B2B logic. No built-in structure leads to inconsistent architecture as team grows. | NestJS (uses Express/Fastify under the hood with structure) |
-| **MongoDB** | Lack of ACID transactions across collections makes order management error-prone. Dealer-product-order relationships are inherently relational. | PostgreSQL with JSONB for flexible fields |
-| **Redux (standalone)** | Massive boilerplate for what TanStack Query + Zustand do better. Redux belongs in 2020, not 2025. | TanStack Query (server state) + Zustand (client state) |
-| **TypeORM** | Spotty maintenance, critical bugs unresolved for months. Prisma and Drizzle have surpassed it in 2025. | Prisma (DX) or Drizzle (performance) |
-| **Create React App** | Deprecated. No longer maintained. | Next.js or Vite |
-| **MobX** | Declining adoption, harder to debug than Zustand for simple cases, still requires understanding of reactive programming. | Zustand for client state |
-| **GraphQL (for this project)** | Overkill for a straightforward CRUD B2B system. REST API is simpler, faster to implement, easier to debug. | REST API with NestJS controllers |
-| **Sequelize** | Legacy ORM with poor TypeScript support compared to modern alternatives. | Prisma |
-| **Local file storage** | No CDN, no automatic optimization, disaster recovery issues. | Cloudinary (images) |
-| **AWS S3 (for MVP)** | Requires manual optimization pipeline. Adds complexity without benefit at MVP scale. | Cloudinary (upgrade to S3 when cost justifies complexity) |
-| **OneSignal (for MVP)** | More complex setup than needed. Better for marketing-heavy push campaigns. | Expo Push Notifications → FCM |
-| **Socket.io** | Stateful connections complicate horizontal scaling. For simple order updates, polling or server-sent events sufficient. | Polling with TanStack Query (5-min intervals) or WebSockets only if real-time critical |
-
----
-
-## Installation Commands
-
-### Backend (NestJS)
-```bash
-# Create NestJS project
-npm i -g @nestjs/cli
-nest new bayi-backend
-
-# Core dependencies
-npm install @nestjs/config @nestjs/swagger @nestjs/passport passport passport-jwt
-npm install @prisma/client bcrypt jsonwebtoken helmet cors compression
-npm install class-validator class-transformer
-npm install cloudinary
-
-# Dev dependencies
-npm install -D @nestjs/platform-fastify
-npm install -D prisma @types/passport-jwt @types/bcrypt @types/jsonwebtoken
-npm install -D @types/node typescript ts-node
-
-# Initialize Prisma
-npx prisma init
+  return new Response(pdfBuffer, {
+    headers: { 'Content-Type': 'application/pdf' }
+  });
+}
 ```
 
-### Web (Next.js)
+**Why Server-Side:**
+- No client bundle bloat
+- Always generates from current database data
+- Can store PDFs in Supabase Storage for archival
+
+**Alternative Rejected:** Puppeteer
+- **Why NOT:** Large container (300MB+ with Chrome), high latency, overkill for structured invoices
+- **When to Reconsider:** If business requires pixel-perfect HTML email templates as PDFs (not current requirement)
+
+**Confidence:** HIGH — Proven with Next.js 16 + React 19, multiple production references
+
+**Sources:**
+- [react-pdf Official Documentation](https://react-pdf.org/compatibility)
+- [Building a PDF generation service using Next.js and React PDF](https://03balogun.medium.com/building-a-pdf-generation-service-using-nextjs-and-react-pdf-78d5931a13c7)
+- [Creating PDF in React/Next.js: A Complete Guide](https://dominikfrackowiak.com/en/blog/react-pdf-with-next-js)
+
+---
+
+### UI Component Extensions (Web Only)
+
+#### Radix UI Accordion, Tabs, Popover, Collapsible — REQUIRED
+
+**Already in Stack:** Dialog, Select, Switch, Label, Slot
+**Add for v2.0:**
+
+| Component | Version | Use Case in v2.0 |
+|-----------|---------|------------------|
+| `@radix-ui/react-accordion` | ^1.2.3 | FAQ section (Destek), financial details expansion (Finansal Bilgiler) |
+| `@radix-ui/react-tabs` | ^1.2.5 | Dashboard section navigation, report view switching |
+| `@radix-ui/react-popover` | ^1.2.8 | Help tooltips, quick action menus |
+| `@radix-ui/react-collapsible` | ^1.2.4 | Campaign detail expansion (Kampanyalar) |
+
+**Why Radix:**
+- Already in stack (consistent patterns)
+- Accessible by default (WAI-ARIA compliant)
+- Unstyled (works with existing Tailwind setup)
+- Small bundle size (~10KB total for all four)
+- TypeScript-first
+
+**Installation:**
 ```bash
-# Create Next.js project with TypeScript
-npx create-next-app@latest bayi-web --typescript --tailwind --app
-
-# Dependencies
-npm install @tanstack/react-query zustand
-npm install axios # or fetch wrapper
-
-# UI
-npm install clsx tailwind-merge # for shadcn/ui utilities
-npx shadcn@latest init
-
-# Dev dependencies
-npm install -D @types/node
+npm install @radix-ui/react-accordion @radix-ui/react-tabs @radix-ui/react-popover @radix-ui/react-collapsible
 ```
 
-### Mobile (React Native + Expo)
-```bash
-# Create Expo project with Expo Router
-npx create-expo-app@latest bayi-mobile -e with-router
+**Confidence:** HIGH — Same library family already in use
 
-# UI libraries
-npx expo install @gluestack-ui/themed @gluestack-style/react
-npx expo install react-native-paper
+**Sources:**
+- [Radix Primitives - Accordion](https://www.radix-ui.com/primitives/docs/components/accordion)
+- [Radix Primitives - Tabs](https://www.radix-ui.com/primitives/docs/components/tabs)
+- [Building Low Level Components the Radix Way](https://alexkondov.com/building-low-level-components-the-radix-way/)
 
-# Core functionality
-npx expo install expo-notifications expo-device expo-constants
-npx expo install react-native-gesture-handler react-native-reanimated
-npx expo install expo-image-picker expo-secure-store
+---
 
-# Image handling
-npm install react-native-fast-image
-npm install axios # API client
+### Mobile Document Handling
 
-# State management
-npm install @tanstack/react-query zustand
+#### `expo-document-picker` (^12.3.1) — REQUIRED
+**Purpose:** Allow dealers to select and upload documents from mobile devices
+**Use Cases:**
+- Upload invoice documents (Sipariş Detayları)
+- Attach files to support messages (Destek)
+
+**Why This Library:**
+- Official Expo SDK (well-maintained, consistent API)
+- Cross-platform (iOS/Android)
+- Works with Expo Go (no development build required)
+
+**Critical Configuration:**
+```typescript
+import * as DocumentPicker from 'expo-document-picker';
+
+const result = await DocumentPicker.getDocumentAsync({
+  type: ['application/pdf', 'image/*'],
+  copyToCacheDirectory: true, // MUST set to true for file access
+});
 ```
+
+**Integration with Supabase Storage:**
+```typescript
+if (result.type === 'success') {
+  const file = new File([result.file], result.name);
+  await supabase.storage
+    .from('documents')
+    .upload(`dealer/${userId}/${result.name}`, file);
+}
+```
+
+**Confidence:** HIGH — Official Expo SDK, widely used
+
+**Sources:**
+- [Expo DocumentPicker Documentation](https://docs.expo.dev/versions/latest/sdk/document-picker/)
+- [React Native File & Image Picker with Expo](https://medium.com/@YAGNIK09/react-native-file-image-picker-with-expo-documentpicker-imagepicker-camera-2b3699b3db99)
+
+---
+
+#### PDF Viewing on Mobile — NO NEW DEPENDENCY (Start with WebView)
+
+**Recommended Approach for v2.0:** Use React Native WebView (already available in Expo)
+
+```typescript
+import { WebView } from 'react-native-webview';
+
+// Display PDF using Google Docs Viewer
+<WebView
+  source={{ uri: `https://docs.google.com/viewer?url=${pdfUrl}` }}
+/>
+```
+
+**Pros:**
+- Zero new dependencies
+- Works in Expo Go (no development build)
+- Consistent with existing stack
+
+**Cons:**
+- Slower rendering than native
+- Requires internet connection
+- Limited offline support
+
+**Alternative (DEFER TO PHASE 07 TESTING):** `react-native-pdf` (^7.0.3)
+
+**Add ONLY if Phase 07 testing shows:**
+- Dealers frequently access large PDFs (>5MB)
+- Performance issues with WebView rendering
+- Need offline PDF viewing
+
+**Trade-offs of react-native-pdf:**
+- Requires Expo development build (no longer works in Expo Go)
+- Adds build complexity
+- 80x faster rendering (native-backed)
+
+**Recommendation:** START with WebView, add react-native-pdf ONLY if performance testing justifies complexity.
+
+**Confidence:** MEDIUM — WebView approach solid but untested for this use case
+
+**Sources:**
+- [React Native PDF Viewer Guide](https://theappmarket.io/blog/react-native-pdf-viewer)
+- [Handling PDF Links in WebView in React Native](https://medium.com/@valentyndanilichev/handling-pdf-links-in-webview-in-react-native-eecba9f18591)
+
+---
+
+## Leveraging Existing Stack (NO NEW DEPENDENCIES)
+
+### Real-time Messaging (Destek Feature)
+
+**Use:** Supabase Realtime (already in stack via `@supabase/supabase-js`)
+
+**Why No New Dependency:**
+- Supabase Realtime Postgres Changes already available
+- Persistent messages (not ephemeral)
+- RLS policies provide security
+- WebSocket connection already established
+
+**Implementation:**
+```typescript
+// Subscribe to new messages for dealer
+const channel = supabase
+  .channel(`support:dealer-${dealerId}`)
+  .on('postgres_changes', {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'messages',
+    filter: `dealer_id=eq.${dealerId}`
+  }, (payload) => {
+    setMessages(prev => [...prev, payload.new]);
+  })
+  .subscribe();
+```
+
+**Data Model:**
+```sql
+CREATE TABLE messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  dealer_id uuid REFERENCES dealers(id),
+  sender_type text CHECK (sender_type IN ('dealer', 'admin')),
+  content text NOT NULL,
+  read_at timestamptz,
+  created_at timestamptz DEFAULT now()
+);
+
+-- RLS: Dealers see only their messages
+CREATE POLICY "Dealers view own messages"
+  ON messages FOR SELECT
+  USING (dealer_id = auth.uid());
+```
+
+**Why NOT Separate Chat Service (SendBird, Stream Chat):**
+- Adds external dependency and cost
+- Over-engineered for dealer support (not consumer chat)
+- Supabase Realtime provides needed capabilities
+
+**When to Reconsider:** Message volume >10K/day or need advanced features (typing indicators, reactions, threads)
+
+**Confidence:** HIGH — Supabase Realtime well-documented, proven for chat use cases
+
+**Sources:**
+- [Supabase Realtime Chat Documentation](https://supabase.com/ui/docs/nextjs/realtime-chat)
+- [Realtime Chat With Supabase](https://blog.stackademic.com/realtime-chat-with-supabase-realtime-is-supa-easy-091c96411afd)
+
+---
+
+### File Upload/Download (Sipariş Detayları, Destek)
+
+**Use:** Supabase Storage (already in stack)
+
+**Capabilities Already Available:**
+- File upload/download
+- Authenticated access via RLS policies
+- Public/private buckets
+- Signed upload URLs (bypasses Next.js 1MB body limit)
+
+**Web Upload Pattern:**
+```typescript
+// Server Action for signed URL (files >1MB)
+'use server'
+export async function getUploadUrl(fileName: string) {
+  const supabase = createClient();
+  const { data } = await supabase.storage
+    .from('documents')
+    .createSignedUploadUrl(`dealer/${userId}/${fileName}`);
+  return data?.signedUrl; // Expires in 2 hours
+}
+
+// Client upload
+const uploadFile = async (file: File) => {
+  const signedUrl = await getUploadUrl(file.name);
+  await fetch(signedUrl, {
+    method: 'PUT',
+    body: file,
+    headers: { 'Content-Type': file.type }
+  });
+};
+```
+
+**Security via RLS:**
+```sql
+-- Dealers upload only to their own folder
+CREATE POLICY "Dealers upload own files"
+  ON storage.objects FOR INSERT
+  USING (bucket_id = 'documents' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Dealers download only their files
+CREATE POLICY "Dealers download own files"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'documents' AND (storage.foldername(name))[1] = auth.uid()::text);
+```
+
+**File Validation (Use Existing React Hook Form):**
+```typescript
+<input
+  type="file"
+  {...register('file', {
+    validate: {
+      fileType: (value) => {
+        const allowed = ['application/pdf', 'image/png', 'image/jpeg'];
+        return allowed.includes(value?.[0]?.type) || 'Only PDF, PNG, JPG allowed';
+      },
+      fileSize: (value) => {
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        return value?.[0]?.size <= maxSize || 'File must be under 10MB';
+      }
+    }
+  })}
+/>
+```
+
+**Best Practices:**
+- Server-side validation MANDATORY (client validation can be bypassed)
+- Enforce 10MB max on web, 5MB on mobile (network considerations)
+- Allowed types: PDF, PNG, JPG
+- Use signed URLs for files >1MB (Next.js Server Action body limit workaround)
+
+**Confidence:** HIGH — Supabase Storage well-documented, proven solution
+
+**Sources:**
+- [Complete Guide to File Uploads with Next.js and Supabase Storage](https://supalaunch.com/blog/file-upload-nextjs-supabase)
+- [Signed URL file uploads with Next.js and Supabase](https://medium.com/@olliedoesdev/signed-url-file-uploads-with-nextjs-and-supabase-74ba91b65fe0)
+- [React Hook Form: Working with Multipart Form Data](https://claritydev.net/blog/react-hook-form-multipart-form-data-file-uploads)
+
+---
+
+### Dashboard Widgets & Charts (Bayi Dashboard)
+
+**Use:** Recharts (^2.15.4 — already in stack)
+
+**Coverage:**
+- Spending trends → `LineChart` (already used in v1 admin reporting)
+- Category breakdown → `PieChart`
+- Monthly comparison → `BarChart`
+
+**No New Dependencies Needed.**
+
+**State Management:** Use Zustand (already in stack) for dashboard state (date range, filters)
+
+**Confidence:** HIGH — Recharts already proven in v1
+
+---
+
+### Toast Notifications (All Features)
+
+**Use:** Sonner (^2.0.7 — already in stack)
+
+**Coverage in v2.0:**
+- File upload success/errors
+- Campaign notifications
+- Order status updates
+- Support message notifications
+
+**Why NOT Add React-Toastify:**
+- Sonner already provides what's needed
+- 2-3KB vs 16KB for React-Toastify
+- Modern API, dark/light mode support
+- 11.5K GitHub stars, 7M weekly downloads
+
+**Confidence:** HIGH — Sonner sufficient for all v2.0 notification needs
+
+**Sources:**
+- [Comparing the top React toast libraries [2025 update]](https://blog.logrocket.com/react-toast-libraries-compared-2025/)
+- [Sonner vs. Toast: A Deep Dive](https://www.oreateai.com/blog/sonner-vs-toast-a-deep-dive-into-react-notification-libraries/4596cec74c442a27834f2ec4b53b8eb2)
+
+---
+
+## Optional Dependencies (Defer to Phase Testing)
+
+### `react-dropzone` (^14.3.5) — OPTIONAL
+
+**Purpose:** Drag-and-drop file upload UI
+**Use Case:** Dealer document uploads (if native input UX is insufficient)
+
+**Why Defer:**
+- Native file input with React Hook Form is simpler
+- One less dependency (bundle size matters on mobile)
+- Can add later if UX testing shows dealers struggle
+
+**Add ONLY if Phase 07 testing shows:**
+- Dealers confused by native file input
+- High support tickets about file uploads
+- Multiple file uploads needed frequently
+
+**Integration (if added):**
+```typescript
+import { useDropzone } from 'react-dropzone';
+
+const { getRootProps, getInputProps } = useDropzone({
+  accept: { 'application/pdf': ['.pdf'] },
+  maxSize: 10 * 1024 * 1024,
+  onDrop: (files) => handleUpload(files)
+});
+```
+
+**Confidence:** LOW (not yet validated as necessary)
+
+---
+
+### `react-native-pdf` (^7.0.3) — OPTIONAL
+
+**Purpose:** Native PDF rendering on mobile
+**Use Case:** If WebView PDF performance is poor
+
+**Why Defer:**
+- Requires Expo development build (no longer works in Expo Go)
+- Adds build complexity
+- WebView approach simpler for MVP
+
+**Add ONLY if Phase 07 testing shows:**
+- Slow WebView rendering with large PDFs (>5MB)
+- Dealers frequently view PDFs offline
+- Performance issues impact user experience
+
+**Confidence:** LOW (WebView approach untested but likely sufficient)
+
+---
+
+## What NOT to Add
+
+### ❌ Puppeteer
+**Why Avoid:** Large container (300MB+ Chrome), high latency, overkill for invoices
+**When to Reconsider:** Need pixel-perfect HTML email templates as PDFs
+
+### ❌ Separate Chat Service (SendBird, Stream Chat)
+**Why Avoid:** External dependency, cost, over-engineered for dealer support
+**When to Reconsider:** Message volume >10K/day or need advanced chat features
+
+### ❌ react-dropzone (for now)
+**Why Avoid:** Native input simpler, one less dependency
+**When to Reconsider:** Phase 07 UX testing shows dealer confusion
+
+### ❌ Heavy PDF Viewers (PSPDFKit, Nutrient)
+**Why Avoid:** Commercial licensing ($$$), large SDK, overkill for read-only invoices
+**When to Reconsider:** Need PDF annotation/editing
+
+### ❌ Redux or Additional State Management
+**Why Avoid:** Zustand already in stack, adding Redux for messaging over-engineered
+**When to Reconsider:** State complexity exceeds Zustand capabilities
+
+---
+
+## Installation Summary
+
+### Required for v2.0 (Web)
+```bash
+# PDF generation
+npm install @react-pdf/renderer
+
+# Radix UI additions
+npm install @radix-ui/react-accordion @radix-ui/react-tabs @radix-ui/react-popover @radix-ui/react-collapsible
+```
+
+### Required for v2.0 (Mobile)
+```bash
+# Document picker
+npx expo install expo-document-picker
+```
+
+### Optional (Evaluate in Phase)
+```bash
+# If native file input UX insufficient (web)
+npm install react-dropzone
+
+# If WebView PDF performance poor (mobile)
+npx expo install react-native-pdf
+# Note: Requires Expo development build
+```
+
+**Total:**
+- **Required:** 5 packages (1 PDF + 4 UI components)
+- **Optional:** 2 packages (both deferred to testing)
+- **Bundle Impact:** ~150KB (web), ~50KB (mobile) for required dependencies
+- **Breaking Changes:** None
+
+---
+
+## Phase-by-Phase Breakdown
+
+| Phase | New Dependencies | Leverages Existing |
+|-------|------------------|-------------------|
+| **06 - Bayi Dashboard** | Radix Tabs, Accordion | Recharts, Zustand |
+| **07 - Finansal Bilgiler** | @react-pdf/renderer, Radix Popover | Supabase Storage, React Hook Form |
+| **08 - Favoriler** | None | Supabase Database |
+| **09 - Kampanyalar** | Radix Collapsible | Sonner, Supabase Database |
+| **10 - Destek** | None | Supabase Realtime, Radix Popover (from 07) |
+| **11 - Sipariş Detayları** | expo-document-picker (mobile) | @react-pdf/renderer (from 07), Supabase Storage |
+| **12 - Bayi Raporları** | None | @react-pdf/renderer (from 07), Recharts |
+
+---
+
+## Version Compatibility Matrix
+
+| Dependency | Version | Next.js | React | Expo | Supabase | Notes |
+|------------|---------|---------|-------|------|----------|-------|
+| @react-pdf/renderer | ^4.1.10 | 14-16 ✅ | 18-19 ✅ | N/A | ✅ | Compatible with current stack |
+| @radix-ui/* | ^1.2.x | Any ✅ | 18-19 ✅ | N/A | ✅ | Same version as existing Radix components |
+| expo-document-picker | ^12.3.1 | N/A | N/A | 51-52 ✅ | ✅ | Official Expo SDK |
+| react-native-pdf | ^7.0.3 | N/A | N/A | 51-52 ✅ | ✅ | Optional, requires dev build |
+| react-dropzone | ^14.3.5 | 14-16 ✅ | 18-19 ✅ | N/A | ✅ | Optional |
+
+**Current Stack:** Next.js 16.1.4 ✅, React 19.2.3 ✅, Supabase (latest) ✅
+**Result:** All proposed dependencies fully compatible
 
 ---
 
 ## Confidence Assessment
 
-| Area | Confidence | Reasoning |
-|------|------------|-----------|
-| **Backend Framework (NestJS)** | **HIGH** | Dominant choice for enterprise Node.js in 2025, excellent for B2B complexity. Multiple authoritative sources confirm. |
-| **Database (PostgreSQL + Prisma)** | **HIGH** | PostgreSQL is proven for transactional B2B systems. Prisma is the most popular TypeScript ORM in 2025. |
-| **Mobile (React Native + Expo)** | **HIGH** | Expo is the recommended way to build React Native apps per official docs. Expo Router is default for new projects. |
-| **Web (Next.js App Router)** | **HIGH** | Next.js 15+ App Router is the official recommendation from Vercel. Industry standard verified by multiple sources. |
-| **State Management (TanStack Query + Zustand)** | **HIGH** | Clear consensus in 2025 community that this combination replaces Redux for most use cases. |
-| **Authentication (JWT)** | **MEDIUM** | JWT is standard for mobile + web, but implementation details (refresh token rotation, storage) require careful execution. |
-| **Push Notifications (FCM)** | **MEDIUM** | FCM is proven, but Expo Push Notifications for MVP is a pragmatic choice with migration path. Consider OneSignal if marketing features become critical. |
-| **Image Storage (Cloudinary)** | **MEDIUM** | Best DX but cost may require S3 migration later. Free tier sufficient for MVP verified. |
+| Area | Level | Reasoning |
+|------|-------|-----------|
+| PDF Generation | **HIGH** | @react-pdf/renderer proven with Next.js 16 + React 19 |
+| File Upload | **HIGH** | Supabase Storage well-documented, signed URLs solve Next.js limits |
+| Real-time Messaging | **HIGH** | Supabase Realtime already in stack, Postgres changes pattern established |
+| UI Components | **HIGH** | Radix UI already in use, adding more components is low-risk |
+| Mobile PDF (WebView) | **MEDIUM** | WebView approach solid but untested for this use case |
+| Mobile PDF (Native) | **MEDIUM** | react-native-pdf proven but adds build complexity |
+| **Overall** | **HIGH** | Minimal additions to proven stack, clear fallback options |
 
 ---
 
-## Version Lock Recommendations
+## Key Decisions & Rationale
 
-Lock major versions to avoid breaking changes:
+| Decision | Chosen | Rejected | Why |
+|----------|--------|----------|-----|
+| **PDF Generation** | @react-pdf/renderer | Puppeteer | Smaller bundle, faster rendering, no Chrome needed |
+| **Messaging** | Supabase Realtime | SendBird, Stream Chat | Already in stack, zero cost, simpler integration |
+| **File Upload** | Native input first | react-dropzone from start | Simpler, defer complexity until validated |
+| **Mobile PDF** | WebView first | react-native-pdf from start | Avoid dev build complexity until performance validates need |
+| **Notifications** | Sonner (keep) | React-Toastify | Already sufficient, lightweight, modern |
+| **UI Components** | Radix (expand) | New library | Consistent with existing patterns |
 
-```json
-{
-  "dependencies": {
-    "@nestjs/core": "^11.1.0",
-    "next": "^16.1.0",
-    "react-native": "^0.83.0",
-    "expo": "~54.0.0",
-    "prisma": "^7.3.0",
-    "@tanstack/react-query": "^5.90.0"
-  }
+**Philosophy:** Extend existing capabilities, add dependencies only when necessary, prefer server-side solutions to reduce client bundle size.
+
+---
+
+## Integration with Existing Architecture
+
+### Supabase-First Approach
+
+All v2.0 features integrate with existing Supabase services:
+
+```
+┌─────────────────────────────────────────┐
+│         Next.js 16 App Router           │
+│  (Existing: Auth, Catalog, Cart, Orders)│
+└─────────────────┬───────────────────────┘
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+┌───────▼────────┐  ┌──────▼─────────┐
+│  Supabase Auth │  │ Supabase DB    │
+│  (Existing)    │  │ (PostgreSQL)   │
+│                │  │                │
+│  - Dealers     │  │ + messages     │ ← New for Destek
+│  - Admins      │  │ + favorites    │ ← New for Favoriler
+└────────────────┘  │ + campaigns    │ ← New for Kampanyalar
+                    │                │
+                    │ Existing:      │
+                    │ - orders       │
+                    │ - products     │
+                    │ - dealers      │
+                    └────────────────┘
+                            │
+                ┌───────────┴────────────┐
+                │                        │
+        ┌───────▼────────┐      ┌───────▼────────┐
+        │ Supabase       │      │ Supabase       │
+        │ Realtime       │      │ Storage        │
+        │                │      │                │
+        │ + messages     │      │ + invoices/    │ ← New for PDFs
+        │   channel      │      │ + documents/   │ ← New for uploads
+        └────────────────┘      └────────────────┘
+
+┌─────────────────────────────────────────┐
+│         @react-pdf/renderer             │ ← New dependency
+│  (Server-side PDF generation)           │
+│                                         │
+│  Invoice → PDF → Supabase Storage       │
+└─────────────────────────────────────────┘
+```
+
+### Server Actions Pattern (Existing, Extended)
+
+v2.0 features follow existing Server Actions pattern:
+
+```typescript
+// Existing pattern from v1
+'use server'
+export async function createOrder(data: OrderData) {
+  const supabase = createClient();
+  // ...
+}
+
+// Extended for v2.0
+'use server'
+export async function generateInvoicePDF(orderId: string) {
+  const supabase = createClient();
+
+  // 1. Fetch data
+  const { data: invoice } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single();
+
+  // 2. Generate PDF
+  const pdfBuffer = await renderToBuffer(<InvoicePDF invoice={invoice} />);
+
+  // 3. Store in Supabase Storage
+  const { data } = await supabase.storage
+    .from('invoices')
+    .upload(`${orderId}.pdf`, pdfBuffer);
+
+  return data.path;
 }
 ```
 
-Use `^` for minor updates, avoid automatic major version upgrades.
+**Consistency:** All new features use existing patterns (Server Actions + Supabase RLS)
 
 ---
 
-## Migration Path
+## Sources
 
-This stack is designed for evolution:
+### PDF Generation
+- [react-pdf Official Documentation](https://react-pdf.org/compatibility)
+- [Building a PDF generation service using Next.js and React PDF](https://03balogun.medium.com/building-a-pdf-generation-service-using-nextjs-and-react-pdf-78d5931a13c7)
+- [Creating PDF in React/Next.js: A Complete Guide](https://dominikfrackowiak.com/en/blog/react-pdf-with-next-js)
+- [Puppeteer vs react-pdf Comparison](https://npm-compare.com/html-pdf,pdfkit,pdfmake,puppeteer,react-pdf,wkhtmltopdf)
 
-1. **MVP (now):** Expo Notifications, Cloudinary free tier, single backend instance
-2. **Scale (700+ dealers):** Migrate to FCM, add Redis for caching, horizontal backend scaling
-3. **Enterprise (2000+ dealers):** Consider Drizzle ORM for performance, S3 for cost, dedicated CDN
-4. **Multi-tenant:** Add tenant isolation in PostgreSQL schemas, consider Auth0/Clerk
+### Supabase Storage & File Uploads
+- [Complete Guide to File Uploads with Next.js and Supabase Storage](https://supalaunch.com/blog/file-upload-nextjs-supabase)
+- [Signed URL file uploads with Next.js and Supabase](https://medium.com/@olliedoesdev/signed-url-file-uploads-with-nextjs-and-supabase-74ba91b65fe0)
+- [Supabase Storage Guide for Next.JS](https://supalaunch.com/blog/supabase-storage-guide-for-nextjs)
+- [Next.js 14 Tutorial Part 5 - File upload using server actions](https://strapi.io/blog/epic-next-js-15-tutorial-part-5-file-upload-using-server-actions)
+- [Size Limitation for Server Actions in Next.js 14](https://github.com/vercel/next.js/discussions/57973)
+
+### Supabase Realtime
+- [Supabase Realtime Chat Documentation](https://supabase.com/ui/docs/nextjs/realtime-chat)
+- [Realtime Chat With Supabase](https://blog.stackademic.com/realtime-chat-with-supabase-realtime-is-supa-easy-091c96411afd)
+- [Build a Real-Time Data Syncing Chat Application](https://egghead.io/courses/build-a-real-time-data-syncing-chat-application-with-supabase-and-next-js-84e58958)
+
+### UI Components
+- [Radix Primitives - Accordion](https://www.radix-ui.com/primitives/docs/components/accordion)
+- [Radix Primitives - Tabs](https://www.radix-ui.com/primitives/docs/components/tabs)
+- [Radix Primitives - Popover](https://www.radix-ui.com/primitives/docs/components/popover)
+- [Radix Primitives - Collapsible](https://www.radix-ui.com/primitives/docs/components/collapsible)
+- [Building Low Level Components the Radix Way](https://alexkondov.com/building-low-level-components-the-radix-way/)
+
+### React Hook Form & Validation
+- [File Uploads with ReactJS and Hooks](https://rootstack.com/en/blog/file-uploads-reactjs-and-hooks-complete-guide)
+- [Uploading files with React Hook Form](https://dreamix.eu/insights/uploading-files-with-react-hook-form/)
+- [React Hook Form: Working with Multipart Form Data](https://claritydev.net/blog/react-hook-form-multipart-form-data-file-uploads)
+
+### Mobile File Handling
+- [Expo DocumentPicker Documentation](https://docs.expo.dev/versions/latest/sdk/document-picker/)
+- [Expo FileSystem Documentation](https://docs.expo.dev/versions/latest/sdk/filesystem/)
+- [React Native File & Image Picker with Expo](https://medium.com/@YAGNIK09/react-native-file-image-picker-with-expo-documentpicker-imagepicker-camera-2b3699b3db99)
+- [React Native PDF Viewer Guide](https://theappmarket.io/blog/react-native-pdf-viewer)
+- [Handling PDF Links in WebView in React Native](https://medium.com/@valentyndanilichev/handling-pdf-links-in-webview-in-react-native-eecba9f18591)
+
+### Toast Notifications
+- [Comparing the top React toast libraries [2025 update]](https://blog.logrocket.com/react-toast-libraries-compared-2025/)
+- [Sonner vs. Toast: A Deep Dive Into React Notification Libraries](https://www.oreateai.com/blog/sonner-vs-toast-a-deep-dive-into-react-notification-libraries/4596cec74c442a27834f2ec4b53b8eb2)
+- [Top 9 React notification libraries in 2026](https://knock.app/blog/the-top-notification-libraries-for-react)
+
+### Next.js Server Actions
+- [How to Bypass Vercel Upload Limits in Next.js](https://medium.com/@swerashed/how-to-bypass-vercel-upload-limits-in-next-js-using-use-client-for-client-side-file-uploads-b045ed3b65a5)
+- [Next.js Server Actions: The Complete Guide (2026)](https://makerkit.dev/blog/tutorials/nextjs-server-actions)
 
 ---
 
 ## Summary
 
-This stack represents the **2025 standard for B2B order management systems**, balancing:
-- **Type safety:** TypeScript throughout (NestJS, Prisma, Next.js, React Native)
-- **Developer experience:** Prisma, TanStack Query, Expo, Next.js App Router
-- **Scalability:** PostgreSQL ACID, stateless JWT, CDN-backed images
-- **Proven reliability:** NestJS, Next.js, PostgreSQL are battle-tested at enterprise scale
+**v2.0 stack additions are MINIMAL and STRATEGIC:**
 
-At 700 dealers and 20-30 orders/day, this stack will perform exceptionally without over-engineering. All components have clear upgrade paths when scale demands it.
+✅ **5 Required Dependencies** (@react-pdf/renderer + 4 Radix UI + expo-document-picker)
+✅ **Leverage 90% of Existing Stack** (Supabase services, React Hook Form, Recharts, Sonner)
+✅ **No Architectural Changes** (same Server Actions + Supabase pattern)
+✅ **Clear Fallback Options** (WebView → react-native-pdf if needed)
+✅ **Progressive Enhancement** (native input → react-dropzone if validated)
+
+**Total Bundle Impact:** ~150KB web, ~50KB mobile
+**Breaking Changes:** None
+**Risk Level:** Low (extending proven patterns)
+
+This approach maintains architectural consistency while adding only what's strictly necessary for v2.0 features.

@@ -1,1228 +1,1237 @@
-# Architecture Research: B2B Dealer Order Management System
+# Architecture Research: v2.0 Integration
 
-**Domain:** B2B Dealer Order Management
-**Researched:** 2026-01-25
-**Project Scale:** ~500 products, ~700 dealers, 20-30 orders/day
-**Tech Stack:** Node.js backend, React Native mobile, React web
+**Project:** B2B Bayi Siparis Yonetim Sistemi
+**Research Date:** 2026-02-08
+**Research Focus:** Architectural integration of v2.0 dealer experience and financial tracking features into existing Supabase/Next.js infrastructure
+**Confidence Level:** HIGH
 
-## Executive Summary
+## Summary
 
-For a B2B dealer order management system at this scale (20-30 orders/day, 700 dealers), a **modular monolith architecture** is strongly recommended over microservices. This provides faster time-to-market, lower operational complexity, and easier debugging while maintaining clear module boundaries for future scalability. The architecture should use REST APIs for simplicity, PostgreSQL for transactional data integrity, and JWT-based authentication for dealers.
+v2.0 features integrate seamlessly into the existing multi-tenant Supabase architecture using established patterns:
 
-**Confidence:** HIGH (based on multiple authoritative sources and consistent 2026 industry recommendations)
+**Database:** 7 new tables with standard RLS policies following existing multi-tenant security model
+**Storage:** 2 new buckets (financial-documents, order-attachments) with dealer-scoped RLS
+**API:** Extend existing Server Actions pattern in `src/lib/actions/` with new domains
+**Components:** New route groups under `(dealer)/` following existing layout structure
+**Realtime:** Optional subscriptions for campaigns/announcements using existing postgres_changes pattern
 
----
+**Key architectural decision:** All new features follow the established "dealer_id IN (SELECT id FROM dealers WHERE user_id = auth.uid())" RLS pattern, maintaining security consistency across all tables.
 
-## Recommended Architecture
+## New Database Tables
 
-### High-Level Architecture
+### 1. dealer_transactions
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Client Applications                       │
-│  ┌──────────────────────┐   ┌──────────────────────┐       │
-│  │   React Web Admin    │   │  React Native Mobile │       │
-│  │   (Dealer Portal)    │   │   (Dealer Orders)    │       │
-│  └──────────┬───────────┘   └──────────┬───────────┘       │
-└─────────────┼──────────────────────────┼───────────────────┘
-              │                          │
-              │    REST API (JSON)       │
-              └──────────┬───────────────┘
-                         │
-┌────────────────────────┼────────────────────────────────────┐
-│                  Node.js Backend                             │
-│                 (Modular Monolith)                          │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │              API Layer (Express.js)                   │  │
-│  │  - Authentication Middleware (JWT)                    │  │
-│  │  - Request Validation                                 │  │
-│  │  - Error Handling                                     │  │
-│  └───────────────┬──────────────────────────────────────┘  │
-│                  │                                          │
-│  ┌───────────────┴──────────────────────────────────────┐  │
-│  │            Business Logic Modules                     │  │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌─────────┐ │  │
-│  │  │  Auth    │ │ Products │ │ Dealers  │ │ Orders  │ │  │
-│  │  │  Module  │ │  Module  │ │  Module  │ │ Module  │ │  │
-│  │  └──────────┘ └──────────┘ └──────────┘ └─────────┘ │  │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐             │  │
-│  │  │ Pricing  │ │  Files   │ │  Notif   │             │  │
-│  │  │  Module  │ │  Module  │ │  Module  │             │  │
-│  │  └──────────┘ └──────────┘ └──────────┘             │  │
-│  └───────────────┬──────────────────────────────────────┘  │
-│                  │                                          │
-│  ┌───────────────┴──────────────────────────────────────┐  │
-│  │              Data Access Layer                        │  │
-│  │  - Repository Pattern                                 │  │
-│  │  - Database Queries                                   │  │
-│  └───────────────┬──────────────────────────────────────┘  │
-└──────────────────┼──────────────────────────────────────────┘
-                   │
-┌──────────────────┼──────────────────────────────────────────┐
-│               External Services                              │
-│  ┌──────────────┴───────┐  ┌────────────┐  ┌────────────┐  │
-│  │    PostgreSQL DB     │  │    FCM     │  │  Cloudinary│  │
-│  │  (Primary Storage)   │  │ (Push Notif)│  │  (Images) │  │
-│  └──────────────────────┘  └────────────┘  └────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-```
+**Purpose:** Financial transaction ledger for ERP-ready dealer account tracking (borç/alacak)
 
-### Why Modular Monolith?
-
-**Industry consensus for 2026:** Start with a modular monolith for systems at this scale. According to recent surveys, 42% of organizations that initially adopted microservices have consolidated back to larger deployable units due to operational complexity.
-
-**Benefits for this project:**
-- **Faster development:** 2-3x faster to market than microservices for small teams
-- **Lower operational cost:** Single deployment, simpler infrastructure
-- **Easier debugging:** End-to-end tracing without distributed system complexity
-- **Natural evolution path:** Clear module boundaries make future extraction to microservices straightforward if needed
-
-**When to reconsider:** If order volume exceeds 500/day or team grows beyond 10 developers working independently.
-
----
-
-## Component Boundaries
-
-### Module Structure
-
-Each module follows the same internal structure:
-
-```
-src/modules/
-├── auth/
-│   ├── controllers/     # HTTP request handlers
-│   ├── services/        # Business logic
-│   ├── repositories/    # Data access
-│   ├── validators/      # Input validation
-│   └── index.ts        # Module exports
-├── products/
-├── dealers/
-├── orders/
-├── pricing/
-├── files/
-└── notifications/
-```
-
-### Module Responsibilities
-
-| Module | Responsibility | Exposed Interface | Dependencies |
-|--------|---------------|-------------------|--------------|
-| **Auth** | JWT token generation/validation, dealer login, session management | `login()`, `validateToken()`, `refreshToken()` | None |
-| **Dealers** | Dealer registration, profile management, group assignment | `getDealer()`, `updateDealer()`, `getDealerGroup()` | Auth |
-| **Products** | Product CRUD, catalog browsing, search | `getProducts()`, `getProductById()`, `searchProducts()` | Files |
-| **Pricing** | Calculate dealer-specific prices based on group discounts | `getPrice()`, `calculateOrderTotal()` | Dealers, Products |
-| **Orders** | Order creation, state management, order history | `createOrder()`, `updateOrderState()`, `getOrders()` | Dealers, Products, Pricing, Notifications |
-| **Files** | Image/file upload, storage, retrieval | `uploadFile()`, `getFileUrl()`, `deleteFile()` | None |
-| **Notifications** | Push notifications via FCM | `sendNotification()`, `sendBulkNotifications()` | Dealers |
-
-### Inter-Module Communication
-
-**Event-Driven Pattern (Recommended):**
-- Modules communicate via internal event emitter for loose coupling
-- Example: Order module emits `order.statusChanged` event, Notification module subscribes
-
-```typescript
-// In Order Service
-eventBus.emit('order.statusChanged', {
-  orderId: '123',
-  dealerId: '456',
-  newStatus: 'Shipped',
-  oldStatus: 'Preparing'
-});
-
-// In Notification Service
-eventBus.on('order.statusChanged', async (event) => {
-  await sendPushNotification(event.dealerId, event.newStatus);
-});
-```
-
-**Direct Function Calls (When Synchronous Required):**
-- For operations requiring immediate response (e.g., pricing calculation during order creation)
-- Always go through service layer, never direct repository access
-
----
-
-## Data Model
-
-### Core Entities and Relationships
-
-```
-┌──────────────┐         ┌──────────────┐
-│   Dealers    │─────────│ DealerGroups │
-│              │ N     1 │              │
-│ id           │         │ id           │
-│ name         │         │ name         │
-│ email        │         │ discount_%   │
-│ phone        │         │              │
-│ group_id     │         └──────────────┘
-│ fcm_token    │
-│ created_at   │
-└──────┬───────┘
-       │
-       │ 1
-       │
-       │ N
-┌──────┴───────┐         ┌──────────────┐
-│   Orders     │─────────│  OrderItems  │
-│              │ 1     N │              │
-│ id           │         │ id           │
-│ dealer_id    │         │ order_id     │
-│ total_amount │         │ product_id   │
-│ status       │         │ quantity     │
-│ created_at   │         │ unit_price   │
-│ updated_at   │         │ discount_%   │
-└──────────────┘         │ subtotal     │
-                         └───────┬──────┘
-                                 │
-                                 │ N
-                                 │
-                                 │ 1
-                         ┌───────┴──────┐
-                         │   Products   │
-                         │              │
-                         │ id           │
-                         │ name         │
-                         │ description  │
-                         │ base_price   │
-                         │ image_url    │
-                         │ stock_qty    │
-                         │ created_at   │
-                         └──────────────┘
-```
-
-### Database Schema Patterns
-
-**Normalization vs Denormalization:**
-- **Normalize transactional data** (Dealers, Orders, OrderItems) up to 3NF for data integrity
-- **Denormalize for read performance** where appropriate:
-  - Store `total_amount` in Orders table (calculated field)
-  - Store `unit_price` and `discount_%` in OrderItems (snapshot at order time)
-  - This prevents recalculation and preserves historical pricing
-
-**Dealer Group Pricing Model:**
-
+**Key columns:**
 ```sql
-CREATE TABLE dealer_groups (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  discount_percentage DECIMAL(5,2) NOT NULL CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
-  created_at TIMESTAMP DEFAULT NOW()
+CREATE TABLE dealer_transactions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  dealer_id UUID REFERENCES dealers(id) ON DELETE CASCADE NOT NULL,
+  transaction_type TEXT NOT NULL CHECK (transaction_type IN ('invoice', 'payment', 'credit_note', 'debit_note')),
+  amount DECIMAL(10,2) NOT NULL,
+  balance_effect TEXT NOT NULL CHECK (balance_effect IN ('debit', 'credit')), -- debit = borç, credit = alacak
+  description TEXT NOT NULL,
+  reference_number TEXT, -- Fatura no, makbuz no
+  transaction_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  document_url TEXT, -- Supabase Storage path to PDF
+  created_by UUID REFERENCES users(id), -- Admin who entered it
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE dealers (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(200) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  phone VARCHAR(50),
-  dealer_group_id INTEGER REFERENCES dealer_groups(id),
-  fcm_token VARCHAR(255),
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE products (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(200) NOT NULL,
-  description TEXT,
-  base_price DECIMAL(10,2) NOT NULL,
-  image_url VARCHAR(500),
-  stock_quantity INTEGER DEFAULT 0,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE orders (
-  id SERIAL PRIMARY KEY,
-  order_number VARCHAR(50) UNIQUE NOT NULL,
-  dealer_id INTEGER REFERENCES dealers(id) NOT NULL,
-  status VARCHAR(50) NOT NULL DEFAULT 'Pending',
-  total_amount DECIMAL(10,2) NOT NULL,
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE order_items (
-  id SERIAL PRIMARY KEY,
-  order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
-  product_id INTEGER REFERENCES products(id),
-  quantity INTEGER NOT NULL CHECK (quantity > 0),
-  unit_price DECIMAL(10,2) NOT NULL,
-  discount_percentage DECIMAL(5,2) DEFAULT 0,
-  subtotal DECIMAL(10,2) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE order_state_history (
-  id SERIAL PRIMARY KEY,
-  order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
-  from_status VARCHAR(50),
-  to_status VARCHAR(50) NOT NULL,
-  changed_by VARCHAR(100),
-  changed_at TIMESTAMP DEFAULT NOW(),
-  notes TEXT
-);
+CREATE INDEX idx_dealer_transactions_dealer_id ON dealer_transactions(dealer_id);
+CREATE INDEX idx_dealer_transactions_date ON dealer_transactions(transaction_date DESC);
+CREATE INDEX idx_dealer_transactions_type ON dealer_transactions(transaction_type);
 ```
 
-**Indexing Strategy:**
+**Relationships:**
+- `dealer_id` → `dealers(id)` (CASCADE DELETE)
+- `created_by` → `users(id)` (admin who entered the transaction)
+- `document_url` → Supabase Storage path (`financial-documents/{dealer_id}/{file}`)
 
+**RLS Policy:**
 ```sql
--- Authentication lookups
-CREATE INDEX idx_dealers_email ON dealers(email);
-
--- Order queries by dealer
-CREATE INDEX idx_orders_dealer_id ON orders(dealer_id);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_orders_created_at ON orders(created_at DESC);
-
--- Order items lookup
-CREATE INDEX idx_order_items_order_id ON order_items(order_id);
-CREATE INDEX idx_order_items_product_id ON order_items(product_id);
-
--- Product search
-CREATE INDEX idx_products_name ON products(name);
-CREATE INDEX idx_products_is_active ON products(is_active);
-```
-
----
-
-## API Design
-
-### REST vs GraphQL Decision
-
-**Recommendation: REST API**
-
-**Rationale:**
-- **93% of teams continue using REST in 2026** for good reason: simplicity, standardization, mature ecosystem
-- **2-3x faster to implement** than GraphQL for small teams
-- **Easier caching** with standard HTTP caching mechanisms
-- **Lower learning curve** for frontend developers
-- **Predictable performance** - no N+1 query problems to debug
-
-**When GraphQL makes sense:**
-- Complex UI requirements pulling from multiple entities
-- Mobile bandwidth optimization critical
-- Frequent schema changes
-
-**For this project:** REST is ideal because data structures are stable (products, dealers, orders), queries are relatively simple, and team velocity is more important than query flexibility.
-
-### API Structure
-
-**Base URL:** `/api/v1`
-
-**Versioning:** Include version in URL path for clear breaking change management
-
-**Key Endpoints:**
-
-```
-Authentication:
-POST   /api/v1/auth/login                    # Dealer login
-POST   /api/v1/auth/refresh                  # Refresh JWT token
-POST   /api/v1/auth/logout                   # Invalidate token
-
-Dealers:
-GET    /api/v1/dealers/me                    # Current dealer profile
-PUT    /api/v1/dealers/me                    # Update profile
-GET    /api/v1/dealers/me/group              # Get dealer group info
-
-Products:
-GET    /api/v1/products                      # List products (with pagination)
-GET    /api/v1/products/:id                  # Get product details
-GET    /api/v1/products/search?q=keyword     # Search products
-
-Orders:
-GET    /api/v1/orders                        # List dealer's orders
-GET    /api/v1/orders/:id                    # Get order details
-POST   /api/v1/orders                        # Create new order
-GET    /api/v1/orders/:id/history            # Order state history
-
-Pricing:
-POST   /api/v1/pricing/calculate             # Calculate prices for cart
-
-Files:
-POST   /api/v1/files/upload                  # Upload image/file
-GET    /api/v1/files/:id                     # Get file URL
-
-Notifications:
-POST   /api/v1/notifications/register-token  # Register FCM token
-```
-
-### API Response Format
-
-**Success Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "123",
-    "name": "Product Name",
-    "price": 100.00
-  },
-  "meta": {
-    "timestamp": "2026-01-25T10:00:00Z"
-  }
-}
-```
-
-**Error Response:**
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Invalid input data",
-    "details": [
-      {
-        "field": "email",
-        "message": "Email is required"
-      }
-    ]
-  },
-  "meta": {
-    "timestamp": "2026-01-25T10:00:00Z"
-  }
-}
-```
-
-**Pagination:**
-
-```json
-{
-  "success": true,
-  "data": [...],
-  "pagination": {
-    "page": 1,
-    "limit": 20,
-    "total": 500,
-    "totalPages": 25
-  }
-}
-```
-
-### API Best Practices
-
-1. **Use nouns, not verbs** in endpoints (`/products`, not `/getProducts`)
-2. **Use HTTP methods semantically** (GET for reads, POST for creates, PUT for updates, DELETE for deletes)
-3. **Return proper HTTP status codes** (200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 404 Not Found, 500 Internal Server Error)
-4. **Accept and return JSON** with `Content-Type: application/json`
-5. **Implement pagination** for list endpoints (default: 20 items per page)
-6. **Filter and search** via query parameters (`?status=Pending&page=2`)
-7. **Rate limiting** to prevent abuse (e.g., 100 requests per minute per dealer)
-
----
-
-## Authentication Flow
-
-### JWT-Based Authentication
-
-**Why JWT for B2B Dealer Portal:**
-- **Stateless:** No server-side session storage, scales horizontally
-- **Performance:** No database lookup for every request
-- **Multi-device support:** Dealers can use web and mobile simultaneously
-- **Standard:** Works seamlessly with React and React Native
-
-### Authentication Architecture
-
-```
-┌─────────────┐                                    ┌─────────────┐
-│   Client    │                                    │   Backend   │
-│ (Mobile/Web)│                                    │  (Node.js)  │
-└──────┬──────┘                                    └──────┬──────┘
-       │                                                  │
-       │ 1. POST /api/v1/auth/login                      │
-       │    { email, password }                          │
-       ├────────────────────────────────────────────────>│
-       │                                                  │
-       │                              2. Validate dealer │
-       │                              3. Generate JWT    │
-       │                                                  │
-       │ 4. Return tokens                                │
-       │    { accessToken, refreshToken }                │
-       │<────────────────────────────────────────────────┤
-       │                                                  │
-       │ 5. Store tokens (secure storage)                │
-       │                                                  │
-       │ 6. API Request with token                       │
-       │    Headers: Authorization: Bearer <accessToken> │
-       ├────────────────────────────────────────────────>│
-       │                                                  │
-       │                              7. Verify JWT      │
-       │                              8. Extract dealer  │
-       │                              9. Process request │
-       │                                                  │
-       │ 10. Return response                             │
-       │<────────────────────────────────────────────────┤
-```
-
-### Token Structure
-
-**Access Token (JWT):**
-- **Expiration:** 15 minutes (security best practice)
-- **Storage:** React Native - secure storage, Web - httpOnly cookie
-- **Payload:**
-
-```json
-{
-  "sub": "dealer_id_123",
-  "email": "dealer@example.com",
-  "dealerGroupId": "group_5",
-  "iat": 1706180400,
-  "exp": 1706181300
-}
-```
-
-**Refresh Token:**
-- **Expiration:** 7 days
-- **Storage:** Same as access token
-- **Purpose:** Renew access token without re-login
-
-### Security Best Practices
-
-1. **Short-lived access tokens** (15 minutes) to limit damage if compromised
-2. **HTTP-only cookies** for web (prevents XSS attacks)
-3. **Secure storage** on mobile (React Native Keychain/Encrypted Storage)
-4. **Token rotation** - issue new refresh token on each refresh
-5. **Logout invalidation** - maintain refresh token blacklist in Redis
-6. **HTTPS only** in production
-7. **Password hashing** with bcrypt (minimum 10 rounds)
-
-### Implementation Example
-
-```typescript
-// Auth Service
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-
-class AuthService {
-  async login(email: string, password: string) {
-    // 1. Find dealer
-    const dealer = await dealerRepository.findByEmail(email);
-    if (!dealer) throw new UnauthorizedError('Invalid credentials');
-
-    // 2. Verify password
-    const isValid = await bcrypt.compare(password, dealer.password_hash);
-    if (!isValid) throw new UnauthorizedError('Invalid credentials');
-
-    // 3. Generate tokens
-    const accessToken = jwt.sign(
-      {
-        sub: dealer.id,
-        email: dealer.email,
-        dealerGroupId: dealer.dealer_group_id
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '15m' }
-    );
-
-    const refreshToken = jwt.sign(
-      { sub: dealer.id },
-      process.env.JWT_REFRESH_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    return { accessToken, refreshToken };
-  }
-
-  async validateToken(token: string) {
-    try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET);
-      return payload;
-    } catch (error) {
-      throw new UnauthorizedError('Invalid token');
-    }
-  }
-}
-```
-
----
-
-## Order State Machine
-
-### State Transition Flow
-
-```
-┌─────────┐
-│ Pending │ ← Initial state when dealer creates order
-└────┬────┘
-     │
-     │ Admin approves
-     ▼
-┌──────────┐
-│ Approved │
-└────┬─────┘
-     │
-     │ Warehouse starts preparation
-     ▼
-┌───────────┐
-│ Preparing │
-└────┬──────┘
-     │
-     │ Order shipped
-     ▼
-┌─────────┐
-│ Shipped │
-└────┬────┘
-     │
-     │ Dealer confirms delivery
-     ▼
-┌───────────┐
-│ Delivered │ ← Terminal state
-└───────────┘
-
-     (Any state)
-         │
-         │ Admin cancels
-         ▼
-┌───────────┐
-│ Cancelled │ ← Terminal state
-└───────────┘
-```
-
-### Valid Transitions
-
-| From State | To State | Triggered By | Notification Sent |
-|-----------|----------|--------------|-------------------|
-| Pending | Approved | Admin approval | Yes - "Order approved" |
-| Pending | Cancelled | Admin rejection | Yes - "Order cancelled" |
-| Approved | Preparing | Warehouse start | Yes - "Order being prepared" |
-| Approved | Cancelled | Admin cancellation | Yes - "Order cancelled" |
-| Preparing | Shipped | Shipping dispatch | Yes - "Order shipped" |
-| Preparing | Cancelled | Admin cancellation | Yes - "Order cancelled" |
-| Shipped | Delivered | Dealer confirmation or Auto (after 7 days) | Yes - "Order delivered" |
-
-### State Machine Best Practices
-
-**1. Define transitions explicitly**
-- Prevents invalid state changes (e.g., Delivered → Pending)
-- Enforces business rules in code
-
-**2. Use meaningful state names**
-- "Approved" not "State2"
-- Reflects business process, not technical implementation
-
-**3. Maintain state history**
-- `order_state_history` table tracks all transitions
-- Useful for auditing and customer service
-
-**4. Idempotent transitions**
-- Calling transition multiple times has same effect
-- Prevents duplicate notifications
-
-### Implementation
-
-```typescript
-// Order State Machine
-class OrderStateMachine {
-  private validTransitions = {
-    'Pending': ['Approved', 'Cancelled'],
-    'Approved': ['Preparing', 'Cancelled'],
-    'Preparing': ['Shipped', 'Cancelled'],
-    'Shipped': ['Delivered'],
-    'Delivered': [],
-    'Cancelled': []
-  };
-
-  async transitionState(
-    orderId: string,
-    toStatus: OrderStatus,
-    changedBy: string,
-    notes?: string
-  ) {
-    const order = await orderRepository.findById(orderId);
-
-    // 1. Validate transition
-    if (!this.isValidTransition(order.status, toStatus)) {
-      throw new ValidationError(
-        `Cannot transition from ${order.status} to ${toStatus}`
-      );
-    }
-
-    // 2. Update order status
-    await orderRepository.updateStatus(orderId, toStatus);
-
-    // 3. Record in history
-    await orderStateHistoryRepository.create({
-      orderId,
-      fromStatus: order.status,
-      toStatus,
-      changedBy,
-      notes
-    });
-
-    // 4. Emit event for notifications
-    eventBus.emit('order.statusChanged', {
-      orderId,
-      dealerId: order.dealer_id,
-      oldStatus: order.status,
-      newStatus: toStatus
-    });
-  }
-
-  private isValidTransition(from: OrderStatus, to: OrderStatus): boolean {
-    return this.validTransitions[from]?.includes(to) ?? false;
-  }
-}
-```
-
----
-
-## File/Image Handling Architecture
-
-### Upload Strategy
-
-**Recommended: Cloud Storage (Cloudinary or AWS S3)**
-
-**Why not local filesystem:**
-- Limited disk space
-- No automatic backups
-- Doesn't scale horizontally
-- No CDN integration
-
-**Why Cloudinary:**
-- Automatic image optimization
-- On-the-fly transformations (resize, crop)
-- CDN delivery (fast globally)
-- Free tier: 25 GB storage, 25 GB bandwidth
-
-### Upload Flow
-
-```
-┌─────────────┐                                    ┌─────────────┐
-│   Client    │                                    │   Backend   │
-└──────┬──────┘                                    └──────┬──────┘
-       │                                                  │
-       │ 1. Select image                                 │
-       │ 2. POST /api/v1/files/upload                    │
-       │    (multipart/form-data)                        │
-       ├────────────────────────────────────────────────>│
-       │                                                  │
-       │                              3. Validate file   │
-       │                              4. Upload to Cloud │
-       │                                                  │
-       │ 5. Return file URL                              │
-       │    { url: "https://cdn.../image.jpg" }          │
-       │<────────────────────────────────────────────────┤
-       │                                                  │
-       │ 6. Use URL in product/order data                │
-```
-
-### Implementation
-
-```typescript
-// Using Multer + Cloudinary
-import multer from 'multer';
-import { v2 as cloudinary } from 'cloudinary';
-
-// Configure multer for memory storage
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB max
-  },
-  fileFilter: (req, file, cb) => {
-    // Only accept images
-    if (!file.mimetype.startsWith('image/')) {
-      return cb(new Error('Only images allowed'));
-    }
-    cb(null, true);
-  }
-});
-
-// File upload controller
-class FileController {
-  async uploadImage(req: Request, res: Response) {
-    if (!req.file) {
-      throw new ValidationError('No file provided');
-    }
-
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload_stream(
-      {
-        folder: 'dealer-products',
-        transformation: [
-          { width: 800, height: 800, crop: 'limit' },
-          { quality: 'auto' }
-        ]
-      },
-      (error, result) => {
-        if (error) throw error;
-        return result;
-      }
-    );
-
-    req.file.stream.pipe(result);
-
-    return {
-      url: result.secure_url,
-      publicId: result.public_id
-    };
-  }
-}
-```
-
-### Security Considerations
-
-1. **Validate file type** - check magic numbers, not just MIME type
-2. **Limit file size** - 5MB max for images
-3. **Scan for malware** if handling user uploads
-4. **Generate unique filenames** to prevent overwrites
-5. **Restrict access** - only authenticated dealers can upload
-
----
-
-## Code Sharing Strategy (React Native + React Web)
-
-### What to Share
-
-**SHARE (High ROI):**
-- **Business logic** - API calls, data transformations
-- **Type definitions** - TypeScript interfaces for API responses
-- **State management** - Redux/Zustand stores
-- **Utilities** - date formatting, price formatting, validation
-- **API client** - Axios instance with interceptors
-- **Constants** - API URLs, config values
-
-**DON'T SHARE (Platform-specific):**
-- **UI components** - Different design patterns (mobile vs web)
-- **Navigation** - React Navigation vs React Router
-- **Storage** - AsyncStorage vs LocalStorage
-- **Push notifications** - Platform-specific implementations
-
-### Monorepo Structure
-
-**Recommended: Shared package approach**
-
-```
-bayi-yönetimi/
-├── packages/
-│   ├── shared/              # Shared business logic
-│   │   ├── src/
-│   │   │   ├── api/         # API client & endpoints
-│   │   │   ├── types/       # TypeScript types
-│   │   │   ├── utils/       # Helper functions
-│   │   │   ├── stores/      # State management
-│   │   │   └── constants/   # Shared constants
-│   │   └── package.json
-│   │
-│   ├── mobile/              # React Native app
-│   │   ├── src/
-│   │   │   ├── components/  # Mobile UI components
-│   │   │   ├── screens/     # Mobile screens
-│   │   │   ├── navigation/  # React Navigation
-│   │   │   └── App.tsx
-│   │   └── package.json
-│   │
-│   └── web/                 # React web app
-│       ├── src/
-│       │   ├── components/  # Web UI components
-│       │   ├── pages/       # Web pages
-│       │   ├── routes/      # React Router
-│       │   └── App.tsx
-│       └── package.json
-│
-└── package.json             # Root package.json
-```
-
-### Shared API Client Example
-
-```typescript
-// packages/shared/src/api/client.ts
-import axios from 'axios';
-
-const apiClient = axios.create({
-  baseURL: process.env.API_URL || 'http://localhost:3000/api/v1',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-// Request interceptor - add auth token
-apiClient.interceptors.request.use((config) => {
-  const token = getStoredToken(); // Platform-specific implementation
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Response interceptor - handle errors
-apiClient.interceptors.response.use(
-  (response) => response.data,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired, redirect to login
-      handleLogout();
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default apiClient;
-```
-
-### Expected Code Sharing Percentage
-
-According to 2026 industry data:
-- **41% report shared UI components cut maintenance by at least 25%**
-- **Realistic expectation: 40-60% code sharing**
-  - 60-70% business logic shared
-  - 10-20% UI components shared (design tokens, basic components)
-
----
-
-## Push Notifications Architecture
-
-### Firebase Cloud Messaging (FCM)
-
-**Why FCM:**
-- Free tier sufficient for this scale
-- Works on both Android and iOS
-- Reliable delivery
-- Rich notification support
-
-### Notification Flow
-
-```
-┌─────────────┐                                    ┌─────────────┐
-│   Mobile    │                                    │   Backend   │
-│     App     │                                    │  (Node.js)  │
-└──────┬──────┘                                    └──────┬──────┘
-       │                                                  │
-       │ 1. App initializes                              │
-       │ 2. Request FCM token from Firebase              │
-       │                                                  │
-       │ 3. POST /api/v1/notifications/register-token    │
-       │    { fcmToken: "..." }                          │
-       ├────────────────────────────────────────────────>│
-       │                                                  │
-       │                              4. Store token     │
-       │                              in dealers table   │
-       │                                                  │
-       │ 5. Confirmation                                 │
-       │<────────────────────────────────────────────────┤
-       │                                                  │
-
-       ... Later, when order status changes ...
-
-                                                          │
-                              6. Order status changes    │
-                              7. Notification service    │
-                              8. Send to FCM             │
-                                                          │
-       ┌────────────────────────────────────────────────┐│
-       │ FCM Server                                      ││
-       │                                                 ││
-       │ 9. Deliver push notification                   ││
-       └────────────────────────────────────────────────┘│
-       │                                                  │
-       │<─────────────────────────────────────────────────┘
-       │
-       │ 10. Display notification
-```
-
-### Backend Implementation
-
-```typescript
-// Notification Service
-import admin from 'firebase-admin';
-
-class NotificationService {
-  constructor() {
-    // Initialize Firebase Admin SDK
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY
-      })
-    });
-  }
-
-  async sendOrderStatusNotification(
-    dealerId: string,
-    orderNumber: string,
-    newStatus: string
-  ) {
-    // Get dealer's FCM token
-    const dealer = await dealerRepository.findById(dealerId);
-    if (!dealer.fcm_token) return;
-
-    // Prepare notification
-    const message = {
-      token: dealer.fcm_token,
-      notification: {
-        title: 'Order Update',
-        body: `Order ${orderNumber} is now ${newStatus}`
-      },
-      data: {
-        type: 'ORDER_STATUS_CHANGE',
-        orderId: orderNumber,
-        status: newStatus
-      }
-    };
-
-    // Send via FCM
-    try {
-      await admin.messaging().send(message);
-    } catch (error) {
-      if (error.code === 'messaging/invalid-registration-token') {
-        // Token expired, remove from database
-        await dealerRepository.updateFcmToken(dealerId, null);
-      }
-    }
-  }
-}
-
-// Event handler
-eventBus.on('order.statusChanged', async (event) => {
-  await notificationService.sendOrderStatusNotification(
-    event.dealerId,
-    event.orderId,
-    event.newStatus
+-- Dealers can read own transactions
+CREATE POLICY "Dealers can read own transactions"
+  ON dealer_transactions FOR SELECT
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers WHERE user_id = auth.uid()
+    )
   );
-});
+
+-- Admins can manage all transactions
+CREATE POLICY "Admins can manage dealer transactions"
+  ON dealer_transactions FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM users
+      WHERE auth.uid() = id AND role = 'admin'
+    )
+  );
 ```
 
-### Mobile Implementation (React Native)
+**Business Logic:**
+- Current balance calculation: `SELECT SUM(CASE WHEN balance_effect = 'debit' THEN amount ELSE -amount END) FROM dealer_transactions WHERE dealer_id = $1`
+- ERP-ready schema: When ERP integration happens, this becomes the sync target (ERP writes transactions here)
+- Admin manually enters transactions in v2.0; automated sync deferred to later milestone
 
+---
+
+### 2. favorite_products
+
+**Purpose:** Dealer-specific favorite products for quick access
+
+**Key columns:**
+```sql
+CREATE TABLE favorite_products (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  dealer_id UUID REFERENCES dealers(id) ON DELETE CASCADE NOT NULL,
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(dealer_id, product_id)
+);
+
+CREATE INDEX idx_favorite_products_dealer_id ON favorite_products(dealer_id);
+CREATE INDEX idx_favorite_products_product_id ON favorite_products(product_id);
+```
+
+**Relationships:**
+- `dealer_id` → `dealers(id)` (CASCADE DELETE)
+- `product_id` → `products(id)` (CASCADE DELETE)
+- Composite unique constraint ensures one favorite per dealer-product pair
+
+**RLS Policy:**
+```sql
+-- Dealers can manage own favorites
+CREATE POLICY "Dealers can manage own favorites"
+  ON favorite_products FOR ALL
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers WHERE user_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    dealer_id IN (
+      SELECT id FROM dealers WHERE user_id = auth.uid()
+    )
+  );
+```
+
+**Query Pattern:**
 ```typescript
-// Using @react-native-firebase/messaging
-import messaging from '@react-native-firebase/messaging';
+// Get dealer's favorites with product details
+const { data } = await supabase
+  .from('favorite_products')
+  .select(`
+    id,
+    created_at,
+    product:products(
+      id, code, name, base_price, stock_quantity, image_url,
+      category:categories(name),
+      brand:brands(name)
+    )
+  `)
+  .eq('dealer_id', dealerId)
+  .order('created_at', { ascending: false })
+```
 
-class PushNotificationManager {
-  async initialize() {
-    // Request permission
-    const authStatus = await messaging().requestPermission();
-    if (authStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-      // Get FCM token
-      const fcmToken = await messaging().getToken();
+---
 
-      // Register with backend
-      await apiClient.post('/notifications/register-token', { fcmToken });
-    }
+### 3. campaigns
+
+**Purpose:** Admin-created marketing campaigns with optional product discounts
+
+**Key columns:**
+```sql
+CREATE TABLE campaigns (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  campaign_type TEXT NOT NULL CHECK (campaign_type IN ('discount', 'announcement', 'promotion')),
+  discount_percent DECIMAL(5,2), -- NULL if type = 'announcement'
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  target_dealer_groups UUID[], -- NULL = all groups, array of dealer_group_ids = specific groups
+  image_url TEXT, -- Optional campaign image
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CHECK (end_date >= start_date),
+  CHECK (campaign_type = 'announcement' OR discount_percent IS NOT NULL)
+);
+
+CREATE INDEX idx_campaigns_active ON campaigns(is_active);
+CREATE INDEX idx_campaigns_dates ON campaigns(start_date, end_date);
+```
+
+**Relationships:**
+- `target_dealer_groups` → Array of `dealer_groups(id)` (NULL = all dealers)
+- `image_url` → Supabase Storage path (public bucket or signed URL)
+
+**RLS Policy:**
+```sql
+-- All authenticated users can read active campaigns relevant to them
+CREATE POLICY "Dealers can read relevant campaigns"
+  ON campaigns FOR SELECT
+  TO authenticated
+  USING (
+    is_active = true
+    AND CURRENT_DATE BETWEEN start_date AND end_date
+    AND (
+      target_dealer_groups IS NULL -- Campaign targets all groups
+      OR EXISTS ( -- Campaign targets dealer's group
+        SELECT 1 FROM dealers
+        WHERE user_id = auth.uid()
+          AND dealer_group_id = ANY(target_dealer_groups)
+      )
+    )
+  );
+
+-- Admins can manage all campaigns
+CREATE POLICY "Admins can manage campaigns"
+  ON campaigns FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM users
+      WHERE auth.uid() = id AND role = 'admin'
+    )
+  );
+```
+
+**Realtime:** Optional postgres_changes subscription for campaign updates (campaign created/activated targeting dealer's group)
+
+---
+
+### 4. campaign_products
+
+**Purpose:** Join table linking campaigns to discounted products
+
+**Key columns:**
+```sql
+CREATE TABLE campaign_products (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  campaign_id UUID REFERENCES campaigns(id) ON DELETE CASCADE NOT NULL,
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(campaign_id, product_id)
+);
+
+CREATE INDEX idx_campaign_products_campaign_id ON campaign_products(campaign_id);
+CREATE INDEX idx_campaign_products_product_id ON campaign_products(product_id);
+```
+
+**Relationships:**
+- `campaign_id` → `campaigns(id)` (CASCADE DELETE)
+- `product_id` → `products(id)` (CASCADE DELETE)
+
+**RLS Policy:**
+```sql
+-- Follows campaign visibility (dealers see products in campaigns they can see)
+CREATE POLICY "Dealers can read campaign products for visible campaigns"
+  ON campaign_products FOR SELECT
+  TO authenticated
+  USING (
+    campaign_id IN (
+      SELECT id FROM campaigns
+      WHERE is_active = true
+        AND CURRENT_DATE BETWEEN start_date AND end_date
+        AND (
+          target_dealer_groups IS NULL
+          OR EXISTS (
+            SELECT 1 FROM dealers
+            WHERE user_id = auth.uid()
+              AND dealer_group_id = ANY(target_dealer_groups)
+          )
+        )
+    )
+  );
+
+-- Admins can manage
+CREATE POLICY "Admins can manage campaign products"
+  ON campaign_products FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM users
+      WHERE auth.uid() = id AND role = 'admin'
+    )
+  );
+```
+
+---
+
+### 5. announcements
+
+**Purpose:** Admin-to-dealer messaging system (system announcements, not campaigns)
+
+**Key columns:**
+```sql
+CREATE TABLE announcements (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  priority TEXT NOT NULL DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+  target_dealer_groups UUID[], -- NULL = all dealers
+  target_dealer_ids UUID[], -- NULL = all in groups, specific dealer_ids = only those dealers
+  is_active BOOLEAN DEFAULT true,
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ -- NULL = no expiration
+);
+
+CREATE INDEX idx_announcements_active ON announcements(is_active);
+CREATE INDEX idx_announcements_expires ON announcements(expires_at);
+CREATE INDEX idx_announcements_created ON announcements(created_at DESC);
+```
+
+**Relationships:**
+- `created_by` → `users(id)` (admin who created it)
+- `target_dealer_groups` → Array of `dealer_groups(id)`
+- `target_dealer_ids` → Array of `dealers(id)` (for specific targeting)
+
+**RLS Policy:**
+```sql
+-- Dealers see announcements targeted to them
+CREATE POLICY "Dealers can read targeted announcements"
+  ON announcements FOR SELECT
+  TO authenticated
+  USING (
+    is_active = true
+    AND (expires_at IS NULL OR expires_at > NOW())
+    AND (
+      -- Targeted to all
+      (target_dealer_groups IS NULL AND target_dealer_ids IS NULL)
+      -- Targeted to dealer's group
+      OR EXISTS (
+        SELECT 1 FROM dealers
+        WHERE user_id = auth.uid()
+          AND (dealer_group_id = ANY(target_dealer_groups) OR target_dealer_groups IS NULL)
+          AND (id = ANY(target_dealer_ids) OR target_dealer_ids IS NULL)
+      )
+    )
+  );
+
+-- Admins can manage all
+CREATE POLICY "Admins can manage announcements"
+  ON announcements FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM users
+      WHERE auth.uid() = id AND role = 'admin'
+    )
+  );
+```
+
+**Realtime:** High-value use case for postgres_changes subscription (urgent announcements)
+
+---
+
+### 6. support_messages
+
+**Purpose:** Async dealer-to-admin messaging (ticket-like system)
+
+**Key columns:**
+```sql
+CREATE TABLE support_messages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  dealer_id UUID REFERENCES dealers(id) ON DELETE CASCADE NOT NULL,
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'resolved', 'closed')),
+  priority TEXT NOT NULL DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high')),
+  category TEXT NOT NULL DEFAULT 'general' CHECK (category IN ('general', 'product_request', 'order_issue', 'account', 'technical')),
+  product_id UUID REFERENCES products(id) ON DELETE SET NULL, -- Optional product reference
+  order_id UUID REFERENCES orders(id) ON DELETE SET NULL, -- Optional order reference
+  admin_response TEXT, -- Admin's response
+  responded_by UUID REFERENCES users(id), -- Admin who responded
+  responded_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_support_messages_dealer_id ON support_messages(dealer_id);
+CREATE INDEX idx_support_messages_status ON support_messages(status);
+CREATE INDEX idx_support_messages_created ON support_messages(created_at DESC);
+```
+
+**Relationships:**
+- `dealer_id` → `dealers(id)` (CASCADE DELETE)
+- `product_id` → `products(id)` (SET NULL, optional context)
+- `order_id` → `orders(id)` (SET NULL, optional context)
+- `responded_by` → `users(id)` (admin who responded)
+
+**RLS Policy:**
+```sql
+-- Dealers can read/create own messages
+CREATE POLICY "Dealers can manage own support messages"
+  ON support_messages FOR ALL
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers WHERE user_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    dealer_id IN (
+      SELECT id FROM dealers WHERE user_id = auth.uid()
+    )
+  );
+
+-- Admins can manage all messages
+CREATE POLICY "Admins can manage all support messages"
+  ON support_messages FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM users
+      WHERE auth.uid() = id AND role = 'admin'
+    )
+  );
+```
+
+**Realtime:** Admin side should subscribe to new support_messages (postgres_changes INSERT event)
+
+---
+
+### 7. order_attachments
+
+**Purpose:** Link orders to uploaded documents (fatura, irsaliye PDFs uploaded by admin)
+
+**Key columns:**
+```sql
+CREATE TABLE order_attachments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  order_id UUID REFERENCES orders(id) ON DELETE CASCADE NOT NULL,
+  file_name TEXT NOT NULL,
+  file_url TEXT NOT NULL, -- Supabase Storage path
+  file_type TEXT NOT NULL CHECK (file_type IN ('invoice', 'waybill', 'other')),
+  file_size INT NOT NULL, -- bytes
+  uploaded_by UUID REFERENCES users(id), -- Admin who uploaded
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_order_attachments_order_id ON order_attachments(order_id);
+CREATE INDEX idx_order_attachments_type ON order_attachments(file_type);
+```
+
+**Relationships:**
+- `order_id` → `orders(id)` (CASCADE DELETE)
+- `uploaded_by` → `users(id)` (admin who uploaded)
+- `file_url` → Supabase Storage path (`order-attachments/{order_id}/{file}`)
+
+**RLS Policy:**
+```sql
+-- Dealers can read attachments for their orders
+CREATE POLICY "Dealers can read own order attachments"
+  ON order_attachments FOR SELECT
+  TO authenticated
+  USING (
+    order_id IN (
+      SELECT o.id FROM orders o
+      JOIN dealers d ON o.dealer_id = d.id
+      WHERE d.user_id = auth.uid()
+    )
+  );
+
+-- Admins can manage all attachments
+CREATE POLICY "Admins can manage order attachments"
+  ON order_attachments FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM users
+      WHERE auth.uid() = id AND role = 'admin'
+    )
+  );
+```
+
+---
+
+## Database Summary Table
+
+| Table | Purpose | Foreign Keys | RLS Scope | Realtime |
+|-------|---------|--------------|-----------|----------|
+| `dealer_transactions` | Financial ledger | dealer_id, created_by | Dealer sees own | No |
+| `favorite_products` | Favorites | dealer_id, product_id | Dealer manages own | No |
+| `campaigns` | Marketing campaigns | target_dealer_groups[] | Dealer sees relevant | Optional |
+| `campaign_products` | Campaign-product link | campaign_id, product_id | Follows campaign visibility | No |
+| `announcements` | System messages | created_by, target arrays | Dealer sees targeted | Yes |
+| `support_messages` | Dealer support tickets | dealer_id, product_id, order_id, responded_by | Dealer sees own, admin sees all | Yes (admin) |
+| `order_attachments` | Order documents | order_id, uploaded_by | Dealer sees own orders | No |
+
+---
+
+## File Storage Architecture
+
+### Storage Buckets
+
+**1. financial-documents** (Private bucket)
+
+**Purpose:** Store financial PDFs (invoices, receipts) linked to dealer_transactions
+
+**Folder structure:**
+```
+financial-documents/
+  {dealer_id}/
+    {transaction_id}_{filename}.pdf
+```
+
+**RLS Policy:**
+```sql
+-- Dealers can read own documents
+CREATE POLICY "Dealers can read own financial documents"
+  ON storage.objects FOR SELECT
+  TO authenticated
+  USING (
+    bucket_id = 'financial-documents'
+    AND (storage.foldername(name))[1] IN (
+      SELECT id::text FROM dealers WHERE user_id = auth.uid()
+    )
+  );
+
+-- Admins can manage all documents
+CREATE POLICY "Admins can manage financial documents"
+  ON storage.objects FOR ALL
+  TO authenticated
+  USING (
+    bucket_id = 'financial-documents'
+    AND EXISTS (
+      SELECT 1 FROM users
+      WHERE auth.uid() = id AND role = 'admin'
+    )
+  );
+```
+
+**Upload pattern (Server Action):**
+```typescript
+// In admin action: uploadFinancialDocument(dealerId, transactionId, file)
+const filePath = `${dealerId}/${transactionId}_${file.name}`
+const { data, error } = await supabase.storage
+  .from('financial-documents')
+  .upload(filePath, file, { upsert: false })
+
+// Store path in dealer_transactions.document_url
+```
+
+---
+
+**2. order-attachments** (Private bucket)
+
+**Purpose:** Store order-related documents (fatura, irsaliye) uploaded by admin
+
+**Folder structure:**
+```
+order-attachments/
+  {order_id}/
+    {file_type}_{timestamp}_{filename}.pdf
+```
+
+**RLS Policy:**
+```sql
+-- Dealers can read attachments for their orders
+CREATE POLICY "Dealers can read own order attachments"
+  ON storage.objects FOR SELECT
+  TO authenticated
+  USING (
+    bucket_id = 'order-attachments'
+    AND (storage.foldername(name))[1] IN (
+      SELECT o.id::text FROM orders o
+      JOIN dealers d ON o.dealer_id = d.id
+      WHERE d.user_id = auth.uid()
+    )
+  );
+
+-- Admins can manage all order attachments
+CREATE POLICY "Admins can manage order attachments"
+  ON storage.objects FOR ALL
+  TO authenticated
+  USING (
+    bucket_id = 'order-attachments'
+    AND EXISTS (
+      SELECT 1 FROM users
+      WHERE auth.uid() = id AND role = 'admin'
+    )
+  );
+```
+
+**Upload pattern (Server Action):**
+```typescript
+// In admin action: uploadOrderAttachment(orderId, fileType, file)
+const filePath = `${orderId}/${fileType}_${Date.now()}_${file.name}`
+const { data, error } = await supabase.storage
+  .from('order-attachments')
+  .upload(filePath, file)
+
+// Create order_attachments record with file_url = filePath
+```
+
+---
+
+## Integration Points with Existing System
+
+### 1. Dealer Dashboard (New Route)
+
+**Route:** `src/app/(dealer)/dashboard/page.tsx`
+
+**Integration:**
+- Reuses existing `getDealerInfo()` from `src/lib/actions/catalog.ts`
+- New action: `getDealerStats()` in `src/lib/actions/dashboard.ts`
+- Queries:
+  - Total spending: `SUM(total_amount) FROM orders WHERE dealer_id = $1 AND created_at > $2`
+  - Recent orders: Reuse `getDealerOrders()` with limit
+  - Top products: `SELECT product_id, SUM(quantity) FROM order_items JOIN orders ... GROUP BY product_id ORDER BY SUM DESC LIMIT 5`
+  - Pending orders count: `SELECT COUNT(*) FROM orders WHERE dealer_id = $1 AND status_id IN (SELECT id FROM order_statuses WHERE code IN ('pending', 'confirmed'))`
+  - Current balance: `SELECT SUM(CASE ...) FROM dealer_transactions WHERE dealer_id = $1`
+
+**Components:**
+- `src/components/dashboard/stats-card.tsx` (reusable metric widget)
+- `src/components/dashboard/recent-orders-widget.tsx`
+- `src/components/dashboard/top-products-widget.tsx`
+- Reuses existing `CartIndicator` and nav from `(dealer)/layout.tsx`
+
+---
+
+### 2. Financial Information (New Route)
+
+**Route:** `src/app/(dealer)/financials/page.tsx`
+
+**Actions:** `src/lib/actions/financials.ts`
+- `getDealerTransactions(filters?: { startDate, endDate, type })` → Returns transactions with balance calculation
+- `getDealerBalance()` → Current balance aggregate
+- `downloadFinancialDocument(transactionId)` → Creates signed URL for PDF
+
+**Components:**
+- `src/components/financials/transaction-list.tsx`
+- `src/components/financials/balance-summary.tsx`
+- `src/components/financials/transaction-filters.tsx`
+
+**Admin Side:** `src/app/(admin)/dealers/[id]/financials/page.tsx`
+- Admin can create transactions via `createDealerTransaction(dealerId, data, file?)`
+- Upload PDF to Storage, create dealer_transactions record with document_url
+
+---
+
+### 3. Favorites (New Routes)
+
+**Routes:**
+- `src/app/(dealer)/favorites/page.tsx` (list view)
+- `src/app/(dealer)/catalog/page.tsx` (add favorite button)
+
+**Actions:** `src/lib/actions/favorites.ts`
+- `toggleFavorite(productId)` → Upsert/delete favorite_products record
+- `getFavoriteProducts()` → Join favorite_products with products, returns CatalogProduct[] format
+
+**Integration with Catalog:**
+- Modify `src/components/catalog/product-card.tsx` to show favorite button
+- Client component: `<FavoriteButton productId={id} initialFavorited={isFavorited} />`
+- Calls `toggleFavorite` server action on click
+
+**State Management:**
+- No Zustand needed (favorites are server-managed)
+- Optimistic UI: Toggle button immediately, revalidate on server response
+
+---
+
+### 4. Campaigns & Announcements (New Routes)
+
+**Routes:**
+- `src/app/(dealer)/campaigns/page.tsx` (active campaigns list)
+- `src/app/(dealer)/campaigns/[id]/page.tsx` (campaign detail with products)
+- `src/app/(dealer)/announcements/page.tsx` (announcements list)
+
+**Actions:** `src/lib/actions/campaigns.ts`
+- `getActiveCampaigns()` → Returns campaigns visible to dealer (RLS handles filtering)
+- `getCampaignProducts(campaignId)` → Products in campaign with discount applied
+- `getAnnouncements()` → Active announcements targeted to dealer
+
+**Components:**
+- `src/components/campaigns/campaign-card.tsx`
+- `src/components/campaigns/campaign-products-grid.tsx` (reuses ProductCard)
+- `src/components/announcements/announcement-list.tsx`
+- `src/components/announcements/announcement-badge.tsx` (priority color coding)
+
+**Realtime Integration:**
+- Optional: Subscribe to announcements table for urgent messages
+```typescript
+// In (dealer)/layout.tsx or announcements page
+const channel = supabase
+  .channel('dealer-announcements')
+  .on('postgres_changes', {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'announcements',
+    filter: `priority=eq.urgent` // RLS will filter to dealer's view
+  }, (payload) => {
+    toast.info(payload.new.title) // Show notification
+  })
+  .subscribe()
+```
+
+**Admin Side:** `src/app/(admin)/campaigns/` and `src/app/(admin)/announcements/`
+- CRUD operations for campaigns, campaign_products, announcements
+- Target selection UI (dealer groups checkboxes)
+
+---
+
+### 5. Support / Messages (New Routes)
+
+**Routes:**
+- `src/app/(dealer)/support/page.tsx` (list messages + create new)
+- `src/app/(dealer)/support/[id]/page.tsx` (message detail)
+- `src/app/(dealer)/support/faq/page.tsx` (static FAQ page)
+
+**Actions:** `src/lib/actions/support.ts`
+- `getSupportMessages()` → Dealer's messages ordered by created_at DESC
+- `createSupportMessage(data)` → Create new message, optionally reference product/order
+- `getSupportMessage(id)` → Single message with product/order details
+
+**Components:**
+- `src/components/support/message-list.tsx`
+- `src/components/support/message-form.tsx` (subject, category, message, optional product/order select)
+- `src/components/support/message-detail.tsx` (shows admin response if exists)
+
+**Admin Side:** `src/app/(admin)/support/page.tsx`
+- List all messages with filters (status, priority, dealer)
+- Realtime subscription for new messages:
+```typescript
+supabase
+  .channel('support-messages')
+  .on('postgres_changes', {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'support_messages'
+  }, (payload) => {
+    playNotificationSound()
+    refetchMessages()
+  })
+  .subscribe()
+```
+- Respond action: `respondToSupportMessage(messageId, response)` updates admin_response, responded_by, responded_at, status
+
+---
+
+### 6. Order Details Enhancement (Existing Route)
+
+**Route:** `src/app/(dealer)/orders/[id]/page.tsx` (extend existing)
+
+**New Features:**
+- Display order_attachments (invoices, waybills)
+- Download buttons with signed URLs
+
+**Actions:** Extend `src/lib/actions/orders.ts`
+- `getOrderAttachments(orderId)` → Returns attachments for order
+- `downloadOrderAttachment(attachmentId)` → Creates signed URL
+
+**Components:**
+- `src/components/orders/attachment-list.tsx` (shows file type icons, download buttons)
+- Add to existing order detail page below order items
+
+**Admin Side:** `src/app/(admin)/orders/[id]/page.tsx`
+- Upload attachment form: `uploadOrderAttachment(orderId, fileType, file)`
+- Server action uploads to Storage, creates order_attachments record
+
+---
+
+### 7. Dealer Reports (New Route)
+
+**Route:** `src/app/(dealer)/reports/page.tsx`
+
+**Actions:** `src/lib/actions/reports.ts`
+- `getDealerSpendingAnalysis(period)` → Time-series spending data
+- `getProductPurchaseHistory(productId?)` → Purchase frequency analysis
+- `getPeriodComparison(period1, period2)` → Compare spending across periods
+
+**Analytics Queries (PostgreSQL patterns):**
+
+```sql
+-- Monthly spending trend (last 12 months)
+SELECT
+  DATE_TRUNC('month', created_at) as month,
+  COUNT(*) as order_count,
+  SUM(total_amount) as total_spent
+FROM orders
+WHERE dealer_id = $1
+  AND created_at >= NOW() - INTERVAL '12 months'
+GROUP BY month
+ORDER BY month DESC;
+
+-- Top 10 products by purchase frequency
+SELECT
+  p.id, p.name, p.code,
+  COUNT(DISTINCT oi.order_id) as times_ordered,
+  SUM(oi.quantity) as total_quantity,
+  SUM(oi.total_price) as total_spent
+FROM order_items oi
+JOIN products p ON oi.product_id = p.id
+JOIN orders o ON oi.order_id = o.id
+WHERE o.dealer_id = $1
+GROUP BY p.id, p.name, p.code
+ORDER BY times_ordered DESC
+LIMIT 10;
+
+-- Period comparison (this month vs last month)
+WITH this_month AS (
+  SELECT SUM(total_amount) as amount, COUNT(*) as count
+  FROM orders
+  WHERE dealer_id = $1
+    AND created_at >= DATE_TRUNC('month', CURRENT_DATE)
+),
+last_month AS (
+  SELECT SUM(total_amount) as amount, COUNT(*) as count
+  FROM orders
+  WHERE dealer_id = $1
+    AND created_at >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+    AND created_at < DATE_TRUNC('month', CURRENT_DATE)
+)
+SELECT
+  this_month.amount as this_month_amount,
+  last_month.amount as last_month_amount,
+  this_month.count as this_month_count,
+  last_month.count as last_month_count,
+  ((this_month.amount - last_month.amount) / NULLIF(last_month.amount, 0) * 100) as amount_change_percent,
+  ((this_month.count - last_month.count) / NULLIF(last_month.count, 0) * 100) as count_change_percent
+FROM this_month, last_month;
+```
+
+**Components:**
+- `src/components/reports/spending-chart.tsx` (uses Recharts, already installed from v1)
+- `src/components/reports/period-comparison.tsx`
+- `src/components/reports/top-products-table.tsx`
+
+**Chart Library:** Recharts (already in dependencies from Phase 03)
+
+---
+
+## API Route Structure
+
+### Server Actions Organization
+
+Following existing pattern in `src/lib/actions/`, create new action files:
+
+```
+src/lib/actions/
+  auth.ts (existing)
+  catalog.ts (existing)
+  orders.ts (existing) — EXTEND with getOrderAttachments, downloadOrderAttachment
+  admin-orders.ts (existing)
+  export-reports.ts (existing)
+
+  dashboard.ts (NEW) — getDealerStats, getDealerBalance
+  financials.ts (NEW) — getDealerTransactions, downloadFinancialDocument
+                        ADMIN: createDealerTransaction, uploadFinancialDocument
+  favorites.ts (NEW) — toggleFavorite, getFavoriteProducts, isFavorited
+  campaigns.ts (NEW) — getActiveCampaigns, getCampaignProducts, getAnnouncements
+                       ADMIN: CRUD for campaigns/announcements
+  support.ts (NEW) — getSupportMessages, createSupportMessage, getSupportMessage
+                     ADMIN: respondToSupportMessage, updateMessageStatus
+  reports.ts (NEW) — getDealerSpendingAnalysis, getProductPurchaseHistory, getPeriodComparison
+```
+
+### Server Action Pattern (from existing codebase)
+
+**Standard structure:**
+```typescript
+'use server'
+
+import { createClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
+
+export type ActionState = {
+  success?: boolean
+  message?: string
+  errors?: Record<string, string[]>
+  // ... feature-specific fields
+}
+
+export async function actionName(params): Promise<ActionState> {
+  const supabase = await createClient()
+
+  // 1. Auth check
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { message: 'Oturum acmaniz gerekiyor' }
+
+  // 2. Authorization check (get dealer, verify ownership)
+  const { data: dealer } = await supabase
+    .from('dealers')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+  if (!dealer) return { message: 'Bayi kaydı bulunamadı' }
+
+  // 3. Validation (Zod schema recommended for v2.0)
+  // TODO: Add Zod validation
+
+  // 4. Business logic
+  const { data, error } = await supabase
+    .from('table')
+    .insert(...)
+
+  if (error) return { message: 'Hata: ' + error.message }
+
+  // 5. Revalidate
+  revalidatePath('/relevant-path')
+
+  return { success: true, message: 'Başarılı' }
+}
+```
+
+**Validation Enhancement (recommended for v2.0):**
+```typescript
+import { z } from 'zod'
+
+const createTransactionSchema = z.object({
+  dealer_id: z.string().uuid(),
+  transaction_type: z.enum(['invoice', 'payment', 'credit_note', 'debit_note']),
+  amount: z.number().positive(),
+  balance_effect: z.enum(['debit', 'credit']),
+  description: z.string().min(1),
+  reference_number: z.string().optional(),
+  transaction_date: z.date().default(() => new Date())
+})
+
+export async function createDealerTransaction(
+  formData: z.infer<typeof createTransactionSchema>
+): Promise<ActionState> {
+  // Validate
+  const parsed = createTransactionSchema.safeParse(formData)
+  if (!parsed.success) {
+    return { errors: parsed.error.flatten().fieldErrors }
   }
 
-  setupListeners() {
-    // Foreground message handler
-    messaging().onMessage(async (remoteMessage) => {
-      showInAppNotification(remoteMessage.notification);
-    });
-
-    // Background/quit message handler
-    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-      console.log('Background message:', remoteMessage);
-    });
-
-    // Notification tap handler
-    messaging().onNotificationOpenedApp((remoteMessage) => {
-      if (remoteMessage.data.type === 'ORDER_STATUS_CHANGE') {
-        navigateToOrder(remoteMessage.data.orderId);
-      }
-    });
-  }
+  // ... proceed with validated data
 }
 ```
 
 ---
 
-## Suggested Build Order
+## Component Organization
 
-### Phase 1: Foundation (Week 1-2)
-**Goal:** Project setup, database, authentication
-
-**Build order:**
-1. **Backend project structure** - Express.js with modular architecture
-2. **Database schema** - PostgreSQL tables for dealers, dealer_groups, products
-3. **Auth module** - JWT login, token validation, middleware
-4. **API foundation** - Error handling, validation, response formatting
-
-**Deliverables:**
-- Dealers can register and login
-- JWT tokens issued and validated
-- Basic API structure working
-
-**Why first:** Everything depends on auth. Can't build features without user context.
-
----
-
-### Phase 2: Product Catalog (Week 2-3)
-**Goal:** Dealers can browse products
-
-**Build order:**
-1. **Products module** - CRUD operations, search
-2. **File upload** - Multer + Cloudinary integration
-3. **Pricing module** - Calculate dealer-specific prices based on group
-4. **Mobile UI** - Product listing, product details screens
-5. **Web UI** - Product catalog pages
-
-**Deliverables:**
-- Products displayed with images
-- Prices show dealer-specific discounts
-- Search and filtering work
-
-**Why second:** Can't place orders without products. This gives dealers something to interact with.
-
----
-
-### Phase 3: Order Management (Week 3-5)
-**Goal:** Dealers can create and track orders
-
-**Build order:**
-1. **Orders module** - Create order, calculate totals
-2. **Order state machine** - Implement valid transitions
-3. **Order state history** - Audit trail
-4. **Mobile UI** - Cart, checkout, order history screens
-5. **Web UI** - Order management pages
-
-**Deliverables:**
-- Dealers create orders
-- Orders have correct pricing (with discounts)
-- Order history visible
-- State transitions enforced
-
-**Why third:** Core business value. This is what dealers came for.
-
----
-
-### Phase 4: Notifications (Week 5-6)
-**Goal:** Dealers receive push notifications on order updates
-
-**Build order:**
-1. **FCM setup** - Firebase project, service account
-2. **Notifications module** - Send notifications via FCM
-3. **Event handlers** - Listen to order state changes
-4. **Mobile integration** - FCM token registration, notification handling
-5. **Testing** - All order states trigger correct notifications
-
-**Deliverables:**
-- Push notifications sent on order status change
-- Tapping notification opens order details
-- Notifications work in foreground and background
-
-**Why fourth:** Nice-to-have feature. System is usable without it, but improves UX significantly.
-
----
-
-### Phase 5: Admin Features (Week 6-7)
-**Goal:** Admin can manage orders, products, dealers
-
-**Build order:**
-1. **Admin authentication** - Separate admin login
-2. **Admin web UI** - Order approval, status updates
-3. **Product management** - CRUD for products
-4. **Dealer management** - View dealers, assign groups
-5. **Dashboard** - Order statistics, pending orders
-
-**Deliverables:**
-- Admin approves/rejects orders
-- Admin updates order status through workflow
-- Admin manages product catalog
-
-**Why fifth:** Admin features support operations but aren't needed for initial testing with dealers.
-
----
-
-### Dependencies Diagram
+### New Route Groups
 
 ```
-Phase 1: Foundation
-    │
-    │ (Auth + DB required for everything)
-    │
-    ├─> Phase 2: Product Catalog
-    │       │
-    │       │ (Products required for orders)
-    │       │
-    │       └─> Phase 3: Order Management
-    │               │
-    │               │ (Orders must exist to notify about them)
-    │               │
-    │               └─> Phase 4: Notifications
-    │
-    └─> Phase 5: Admin Features
-            (Can be built anytime after Phase 3)
+src/app/(dealer)/
+  layout.tsx (existing) — ADD nav links for new routes
+  catalog/ (existing)
+  orders/ (existing)
+  cart/ (existing)
+  checkout/ (existing)
+  quick-order/ (existing)
+
+  dashboard/ (NEW) — Stats overview
+    page.tsx
+
+  financials/ (NEW) — Financial tracking
+    page.tsx
+    loading.tsx
+
+  favorites/ (NEW) — Favorite products
+    page.tsx
+
+  campaigns/ (NEW) — Active campaigns
+    page.tsx
+    [id]/
+      page.tsx
+
+  announcements/ (NEW) — System announcements
+    page.tsx
+
+  support/ (NEW) — Support tickets
+    page.tsx
+    [id]/
+      page.tsx
+    faq/
+      page.tsx
+
+  reports/ (NEW) — Dealer analytics
+    page.tsx
+```
+
+### New Shared Components
+
+```
+src/components/
+  ui/ (existing — shadcn components)
+  cart/ (existing)
+  catalog/ (existing)
+  orders/ (existing)
+  layout/ (existing)
+
+  dashboard/ (NEW)
+    stats-card.tsx
+    recent-orders-widget.tsx
+    top-products-widget.tsx
+    balance-summary.tsx
+
+  financials/ (NEW)
+    transaction-list.tsx
+    transaction-filters.tsx
+    balance-summary.tsx
+    document-download-button.tsx
+
+  favorites/ (NEW)
+    favorite-button.tsx (used in catalog)
+    favorites-grid.tsx
+
+  campaigns/ (NEW)
+    campaign-card.tsx
+    campaign-products-grid.tsx
+    discount-badge.tsx
+
+  announcements/ (NEW)
+    announcement-list.tsx
+    announcement-badge.tsx (priority color)
+
+  support/ (NEW)
+    message-list.tsx
+    message-form.tsx
+    message-detail.tsx
+    status-badge.tsx
+
+  reports/ (NEW)
+    spending-chart.tsx (Recharts)
+    period-comparison.tsx
+    top-products-table.tsx
 ```
 
 ---
 
-## Technology Recommendations Summary
+## Suggested Build Order (Based on Dependencies)
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| **Backend Framework** | Express.js | Most popular Node.js framework, fast development |
-| **Architecture Pattern** | Modular Monolith | 2-3x faster to market than microservices for this scale |
-| **API Style** | REST | 93% adoption, easier caching, faster implementation |
-| **Database** | PostgreSQL | ACID compliance for transactional data, excellent performance |
-| **ORM/Query Builder** | Prisma or TypeORM | Type-safe database access, migrations |
-| **Authentication** | JWT | Stateless, scalable, works across web and mobile |
-| **File Storage** | Cloudinary | CDN delivery, image optimization, free tier sufficient |
-| **Push Notifications** | Firebase Cloud Messaging | Free, reliable, cross-platform |
-| **Code Sharing** | Shared package in monorepo | 40-60% code reuse between web and mobile |
-| **State Management** | Zustand or Redux Toolkit | Shared between platforms, simple API |
+### Phase 1: Foundation (No dependencies)
+
+**Tasks:**
+1. Database migrations for all 7 tables
+2. Storage bucket creation + RLS policies
+3. Create new Server Actions structure (empty files)
+4. Update nav-links component with new routes
+
+**Estimated complexity:** Low
+**Why first:** Establishes data layer before building features
+
+---
+
+### Phase 2: Favorites (Simple, standalone)
+
+**Dependencies:** None (uses existing products table)
+
+**Tasks:**
+1. Implement favorites.ts actions (toggleFavorite, getFavoriteProducts)
+2. Create FavoriteButton component
+3. Integrate FavoriteButton into ProductCard
+4. Create favorites/page.tsx (reuses ProductGrid)
+
+**Estimated complexity:** Low
+**Why early:** Simple feature, validates action pattern, no file uploads
+
+---
+
+### Phase 3: Dashboard (Aggregates existing data)
+
+**Dependencies:** Uses existing orders, order_items, products tables
+
+**Tasks:**
+1. Implement dashboard.ts actions (getDealerStats)
+2. Create dashboard components (StatsCard, widgets)
+3. Create dashboard/page.tsx
+4. Update (dealer)/layout to redirect / to /dashboard
+
+**Estimated complexity:** Medium
+**Why mid:** Requires analytics queries, but no new data entry
+
+---
+
+### Phase 4: Campaigns & Announcements (Read-only dealer view)
+
+**Dependencies:** campaigns, announcements tables (admin will populate manually first)
+
+**Tasks:**
+1. Implement campaigns.ts actions (read-only dealer side)
+2. Create campaign/announcement components
+3. Create campaigns/page.tsx, announcements/page.tsx
+4. Optional: Add Realtime subscription for announcements
+
+**Estimated complexity:** Medium
+**Why mid:** Read-only for dealers, defer admin CRUD to later
+
+---
+
+### Phase 5: Support Messages (Async messaging)
+
+**Dependencies:** support_messages table
+
+**Tasks:**
+1. Implement support.ts actions (dealer: create/read, admin: read/respond)
+2. Create support components (form, list, detail)
+3. Create support/page.tsx, support/[id]/page.tsx
+4. Create static support/faq/page.tsx
+5. Admin side: support management page with Realtime
+
+**Estimated complexity:** Medium
+**Why mid:** Standalone feature, tests Realtime on admin side
+
+---
+
+### Phase 6: Financial Information (Complex, requires file uploads)
+
+**Dependencies:** dealer_transactions table, financial-documents bucket
+
+**Tasks:**
+1. Implement financials.ts actions (read for dealer, create+upload for admin)
+2. Server Action for file upload to Storage
+3. Create financials components
+4. Create financials/page.tsx (dealer view)
+5. Admin side: dealer/[id]/financials page with transaction creation + PDF upload
+6. Zod validation for transaction form
+
+**Estimated complexity:** High
+**Why later:** File uploads add complexity, requires admin UI for data entry
+
+---
+
+### Phase 7: Order Attachments (Extends existing orders)
+
+**Dependencies:** order_attachments table, order-attachments bucket
+
+**Tasks:**
+1. Extend orders.ts actions (getOrderAttachments, downloadOrderAttachment)
+2. Create attachment-list component
+3. Integrate into existing orders/[id]/page.tsx
+4. Admin side: order attachment upload on orders/[id]/page.tsx
+
+**Estimated complexity:** Medium
+**Why later:** Extends existing feature, validates Storage pattern from Phase 6
+
+---
+
+### Phase 8: Dealer Reports (Complex queries)
+
+**Dependencies:** Aggregates orders, order_items (existing data)
+
+**Tasks:**
+1. Implement reports.ts actions (complex aggregation queries)
+2. Create reports components (charts, tables)
+3. Create reports/page.tsx
+4. Optimize queries with indexes if needed
+
+**Estimated complexity:** High
+**Why last:** Complex analytics queries, benefits from having real data to test with
+
+---
+
+### Phase 9: Admin CRUD for Campaigns/Announcements (Deferred)
+
+**Tasks:**
+1. Admin campaign management pages
+2. Admin announcement management pages
+3. Target selection UI (dealer groups)
+
+**Estimated complexity:** Medium
+**Why deferred:** Admin can manually insert via SQL initially, UI is polish
+
+---
+
+## Build Order Summary Table
+
+| Phase | Features | Complexity | Dependencies | Reason |
+|-------|----------|------------|--------------|--------|
+| 1 | Database + Storage setup | Low | None | Foundation layer |
+| 2 | Favorites | Low | Existing products | Simple, validates patterns |
+| 3 | Dashboard | Medium | Existing orders | Analytics without new data |
+| 4 | Campaigns/Announcements (read) | Medium | New tables | Read-only, tests RLS |
+| 5 | Support Messages | Medium | New table | Tests Realtime |
+| 6 | Financial Information | High | New table + Storage | File uploads |
+| 7 | Order Attachments | Medium | Phase 6 patterns | Extends existing feature |
+| 8 | Dealer Reports | High | Existing data | Complex queries |
+| 9 | Admin Campaign/Announcement CRUD | Medium | Phase 4 | Polish, can defer |
+
+---
+
+## RLS Security Considerations
+
+### Consistent Pattern Across All Tables
+
+**Standard dealer visibility check:**
+```sql
+dealer_id IN (
+  SELECT id FROM dealers WHERE user_id = auth.uid()
+)
+```
+
+**Why this pattern:**
+- Single JOIN to verify ownership
+- Works with RLS recursion (policies can reference other policies)
+- Indexed on `dealers.user_id` (existing index from v1)
+- Consistent across orders, favorites, transactions, etc.
+
+---
+
+### Storage RLS Pattern
+
+**Folder-based security:**
+```sql
+(storage.foldername(name))[1] IN (
+  SELECT id::text FROM dealers WHERE user_id = auth.uid()
+)
+```
+
+**Why this pattern:**
+- Extracts first folder level (dealer_id or order_id)
+- For orders: Additional check that order belongs to dealer
+- Prevents path traversal (../other-dealer-files)
+
+---
+
+### Multi-Tenant Best Practices
+
+**Index Performance:**
+- CRITICAL: Index `dealer_id` on all new tables (already in schemas above)
+- Index `user_id` on dealers table (existing from v1)
+- RLS policies join dealers table on every query — index is essential
+
+**Policy Simplicity:**
+- Keep policies simple: One dealer ownership check, one admin check
+- Avoid complex subqueries in policies (use functions if needed)
+- Test policies with EXPLAIN ANALYZE to verify index usage
 
 ---
 
 ## Sources
 
-### Architecture Patterns
-- [B2B Ecommerce Software Architecture - Shopify](https://www.shopify.com/enterprise/blog/b2b-ecommerce-software-architecture)
-- [The Modern Blueprint for Digital Ordering - Medium](https://medium.com/razi-chaudhry/the-modern-blueprint-for-digital-ordering-and-real-time-fulfillment-architecture-om-1-203a78bc8b25)
-- [Composable Architecture Streamlines B2B Order Management - Smith](https://smithcommerce.com/insights/composable-architecture-streamlines-b2b-order-management/)
+### Supabase Multi-Tenant Security
+- [Storage Access Control | Supabase Docs](https://supabase.com/docs/guides/storage/security/access-control)
+- [Enforcing Row Level Security in Supabase: A Deep Dive into LockIn's Multi-Tenant Architecture - DEV Community](https://dev.to/blackie360/-enforcing-row-level-security-in-supabase-a-deep-dive-into-lockins-multi-tenant-architecture-4hd2)
+- [Best Practices for Supabase | Security, Scaling & Maintainability](https://www.leanware.co/insights/supabase-best-practices)
+- [Row Level Security | Supabase Docs](https://supabase.com/docs/guides/database/postgres/row-level-security)
 
-### Monolith vs Microservices
-- [Monolithic vs Microservices - AWS](https://aws.amazon.com/compare/the-difference-between-monolithic-and-microservices-architecture/)
-- [Microservices vs Monoliths in 2026 - Java Code Geeks](https://www.javacodegeeks.com/2025/12/microservices-vs-monoliths-in-2026-when-each-architecture-wins.html)
-- [Monolithic vs Microservices in 2026 - Superblocks](https://www.superblocks.com/blog/monolithic-vs-microservices)
+### Supabase Storage & File Uploads
+- [Signed URL file uploads with NextJs and Supabase | by Ollie | Medium](https://medium.com/@olliedoesdev/signed-url-file-uploads-with-nextjs-and-supabase-74ba91b65fe0)
+- [Complete Guide to File Uploads with Next.js and Supabase Storage](https://supalaunch.com/blog/file-upload-nextjs-supabase)
+- [Uploading files to Supabase storage with Next.js](https://kirandev.com/upload-files-to-supabase-storage-nextjs)
 
-### Code Sharing
-- [React Native vs React Web - Zuniweb](https://zuniweb.com/blog/react-native-vs-react-web-building-cross-platform-apps/)
-- [Sharing code with React Native for Web - LogRocket](https://blog.logrocket.com/sharing-code-react-native-web/)
-- [Code Sharing Between React and React Native - Matthew Wolfe](https://matthewwolfe.github.io/blog/code-sharing-react-and-react-native)
+### Next.js Server Actions
+- [Next.js Server Actions: The Complete Guide (2026)](https://makerkit.dev/blog/tutorials/nextjs-server-actions)
+- [Next.js Server Actions Error Handling: A Production-Ready Guide | by Pawan tripathi | Dec, 2025 | Medium](https://medium.com/@pawantripathi648/next-js-server-actions-error-handling-the-pattern-i-wish-i-knew-earlier-e717f28f2f75)
+- [Type safe Server Actions in your Next.js project | next-safe-action](https://next-safe-action.dev/)
+- [Data Fetching: Server Actions and Mutations | Next.js](https://nextjs.org/docs/14/app/building-your-application/data-fetching/server-actions-and-mutations)
 
-### Order State Machines
-- [State machines best practices - commercetools](https://docs.commercetools.com/learning-model-your-business-structure/state-machines/states-and-best-practices)
-- [Understanding the State Pattern - Medium](https://jinlow.medium.com/understanding-the-state-pattern-a-deep-dive-into-e-commerce-order-management-architecture-744b9f0761ab)
-- [What is State Machine - Sylius](https://sylius.com/blog/what-is-state-machine-and-why-is-it-useful-in-modeling-ecommerce-processes/)
+### PostgreSQL Analytics
+- [How to Optimize PostgreSQL for Analytics Workloads](https://oneuptime.com/blog/post/2026-01-25-optimize-postgresql-analytics-workloads/view)
+- [PostgreSQL as a Real-Time Analytics Database | Tiger Data](https://www.tigerdata.com/learn/real-time-analytics-in-postgres)
+- [How to Query Time-Series Data in TimescaleDB](https://oneuptime.com/blog/post/2026-02-02-timescaledb-time-series-queries/view)
 
-### API Design
-- [REST API Design Best Practices - freeCodeCamp](https://www.freecodecamp.org/news/rest-api-design-best-practices-build-a-rest-api/)
-- [REST vs GraphQL vs tRPC 2026 - DEV](https://dev.to/dataformathub/rest-vs-graphql-vs-trpc-the-ultimate-api-design-guide-for-2026-8n3)
-- [GraphQL vs REST - Postman](https://blog.postman.com/graphql-vs-rest/)
+### Supabase Realtime
+- [Best Practices for Supabase | Security, Scaling & Maintainability](https://www.leanware.co/insights/supabase-best-practices)
+- [Multi-tenant · supabase · Discussion #1615](https://github.com/orgs/supabase/discussions/1615)
 
-### Authentication
-- [JWT Security Best Practices - Curity](https://curity.io/resources/learn/jwt-best-practices/)
-- [API key vs JWT for B2B SaaS - Scalekit](https://www.scalekit.com/blog/apikey-jwt-comparison)
-- [Using JWT as API Keys - Security Boulevard](https://securityboulevard.com/2026/01/using-jwt-as-api-keys-security-best-practices-implementation-guide/)
+---
 
-### File Handling
-- [Easily File Upload Using Multer - Bacancy](https://www.bacancytechnology.com/blog/node-js-multer)
-- [Multer: upload files with Node.js - LogRocket](https://blog.logrocket.com/multer-nodejs-express-upload-file/)
-- [Node.js image upload - ImageKit](https://imagekit.io/blog/nodejs-image-upload/)
+**End of Architecture Research**
 
-### Push Notifications
-- [Send FCM Push Notification from Node.js - Medium](https://medium.com/@rhythm6194/send-fcm-push-notification-in-node-js-using-firebase-cloud-messaging-fcm-http-v1-2024-448c0d921fff)
-- [FCM Architectural Overview - Firebase](https://firebase.google.com/docs/cloud-messaging/fcm-architecture)
-- [Firebase Cloud Messaging Guide - Corecotech](https://corecotechnologies.com/development/firebase-cloud-messaging-complete-guide-for-node-js-and-mobile/)
-
-### Database Design
-- [Database design for e-commerce platform - Medium](https://bgiri-gcloud.medium.com/designing-the-database-schema-for-a-new-e-commerce-platform-and-considering-factors-like-ec28d4fb81db)
-- [E-Commerce Database Design: EAV Model - Medium](https://np4652.medium.com/e-commerce-database-design-managing-product-variants-for-multi-vendor-platforms-using-the-eav-01307e63b920)
-- [Ecommerce Database Design - Vertabelo](https://vertabelo.com/blog/er-diagram-for-online-shop/)
-
-### Pricing
-- [Tiered pricing strategies for B2B eCommerce - Turis](https://turis.app/b2b-ecommerce/tiered-pricing-strategies-b2b-wholesale/)
-- [B2B eCommerce Tiered Pricing - Clarity](https://www.clarity-ventures.com/articles/b2b-ecommerce-tiered-pricing-structure-clarity)
-
-### Modular Monolith
-- [modular-monolith-nodejs - GitHub](https://github.com/mgce/modular-monolith-nodejs)
-- [How to better structure your Node.js project - thetshaped.dev](https://thetshaped.dev/p/how-to-better-structure-your-nodejs-project-modular-monolith)
-
-### MVP Build Order
-- [Distributed Order Management: MVP approach - Fluent Commerce](https://fluentcommerce.com/resources/blog/distributed-order-management-an-mvp-approach-to-implementation/)
-- [The Future of Order Management Systems 2026 - Netguru](https://www.netguru.com/blog/oms-future-trends)
+**Research confidence: HIGH** — All patterns verified with official Supabase docs, existing v1 codebase patterns, and 2026 best practices.

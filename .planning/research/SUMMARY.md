@@ -1,424 +1,331 @@
 # Project Research Summary
 
-**Project:** Bayi Yönetimi (B2B Dealer Order Management System)
-**Domain:** Manufacturer-to-Dealer Order Management
-**Researched:** 2026-01-25
+**Project:** Bayi Yönetimi v2.0 - Dealer Dashboard and Financial Tracking
+**Domain:** B2B Dealer Experience and Financial Management (subsequent milestone)
+**Researched:** 2026-02-08
 **Confidence:** HIGH
 
 ## Executive Summary
 
-This is a B2B dealer order management system replacing phone/WhatsApp ordering for a manufacturer with ~700 dealers and ~500 products. The system addresses critical pain points: no after-hours ordering, no real-time stock/price visibility, and manual order processing inefficiencies. Research shows 83% of B2B buyers prefer digital ordering, and 74% switch to competitors for smoother buying experiences—making this transformation essential for competitive survival.
+v2.0 transforms the existing B2B order management system from a transactional ordering tool into a comprehensive dealer relationship platform. Research shows that in 2026, dealer dashboards, financial transparency (cari hesap), and self-service features are table stakes for Turkish B2B — not differentiators. This milestone adds seven integrated feature sets (dashboard, financial tracking, favorites, campaigns, support messaging, order documents, and dealer reports) that leverage the proven Supabase/Next.js foundation from v1 with minimal stack additions.
 
-**Recommended approach:** Build a **modular monolith** (not microservices) using NestJS backend, PostgreSQL for transactional data, Next.js for web admin, and React Native with Expo for mobile dealers. This stack prioritizes type safety throughout (TypeScript everywhere), developer velocity (Prisma ORM, TanStack Query), and proven scalability at the 20-30 orders/day scale. The architecture balances modern best practices with pragmatic MVP speed.
+The recommended approach is an extension strategy: reuse existing patterns (RLS multi-tenancy, Server Actions, Supabase services) rather than introducing new platforms. Only 5 required dependencies (react-pdf + 4 Radix UI components + expo-document-picker) are needed. The architecture follows established database patterns with 7 new tables, all inheriting the same RLS security model as v1. Financial data is ERP-ready from day one (manual admin entry initially, automated sync deferred to post-v2.0), ensuring migration path to Logo/Netsis integration without schema changes.
 
-**Key risks:** Multi-tenant data isolation (dealers seeing each other's data), inflexible pricing architecture requiring rewrites, and ERP integration complexity in Phase 2. All three must be architected correctly in Phase 1—retrofitting is extremely difficult. Research shows 42% of organizations that prematurely adopted microservices consolidated back to monoliths due to operational complexity, validating the modular monolith choice for this scale.
-
----
+The critical risk is financial data leakage through dashboard aggregation queries that bypass RLS policies. Multi-tenant financial systems require exhaustive testing to ensure dealers never see each other's balances or spending data. Secondary risks include performance degradation from naive dashboard calculations (700 dealers with growing order history), manual data entry errors eroding trust, and notification fatigue destroying the campaign communication channel. All are preventable with upfront design: materialized views for dashboard metrics, comprehensive audit logging for financial changes, and strict notification frequency capping. The research provides concrete prevention patterns for each pitfall.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The 2025-2026 standard for B2B order management emphasizes **TypeScript throughout the stack** for type safety in complex business logic (dealer groups, tiered pricing, order workflows). NestJS dominates enterprise Node.js development due to built-in dependency injection and modular architecture—critical for maintainability as features grow. PostgreSQL with Prisma provides ACID transactions for order integrity while supporting flexible product catalogs via JSONB.
+v2.0 requires MINIMAL additions to the existing Next.js 16 + Supabase stack. Research confirms the current platform provides 90% of needed capabilities through integrated services (Database, Storage, Realtime, Auth). The philosophy is "extend existing capabilities rather than introduce new platforms."
 
-**Core technologies:**
+**Core technology additions:**
+- **@react-pdf/renderer** (web): Server-side PDF generation for invoices and dealer reports — chosen over Puppeteer for lighter bundle (1.2M weekly downloads, proven compatibility with Next.js 16 + React 19)
+- **Radix UI extensions** (web): Accordion, Tabs, Popover, Collapsible — consistent with existing v1 Radix usage, adds ~10KB total
+- **expo-document-picker** (mobile): Official Expo SDK for dealer document uploads — cross-platform, works in Expo Go
 
-- **NestJS ^11.1.0** (Backend) — Enterprise-grade architecture with dependency injection, ideal for complex B2B logic like tiered pricing and approval workflows
-- **PostgreSQL 16.x + Prisma ^7.3.0** (Database) — ACID compliance for transactional order data, JSONB for flexible product attributes, best-in-class TypeScript ORM
-- **Next.js ^16.1.0 + React 19** (Web Admin) — App Router with server components, file-based routing, industry standard for 2025
-- **React Native ^0.83 + Expo ^54.0.0** (Mobile) — Cross-platform dealer app with Expo Router for file-based navigation
-- **TanStack Query ^5.90.0 + Zustand ^5.0.10** (State) — Replaces Redux; TanStack Query for server state, Zustand for client state (2025 standard)
-- **Firebase Cloud Messaging** (Push) — Free, reliable push notifications for order updates
-- **Cloudinary** (Images/CDN) — Automatic image optimization, built-in CDN, free tier sufficient for 500 products
-- **JWT + bcrypt** (Auth) — Stateless authentication for web + mobile, refresh token rotation for security
+**Leveraging existing stack:**
+- **Supabase Realtime** (no new dependency): Async messaging for support via postgres_changes subscriptions, already in stack
+- **Supabase Storage** (no new dependency): File uploads for financial documents and order attachments with RLS policies
+- **Recharts** (from v1): Dashboard charts and dealer reports visualization, already proven in admin reporting
+- **Sonner** (from v1): Toast notifications for campaign alerts and file upload feedback, sufficient for all v2.0 needs
 
-**What NOT to use:**
-- **Express standalone** — Too minimal for B2B complexity, use NestJS which provides structure
-- **MongoDB** — Lacks ACID transactions across collections needed for order management
-- **Redux** — TanStack Query + Zustand replace it with less boilerplate
-- **GraphQL** — Overkill for straightforward CRUD; REST is faster to implement and debug
-
----
+**Total bundle impact:** ~150KB web, ~50KB mobile for required dependencies. No breaking changes. All dependencies fully compatible with Next.js 16 + React 19 + Supabase.
 
 ### Expected Features
 
-Research into B2B dealer portals and order management systems in 2026 reveals clear feature expectations. 83% of B2B buyers prefer digital ordering, and real-time visibility is "non-negotiable" per industry sources.
+Research confirms a clear hierarchy of features based on 2026 B2B portal standards and Turkish market expectations:
 
 **Must have (table stakes):**
+- **Cari Hesap (Current Account)** — Financial balance tracking is "the backbone of Turkish B2B relationships" per research. Dealers cannot operate without transparency into borç/alacak (debit/credit). Must include: balance display, transaction history, invoice PDF access, payment history.
+- **Dealer Dashboard** — 71% of B2B buyers expect personalized dashboards in 2026. Must include: spending summary, recent orders widget, pending orders count, quick actions. Empty dashboard = feels unfinished.
+- **Favorites** — B2B portals with saved product lists show 50% faster reorder times. Standard feature across modern platforms. Must include: add to favorites, favorites list, order from favorites.
+- **Kampanyalar (Campaigns)** — Modern dealer portals are marketing hubs. Must include: active campaigns page, announcements system, new product highlighting.
+- **Support Messaging** — Dealers need communication channel beyond phone. 2026 trend is async messaging over traditional ticketing. Must include: message admin, message history, FAQ page.
 
-1. **24/7 Self-Service Ordering** — Core value proposition addressing "no after-hours ordering" pain point
-2. **Real-Time Stock Visibility** — Explicitly listed pain point; prevents overselling and builds trust
-3. **Tiered Pricing (Gold/Silver/Bronze)** — Automatic price application by dealer group, no manual calculation
-4. **Quick/Bulk Order Entry** — CSV upload or SKU paste for dealers who reorder frequently
-5. **Order Tracking & Status Updates** — 73% of customers consider experience a key factor; tracking is expected
-6. **Push Notifications for Order Updates** — Multi-channel (email + in-app) for order confirmations, shipping, delivery
-7. **Order History & Reordering** — One-click reorder from past orders reduces friction
-8. **Secure Authentication & RBAC** — Multi-user access per dealer (owner, manager, staff roles)
-9. **Admin: Product Management** — CRUD for products, categories, pricing, stock levels
-10. **Admin: Order Management** — View, approve, update status, cancel/modify orders
-11. **Admin: Dealer Management** — Create dealers, assign tiers, activate/deactivate
-12. **Basic Reporting** — Sales by period, top products, top dealers, order status summary with CSV export
-
-**Should have (differentiators):**
-
-- **WhatsApp Integration** — Send notifications via WhatsApp (current workflow uses it; meets dealers where they are)
-- **Smart Reorder Suggestions** — AI-driven predictive ordering based on dealer history (defer until post-MVP)
-- **Mobile-First Design / PWA** — Responsive web design is table stakes, full PWA features can be incremental
-- **Product Availability Alerts** — "Notify me when back in stock" captures lost demand
-- **Dealer Performance Dashboard** — Show dealers their YTD metrics, order frequency (empowerment + transparency)
+**Should have (competitive):**
+- **Enhanced Dashboard** — Top products widget, stock alerts for favorites, group performance comparison (with privacy controls)
+- **Targeted Campaigns** — Segment by dealer tier/region rather than blast to all 700 dealers
+- **Order Documents** — Invoice and irsaliye (waybill) PDF download on order detail pages
+- **Dealer Reports** — Self-service spending analysis, period comparison, category breakdown
 
 **Defer (v2+):**
-
-- Advanced promotions engine (coupon codes, flash sales) — tier pricing is sufficient for MVP
-- Complex product configurator — only if manufacturer sells customizable products (verify)
-- Integrated logistics / real-time shipping tracking — basic "shipped" status + tracking number sufficient
-- Built-in CRM — manufacturer likely has existing CRM; integrate if needed
-- Multi-currency / multi-region — only if international dealers confirmed (verify with stakeholders)
-
----
+- **Online Payment Integration** — iyzico/PayTR integration complex (PCI compliance), current offline payment methods work
+- **ERP Real-Time Sync** — v2.0 builds ERP-ready schema but manual data entry; Logo/Netsis integration deferred to dedicated milestone
+- **Realtime Chat** — Async messaging sufficient for B2B, live chat adds complexity without validated need
+- **Advanced Campaign Automation** — A/B testing, personalization rules over-engineered for 700 dealers
 
 ### Architecture Approach
 
-For a system at this scale (20-30 orders/day, 700 dealers), a **modular monolith** is strongly recommended over microservices. This provides 2-3x faster time-to-market, lower operational complexity, and easier debugging while maintaining clear module boundaries for future scalability. Industry data shows 42% of organizations that initially adopted microservices consolidated back to larger units due to operational overhead.
+v2.0 integrates seamlessly into the existing multi-tenant Supabase architecture using established patterns. All new features follow the same security model as v1 (RLS with dealer_id filtering) and Server Actions pattern for data mutations.
 
-**Major components (modules with clear boundaries):**
+**Major components:**
+1. **7 New Database Tables** — dealer_transactions (financial ledger), favorite_products, campaigns, campaign_products, announcements, support_messages, order_attachments. All use standard RLS pattern: `dealer_id IN (SELECT id FROM dealers WHERE user_id = auth.uid())`
+2. **2 New Storage Buckets** — financial-documents (invoices, receipts), order-attachments (fatura, irsaliye). Both use folder-based RLS matching dealer ownership.
+3. **New Server Actions** — 6 new action files (dashboard.ts, financials.ts, favorites.ts, campaigns.ts, support.ts, reports.ts) following existing pattern from catalog.ts and orders.ts
+4. **New Route Groups** — 7 new dealer-facing routes under (dealer)/ (dashboard, financials, favorites, campaigns, announcements, support, reports) plus admin counterparts
+5. **Realtime Subscriptions** (optional) — Support messages (admin inbox) and urgent announcements use postgres_changes pattern already established in v1
 
-1. **Auth Module** — JWT token generation/validation, dealer login, session management (no dependencies)
-2. **Dealers Module** — Dealer CRUD, profile management, group assignment (depends on Auth)
-3. **Products Module** — Product catalog, search, filtering (depends on Files module)
-4. **Pricing Module** — Calculate dealer-specific prices based on group discounts (depends on Dealers, Products)
-5. **Orders Module** — Order creation, state machine, order history (depends on Dealers, Products, Pricing, Notifications)
-6. **Files Module** — Image upload to Cloudinary, storage, retrieval (no dependencies)
-7. **Notifications Module** — Push notifications via FCM (depends on Dealers)
+**Integration points:**
+- Dashboard aggregates existing orders data with new financial transactions
+- Favorites references existing products table
+- Campaigns link to products via campaign_products join table
+- Support messages optionally reference products/orders for context
+- Order attachments extend existing orders with document storage
 
-**Key architectural decisions:**
-
-- **REST API (not GraphQL)** — 93% adoption, easier caching, 2-3x faster to implement for small teams
-- **Event-driven inter-module communication** — Modules communicate via internal event emitter for loose coupling (e.g., order.statusChanged → notification sent)
-- **Repository pattern for data access** — Clean separation between business logic and database queries
-- **Order state machine** — Explicit states (Pending → Approved → Preparing → Shipped → Delivered) with valid transitions enforced
-- **JWT authentication** — Stateless, scalable, works across web and mobile
-- **Cloudinary for images** — CDN delivery, automatic optimization, free tier sufficient for MVP
-- **Code sharing (40-60%)** — Shared package for API client, types, utilities, state management between React Native and Next.js
-
----
+**Build order:** Foundation (tables + storage) → Favorites (simple, validates patterns) → Dashboard (aggregates existing data) → Campaigns (read-only dealer view) → Support (tests Realtime) → Financial (complex, file uploads) → Order Attachments → Reports (complex queries).
 
 ### Critical Pitfalls
 
-Research into B2B order management failures reveals seven architectural mistakes that must be avoided in Phase 1. Retrofitting these is extremely difficult and often requires rewrites.
+Research identified 13 pitfalls across 3 severity tiers. The top 5 critical pitfalls require upfront prevention:
 
-1. **Multi-Tenant Data Isolation Failure** — One dealer sees another's orders/pricing. Prevention: Row-level security (PostgreSQL RLS), ORM default scopes auto-inject tenant_id, automated isolation tests. **Must architect in Phase 1.**
+1. **Financial Data Leakage Through Dashboard Aggregation** — Dashboard aggregate queries (total spending, top products) can bypass RLS if written incorrectly, exposing dealer financial data across all 700 dealers. Prevention: Verify RLS on all financial tables, never use SECURITY DEFINER for dealer queries, test data isolation with multiple dealer sessions, cache per dealer (not globally). This is unrecoverable reputational damage if it occurs.
 
-2. **Pricing Hardcoded in Application Logic** — Business users can't change pricing without developers. Prevention: Design pricing as data (PricingRule tables), pricing engine evaluates rules, admin UI for rule management. **Database schema must be flexible from day one.**
+2. **Dashboard Performance Degradation** — Naive aggregation queries scanning entire orders table on every page load cause 5-10 second load times after 6 months. Under concurrent load (50 active users), database CPU spikes to 100%. Prevention: Pre-aggregate with materialized views or summary tables (refresh hourly), use composite indexes on (dealer_id, created_at), implement smart caching (15-30 min TTL per dealer), batch widget queries in single round-trip.
 
-3. **No Order State Machine** — Invalid transitions occur (shipped → pending), edge cases unhandled, race conditions. Prevention: Explicit state machine with valid transitions, saga pattern for distributed transactions, audit trail of state changes. **Phase 1 requirement.**
+3. **Manual Financial Entry Errors** — Admin manually enters cari hesap balances and payments. Typos, wrong dealer selection, duplicates create discrepancies that erode trust. Prevention: Comprehensive audit logging (who/when/what changed), validation and confirmation on entry, duplicate detection, ERP-ready schema from day one, immutable financial records (no deletion, corrections create audit trail).
 
-4. **Pricing Visibility Leakage** — Dealers infer competitor pricing. Prevention: Filter all pricing queries by authenticated dealer, use UUIDs not sequential IDs, return 404 (not 403) for unauthorized requests, audit log pricing queries. **Security-by-design in Phase 1.**
+4. **PDF Invoice Generation Bottleneck** — On-the-fly PDF generation saturates CPU under load (50 dealers downloading at month-end), requests timeout. Prevention: Pre-generate PDFs asynchronously when invoice is finalized (not when downloaded), cache in Supabase Storage, use background job queue, rate limit concurrent generations, pre-generate all month-end invoices 2 days before.
 
-5. **Inventory Sync Strategy Mismatch** — Batch sync causes "in stock" items to be unavailable; real-time overloads system. Prevention: MVP uses real-time (demo data). Phase 2 ERP uses hybrid: real-time availability checks at checkout, batch reconciliation overnight, inventory reservation during checkout. **Design before Phase 2 integration.**
+5. **Notification Spam Destroys Engagement** — Daily campaign notifications + order status updates = 5-10 notifications/day. Dealers disable all notifications, losing critical communication channel. Prevention: Separate transactional vs marketing notification preferences, frequency capping (max 1 marketing/day), campaigns default to in-app only (push requires explicit action), respect quiet hours (22:00-08:00), rich actionable notification copy.
 
-6. **Mobile API Versioning Not Planned** — Breaking API changes break old mobile clients. Prevention: URI path versioning (/v1/, /v2/) from day one, support 2+ versions simultaneously, 6-month deprecation policy, version detection in API. **Must implement before first mobile release.**
-
-7. **Demo Data Leaks into Production** — Real dealer data in demo environment (privacy violation) or demo orders corrupt production metrics. Prevention: Completely separate databases, environment-specific credentials, synthetic data generation (never copy production), visual indicators in demo UI. **Environment separation from Phase 1.**
-
----
+**Additional medium-priority pitfalls:** Next.js caching serving stale dealer data (force dynamic rendering), materialized view refresh too infrequent (show last updated timestamp), messaging system without SLA/routing becomes bottleneck (build assignment workflow), favorites storing snapshot vs reference (join for current data), cargo tracking complexity underestimated (start manual, add automation incrementally).
 
 ## Implications for Roadmap
 
-Based on combined research findings, dependencies, and pitfall analysis, suggested phase structure:
+Based on combined research findings, v2.0 should be structured into 7 phases following dependency order and risk mitigation:
 
-### Phase 1: Core Ordering (Foundation)
-
-**Rationale:** Establishes the architectural foundation that everything else depends on. Authentication, dealer management, and product catalog are prerequisites for ordering. This phase directly addresses the primary pain point: replacing phone/WhatsApp orders with digital self-service.
+### Phase 1: Foundation & Database Setup
+**Rationale:** All features depend on correct data layer. Financial data security must be correct from day one (unrecoverable if wrong). Establishing RLS patterns and storage buckets before building features prevents architectural rework.
 
 **Delivers:**
-- Dealers can place orders 24/7 with correct tier-based pricing
-- Admin can manage products, dealers, and process orders
-- Real-time stock visibility prevents overselling
-- JWT authentication secures multi-tenant access
+- 7 new database tables with RLS policies
+- 2 new Storage buckets with folder-based RLS
+- Database migrations and verification scripts
+- Server Actions file structure (empty implementations)
 
-**Addresses (from FEATURES.md):**
-- 24/7 self-service ordering (table stakes #1)
-- Tiered pricing by dealer group (#3)
-- Secure authentication & RBAC (#8)
-- Admin: Product management (#9)
-- Admin: Order management (#10)
-- Admin: Dealer management (#11)
-- Real-time stock visibility (#2)
+**Addresses:** PITFALLS.md Critical Pitfall #1 (financial data leakage prevention through RLS verification)
 
-**Avoids (from PITFALLS.md):**
-- Multi-tenant data isolation (#1) — PostgreSQL RLS + ORM scoping from day one
-- Pricing hardcoded in logic (#2) — Flexible pricing schema with dealer_groups table
-- No order state machine (#3) — Explicit state machine with valid transitions
-- API versioning not planned (#6) — /api/v1/ versioning from start
-- Demo data leaks (#7) — Separate environments, synthetic data
-
-**Key architectural decisions required:**
-- Database schema with multi-tenant isolation
-- Pricing data model supporting future extensions
-- Order state machine implementation
-- API structure with versioning
-
-**Research needed:** NONE — Well-documented patterns, current research sufficient.
+**Research flags:** Standard patterns, no additional research needed. Focus on exhaustive RLS testing.
 
 ---
 
-### Phase 2: Trust & Transparency
-
-**Rationale:** With basic ordering functional, dealers need visibility and communication to trust the system. Order tracking prevents "where's my order?" support calls. Order history enables quick reordering. Notifications keep dealers informed without them checking constantly.
+### Phase 2: Favorites (Quick Win)
+**Rationale:** Simplest feature with no external dependencies. Validates Server Actions pattern and component integration before tackling complex features. High business value (50% faster reorders) with low complexity.
 
 **Delivers:**
-- Order tracking with status timeline
-- Push notifications for order updates (confirmed, shipped, delivered)
-- Order history with one-click reorder
-- Email notifications for order events
+- Favorites toggle on product cards
+- Favorites list page (reuses ProductGrid)
+- Stock alerts for favorited products
 
-**Uses (from STACK.md):**
-- Firebase Cloud Messaging for push notifications
-- Event-driven architecture (order.statusChanged events trigger notifications)
+**Addresses:** FEATURES.md table stakes, PITFALLS.md #7 (reference vs snapshot design)
 
-**Addresses (from FEATURES.md):**
-- Order tracking & status updates (#5)
-- Push notifications (#6)
-- Order history & reordering (#7)
+**Uses:** favorite_products table, existing products table, toggleFavorite/getFavoriteProducts actions
 
-**Implements (from ARCHITECTURE.md):**
-- Notifications Module listening to order state change events
-- FCM integration for mobile push
-- Event emitter pattern for decoupled modules
-
-**Research needed:** NONE — Standard notification patterns, FCM documentation sufficient.
+**Research flags:** None. Well-documented wishlist patterns.
 
 ---
 
-### Phase 3: Efficiency & Insights
-
-**Rationale:** Power users need faster ordering workflows and admins need business insights. Quick order entry reduces friction for repeat orders. Basic reporting provides visibility into sales trends and dealer performance.
+### Phase 3: Dealer Dashboard
+**Rationale:** Early visibility into dealer experience. Aggregates existing orders data (no new data entry needed), so can be built before financial features are ready. Dashboard performance patterns inform later reporting features.
 
 **Delivers:**
-- Quick/bulk order entry (CSV upload or SKU paste)
-- Product search and filtering
-- Admin reporting dashboard (sales, top products, top dealers)
-- Export capabilities for further analysis
+- Dashboard landing page (replaces empty catalog as default)
+- 4 core widgets: spending summary, recent orders, pending count, quick actions
+- Balance summary (reads from financial tables once Phase 5 complete)
 
-**Addresses (from FEATURES.md):**
-- Quick/bulk order entry (#4)
-- Basic reporting (#12)
-- Product search optimization (from PITFALLS.md #15)
+**Addresses:** FEATURES.md table stakes (71% expect personalized dashboards), PITFALLS.md #2 (performance optimization with materialized views)
 
-**Avoids (from PITFALLS.md):**
-- Search performance not optimized (#15) — Database indexing, debounced typeahead
-- Manual approval bottlenecks (#8) — Implement auto-approval rules for trusted dealers
+**Uses:** dashboard.ts actions, Recharts from v1, existing orders data, new dealer_transactions table
 
-**Research needed:** NONE — Standard search optimization and reporting patterns.
+**Research flags:** Focus on aggregation query optimization and caching strategy. Standard PostgreSQL analytics patterns.
 
 ---
 
-### Phase 4: Differentiators (Post-MVP)
-
-**Rationale:** Competitive advantages that set this system apart from competitors. WhatsApp integration leverages existing dealer behavior. Smart reorder suggestions provide proactive value. Dealer dashboard empowers self-service analytics.
+### Phase 4: Campaigns & Announcements
+**Rationale:** Read-only dealer view can be built independently while financial features (Phase 5) are in development. Establishes notification preferences system needed for all future features. Defer admin CRUD to later (admin can manually insert via SQL initially).
 
 **Delivers:**
-- WhatsApp integration for notifications
-- Product availability alerts (back-in-stock notifications)
-- Dealer performance dashboard (YTD metrics)
-- Smart reorder suggestions (AI-driven, requires order history)
+- Active campaigns page with product listings
+- Announcements feed
+- Notification preferences UI
+- In-app notification center
 
-**Addresses (from FEATURES.md):**
-- WhatsApp integration (differentiator #1)
-- Product availability alerts (#4)
-- Dealer performance dashboard (#5)
-- Smart reorder suggestions (#2, requires ML)
+**Addresses:** FEATURES.md table stakes (marketing hub), PITFALLS.md #5 (notification spam prevention through frequency capping)
 
-**Research needed:** MEDIUM
-- WhatsApp Business API integration specifics
-- ML models for reorder prediction (if pursuing smart suggestions)
+**Uses:** campaigns, announcements, campaign_products tables, Radix Tabs/Collapsible, Sonner notifications, optional Realtime subscriptions
+
+**Research flags:** Notification best practices well-documented. Consider deeper research on Turkish B2B campaign patterns if targeting becomes priority.
 
 ---
 
-### Phase 5: ERP Integration (Major Extension)
-
-**Rationale:** Connects to manufacturer's existing systems for real-time inventory, product data, and order fulfillment. This is explicitly mentioned as Phase 2 in project context but should come after core system is validated with dealers.
+### Phase 5: Financial Tracking (Highest Business Value)
+**Rationale:** Most complex feature (file uploads, manual entry validation, audit logging) but highest business value. "Backbone of Turkish B2B relationships" per research. All preparatory work (database, RLS, dashboard placeholder) completed in earlier phases allows focus on correct implementation.
 
 **Delivers:**
-- Bidirectional sync with ERP for inventory, products, orders
-- Hybrid sync strategy (real-time checkout, batch reconciliation)
-- Automated order fulfillment workflow
-- Production-ready inventory management
+- Cari hesap balance display for dealers
+- Transaction history (invoice, payment, credit/debit notes) with filtering
+- Invoice PDF viewing/download
+- Admin panel for manual transaction entry with validation
+- Comprehensive audit logging
 
-**Uses (from STACK.md):**
-- Queue-based architecture for sync resilience
-- External system ID fields in database (designed in Phase 1)
+**Addresses:** FEATURES.md highest-priority table stakes, PITFALLS.md #3 (manual entry errors), #4 (PDF generation performance)
 
-**Avoids (from PITFALLS.md):**
-- Inventory sync strategy mismatch (#5) — Hybrid approach designed upfront
-- ERP integration treated as "just an API call" (#9) — Proper planning, 3-6 month budget
-- No plan for ERP downtime (#9) — Queue-based eventual consistency
+**Uses:** dealer_transactions table, financial-documents bucket, @react-pdf/renderer, Server Actions for file upload, Radix Accordion/Popover
 
-**Research needed:** HIGH
-- Target ERP's specific API documentation and data model
-- ERP authentication and security requirements
-- Real-time vs batch capabilities and limitations
-- ERP-specific edge cases and vendor best practices
+**Research flags:** DEEP RESEARCH RECOMMENDED on Turkish accounting standards, Logo/Netsis ERP data models for schema compatibility, financial compliance requirements. Phase success depends on ERP-ready schema.
 
-**Critical:** This phase has highest risk. Budget 3-6 months, expect 50% of effort in edge cases and error handling.
+---
+
+### Phase 6: Support & Messaging
+**Rationale:** Builds on notification system from Phase 4. Tests Realtime subscriptions on admin side (low risk — only admin sees real-time updates). Async messaging pattern simpler than live chat, matches 2026 B2B trends.
+
+**Delivers:**
+- Dealer message creation form (with category, optional product/order reference)
+- Message history for dealers
+- Admin support inbox with assignment and status tracking
+- Static FAQ page
+- Admin real-time notification on new messages
+
+**Addresses:** FEATURES.md table stakes (communication channel), PITFALLS.md #6 (messaging workflow design)
+
+**Uses:** support_messages table, Realtime postgres_changes for admin, expo-document-picker for attachments (mobile), Radix Popover
+
+**Research flags:** Standard support ticketing patterns. Consider deeper research on WhatsApp Business API integration if that becomes priority post-v2.0.
+
+---
+
+### Phase 7: Order Documents & Reports
+**Rationale:** Extends existing orders feature with document management (validates file upload patterns from Phase 5). Dealer reports require meaningful data (months of orders), so build last when real data exists for testing aggregation queries.
+
+**Delivers:**
+- Invoice/irsaliye PDF download on order detail pages
+- Dealer spending analysis reports
+- Period comparison (this month vs last month)
+- Category breakdown
+- Cargo tracking info (manual entry by admin, external link for dealers)
+
+**Addresses:** FEATURES.md should-haves, PITFALLS.md #8 (cargo tracking scoped to manual), #10 (materialized view refresh strategy for reports)
+
+**Uses:** order_attachments table, order-attachments bucket, reports.ts actions with complex aggregation queries, Recharts
+
+**Research flags:** Standard patterns. Cargo tracking automation deferred; consider research if real-time tracking becomes requirement.
 
 ---
 
 ### Phase Ordering Rationale
 
 **Dependency-driven:**
-- Phase 1 must come first: Auth, Dealers, Products, and Orders are the foundation everything else builds on
-- Phase 2 depends on Phase 1: Cannot track orders or send notifications without order creation
-- Phase 3 enhances Phase 1: Bulk ordering and reporting add efficiency but aren't blockers
-- Phase 4 can run parallel to Phase 3: Differentiators are independent features
-- Phase 5 should come last: ERP integration requires validated system and dealer feedback
-
-**Architecture-driven:**
-- Modular monolith allows phases to add modules incrementally without rewrites
-- Event-driven communication means Phase 2 (notifications) integrates cleanly without changing Phase 1 code
-- REST API versioning allows mobile updates to roll out gradually
-
-**Pitfall-driven:**
-- Phase 1 must architect multi-tenant isolation, flexible pricing, state machine, and API versioning correctly
-- Phase 5 (ERP) benefits from database schema designed in Phase 1 with external system IDs
-- Delaying differentiators (Phase 4) until after core system (Phases 1-3) avoids over-engineering
+- Foundation must precede all features (database + storage)
+- Favorites has zero dependencies → early quick win validates patterns
+- Dashboard aggregates orders (existing) before financial data available
+- Campaigns establishes notification system before support messaging needs it
+- Financial complexity isolated to single phase after simpler features proven
+- Order documents reuse file upload patterns from financial tracking
 
 **Risk mitigation:**
-- Phases 1-3 use well-documented patterns (low research risk)
-- Phase 4 has moderate novelty (WhatsApp integration needs research)
-- Phase 5 has highest risk (ERP integration requires deep, vendor-specific research)
+- RLS verification in Phase 1 before any financial data entered
+- Performance patterns (caching, materialized views) established in Dashboard before Reports
+- Notification preferences built before marketing features launch
+- Manual entry validation and audit logging designed upfront in Financial phase
 
----
+**Business value sequence:**
+- Early quick win (Favorites) shows progress
+- Dashboard visibility early, even if balance summary empty initially
+- Financial tracking (highest value) in Phase 5 after foundation solid
+- Lower-value features (reports, documents) deferred to end
 
 ### Research Flags
 
 **Phases needing deeper research during planning:**
 
-- **Phase 5 (ERP Integration):** HIGH PRIORITY — Vendor-specific API documentation, data model mapping, sync strategy design, edge case handling. Current generic research insufficient for implementation.
-- **Phase 4 (WhatsApp Integration):** MEDIUM PRIORITY — WhatsApp Business API specifics, cost analysis, message template requirements.
+- **Phase 5 (Financial Tracking):** Turkish accounting standards for cari hesap, Logo/Netsis ERP data export formats for schema compatibility, financial data retention laws in Turkey. Current research covers B2B patterns but lacks Turkey-specific compliance context.
 
 **Phases with standard patterns (skip research-phase):**
 
-- **Phase 1 (Core Ordering):** Well-documented patterns for auth, CRUD, state machines. Current research sufficient.
-- **Phase 2 (Notifications):** FCM integration is standard, existing documentation adequate.
-- **Phase 3 (Efficiency):** Search optimization and reporting use established patterns.
-
-**Validation recommended:**
-
-- **Dealer-specific approval workflows:** Research covers general B2B, but manufacturer-dealer relationships may have unique requirements (validate with stakeholders)
-- **Mobile device landscape:** Confirm dealers' actual devices (iOS vs Android mix, connectivity quality, device age)
-- **Pricing complexity depth:** Verify whether simple 3-tier pricing is sufficient or if promotional/seasonal/contract pricing needed
-- **International dealers:** Confirm single-currency assumption; multi-currency moves from anti-feature to table stakes if international dealers exist
-
----
+- **Phase 1 (Foundation):** Standard Supabase RLS patterns extensively documented
+- **Phase 2 (Favorites):** E-commerce wishlist patterns well-established
+- **Phase 3 (Dashboard):** PostgreSQL analytics optimization well-documented
+- **Phase 4 (Campaigns):** Push notification best practices comprehensive for 2026
+- **Phase 6 (Support):** Async messaging patterns established in customer support systems
+- **Phase 7 (Reports & Documents):** Standard aggregation queries, file storage patterns proven
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| **Stack** | **HIGH** | NestJS, PostgreSQL, React Native, Next.js are industry standards for B2B systems in 2025-2026. Multiple authoritative sources confirm. Prisma + TanStack Query + Zustand represent current best practices. |
-| **Features** | **HIGH** | Table stakes features (24/7 ordering, stock visibility, tiered pricing, tracking) consistently cited across B2B research. 83% digital ordering preference statistic validates priorities. Feature dependencies are logical. |
-| **Architecture** | **HIGH** | Modular monolith recommended by 2026 consensus (42% microservices consolidation validates this). REST over GraphQL for simplicity is well-supported. State machine pattern for orders is established best practice. |
-| **Pitfalls** | **HIGH** | Multi-tenant security, pricing flexibility, state machines, and ERP complexity are extensively documented in B2B literature. 50% ERP integration failure rate is well-cited. Mobile API versioning is critical and proven. |
+| Stack | HIGH | Minimal additions to proven Next.js 16 + Supabase stack. All dependencies compatible and well-documented with v1 versions. @react-pdf/renderer verified for Next.js 16 + React 19. |
+| Features | HIGH | All feature categories validated by 2026 B2B portal research. Cari hesap confirmed as critical for Turkish market by multiple sources. Dashboard and favorites are universal table stakes. |
+| Architecture | HIGH | Extends existing v1 multi-tenant patterns. 7 new tables follow established RLS model. No architectural changes required. Integration points clearly defined. |
+| Pitfalls | HIGH | Multi-tenant financial security extensively documented. Dashboard performance patterns proven. Manual entry risks and notification fatigue well-researched. Medium confidence on cargo tracking complexity (inferred from B2B guides). |
 
 **Overall confidence: HIGH**
 
-Research quality is strong due to:
-- Multiple authoritative sources per finding (not single-source)
-- 2025-2026 recency ensures modern best practices
-- B2B-specific sources (not generic e-commerce)
-- Consistent patterns across stack, features, architecture, and pitfalls
-- Statistical validation (83% digital ordering preference, 42% microservices consolidation, 50% ERP integration failure)
-
----
+v2.0 research is comprehensive and actionable. All major technical decisions (stack, architecture, security patterns) have clear evidence-based recommendations. Feature prioritization aligns with both 2026 B2B standards and Turkish market specifics.
 
 ### Gaps to Address
 
-While research confidence is high overall, the following areas need validation or additional research during execution:
+**Turkey-specific financial context:**
+- Research covers international B2B financial tracking but lacks detail on Turkish accounting terminology (borç/alacak conventions), Logo/Netsis ERP specifics, and compliance requirements (e-invoice, e-ledger). Recommend consulting with Turkish accounting software expert during Phase 5 planning to validate schema.
 
-**Validation needed (stakeholder confirmation):**
+**Cargo company integration:**
+- Research identifies complexity but provides limited detail on specific Turkish carriers (Aras, MNG, Yurtiçi, PTT) API capabilities. Current recommendation (start manual, add automation incrementally) is sound, but deeper carrier research would be valuable if automated tracking becomes priority.
 
-1. **International dealer presence** — If yes, multi-currency and multi-language move from anti-features to table stakes. Verify before finalizing Phase 1 schema.
+**Dealer usage patterns:**
+- Research based on general B2B portal trends. Actual dealer behavior (mobile vs desktop usage ratio, feature adoption curves, notification tolerance) should be validated with analytics after launch to inform priorities.
 
-2. **Pricing complexity beyond 3-tier** — Research assumes Gold/Silver/Bronze is sufficient. Validate whether promotional pricing, seasonal pricing, volume discounts, or contract-specific pricing are needed. Impacts Phase 1 pricing schema design.
-
-3. **Credit/payment terms management** — Research unclear if dealers buy on credit or prepay. If credit limits and payment terms are critical, add to Phase 1 (from differentiators). Verify with stakeholders.
-
-4. **Target ERP system** — Phase 5 planning cannot proceed without identifying the specific ERP. Different systems (SAP, Oracle, Microsoft Dynamics, NetSuite, Odoo) have vastly different integration patterns.
-
-5. **Dealer device landscape** — Confirm iOS vs Android mix, device age, and connectivity quality (WiFi vs 3G/4G). Impacts offline-first design priority and minimum supported OS versions.
-
-6. **WhatsApp priority** — Current workflow uses WhatsApp. Validate whether WhatsApp notification integration is high-value quick win or nice-to-have for Phase 4.
-
-**Research to conduct later:**
-
-- **Phase 5: ERP integration** — Once ERP selected, conduct deep research into vendor-specific API, data model, authentication, sync capabilities, and known pitfalls. Budget 1-2 weeks research before Phase 5 planning.
-
-- **Phase 4: WhatsApp Business API** — If prioritized, research message template requirements, pricing structure, conversation-based billing, and approved use cases.
-
-**Technical unknowns (resolve during Phase 1):**
-
-- **Inventory reservation timeout** — How long to hold stock during checkout? (Recommend 15 minutes based on e-commerce norms, adjust based on dealer feedback)
-
-- **Auto-approval thresholds** — What order value triggers manual approval? (Start conservative in MVP, tune based on Phase 1 learnings)
-
-- **Notification frequency limits** — Max notifications per dealer per day to avoid fatigue? (Recommend starting with critical-only in MVP, expand based on opt-out rates)
-
----
+**Handling during execution:**
+- Turkey-specific gaps: Validate financial schema with ERP export samples before Phase 5 implementation
+- Cargo integration: Defer automation research until Phase 7; assess dealer demand for real-time tracking
+- Usage patterns: Instrument all v2.0 features with analytics from day one; review after 30 days to adjust priorities
 
 ## Sources
 
 ### Primary (HIGH confidence)
 
-**Stack Research:**
-- [Express.js vs Fastify vs NestJS Comparison 2026](https://www.index.dev/skill-vs-skill/backend-nestjs-vs-expressjs-vs-fastify)
-- [PostgreSQL vs MongoDB 2025 Decision Guide](https://dev.to/hamzakhan/postgresql-vs-mongodb-in-2025-which-database-should-power-your-next-project-2h97)
-- [Node.js ORMs 2025: Prisma vs Drizzle vs TypeORM](https://thedataguy.pro/blog/2025/12/nodejs-orm-comparison-2025/)
-- [Redux Toolkit vs React Query vs Zustand 2025](https://medium.com/@vishalthakur2463/redux-toolkit-vs-react-query-vs-zustand-which-one-should-you-use-in-2025-048c1d3915f4)
-- [Next.js Routing: App Router vs Pages Router 2025](https://kitemetric.com/blogs/next-js-routing-in-2025-app-router-vs-pages-router)
+**Stack & Technology:**
+- [react-pdf Official Compatibility Documentation](https://react-pdf.org/compatibility) — Next.js 16 + React 19 compatibility verified
+- [Supabase Storage Access Control](https://supabase.com/docs/guides/storage/security/access-control) — Official RLS patterns for file storage
+- [Next.js Server Actions Official Guide](https://nextjs.org/docs/14/app/building-your-application/data-fetching/server-actions-and-mutations) — Data mutation patterns
 
-**Features Research:**
-- [B2B Order Management Buyer Experience (BigCommerce)](https://www.bigcommerce.com/articles/b2b-ecommerce/b2b-order-management/)
-- [The New B2B Buyer 2026 Insights (Nishtech)](https://www.nishtech.com/Blog/2025/December/The-New-B2B-Buyer-2026-Insights) — 83% digital ordering preference
-- [Top 7 B2B Order Management Trends 2026 (Silicon Slopes)](https://www.siliconslopes.com/c/posts/top-7-b2b-order-management-software-trends-to-transform-your-business-in-2026)
-- [Dealer Portal Benefits for Manufacturers (GenAlpha)](https://www.genalpha.com/post/start-your-digital-commerce-journey-with-a-dealer-portal-5-benefits-for-manufacturers)
-- [Creating Tiered Pricing Structures 2026 (InfluenceFlow)](https://influenceflow.io/resources/creating-tiered-pricing-structures-a-complete-guide-for-2026/)
+**Features & B2B Standards:**
+- [B2B Portal Features 2026 (B2Bridge)](https://b2bridge.io/blog/b2b-portal/) — 71% personalization expectation statistic
+- [B2B Store Cari Hesap Takibi](https://tr.b2bstore.com/cari-hesap-takibi/) — Turkish B2B financial tracking as "backbone"
+- [Microsoft Dynamics 365 B2B Invoice Management](https://learn.microsoft.com/en-us/dynamics365/commerce/b2b/invoice-management) — Invoice access as table stakes
+- [Shopify B2B Wishlist Apps](https://apps.shopify.com/wishlist-project-planner) — 50% faster reorder time with favorites
 
-**Architecture Research:**
-- [B2B Ecommerce Software Architecture (Shopify)](https://www.shopify.com/enterprise/blog/b2b-ecommerce-software-architecture)
-- [Microservices vs Monoliths 2026 (Java Code Geeks)](https://www.javacodegeeks.com/2025/12/microservices-vs-monoliths-in-2026-when-each-architecture-wins.html) — 42% consolidation statistic
-- [Monolithic vs Microservices 2026 (AWS)](https://aws.amazon.com/compare/the-difference-between-monolithic-and-microservices-architecture/)
-- [State Machines Best Practices (commercetools)](https://docs.commercetools.com/learning-model-your-business-structure/state-machines/state-machines-page)
-- [REST vs GraphQL vs tRPC 2026 (DEV)](https://dev.to/dataformathub/rest-vs-graphql-vs-trpc-the-ultimate-api-design-guide-for-2026-8n3) — 93% REST adoption
+**Security & Multi-Tenancy:**
+- [Supabase RLS Multi-Tenant Guide (DEV Community)](https://dev.to/blackie360/-enforcing-row-level-security-in-supabase-a-deep-dive-into-lockins-multi-tenant-architecture-4hd2) — Multi-tenant RLS patterns
+- [Multi-Tenant Security Best Practices (Qrvey)](https://qrvey.com/blog/multi-tenant-security/) — Data leakage prevention
 
-**Pitfalls Research:**
-- [Multi-Tenant Security Risks and Best Practices (Qrvey)](https://qrvey.com/blog/multi-tenant-security/)
-- [B2B Pricing Mistakes Survey of 1,700 Companies (HBR)](https://hbr.org/2018/06/a-survey-of-1700-companies-reveals-common-b2b-pricing-mistakes)
-- [B2B ERP Integration Pitfalls (Ignitiv)](https://www.ignitiv.com/b2b-ecommerce-erp-integration/) — 50% failure rate
-- [API Versioning Best Practices 2026 (GetLate)](https://getlate.dev/blog/api-versioning-best-practices)
-- [Common Order Management Mistakes (Sharp Commerce)](https://sharpcommerce.com/common-order-management-mistakes/)
+**Performance & Optimization:**
+- [Supabase Materialized Views Guide (DEV)](https://dev.to/kovidr/optimize-read-performance-in-supabase-with-postgres-materialized-views-12k5) — Dashboard performance optimization
+- [PostgreSQL Analytics Workload Optimization (Epsio)](https://www.epsio.io/blog/postgres-for-analytics-workloads-capabilities-and-performance-tips) — Aggregation query patterns
 
 ### Secondary (MEDIUM confidence)
 
-- Various dealer portal case studies from I95Dev, Digital Hill
-- Mobile UX best practices from WebProNews, Usability studies
-- Push notification optimization guides from Reteno, Appbot
-- Offline-first architecture patterns from Quokka Labs, OctalSoft
+**Notification Best Practices:**
+- [Push Notification Best Practices 2026 (Reteno)](https://reteno.com/blog/push-notification-best-practices-ultimate-guide-for-2026) — Frequency capping, quiet hours
+- [Why Push Notification Architecture Fails (Netguru)](https://www.netguru.com/blog/why-mobile-push-notification-architecture-fails) — Spam prevention patterns
 
-### Research Methodology
+**B2B Portal Patterns:**
+- [Complete Guide to B2B Dealer Portals (OroCommerce)](https://oroinc.com/b2b-ecommerce/blog/the-complete-guide-to-b2b-dealer-portals/) — Portal feature standards
+- [Self-Serve Dealer Portals 2026 (Shopaccino)](https://www.shopaccino.com/blog/how-b2b-brands-can-improve-dealer-relationships-with-selfserve-ordering-portals) — Campaign management patterns
 
-Research was conducted across four parallel workstreams (STACK, FEATURES, ARCHITECTURE, PITFALLS) focusing on 2025-2026 sources to ensure current best practices. Sources were prioritized by:
-1. Authoritative industry publications (HBR, AWS, official framework docs)
-2. B2B-specific content (not generic e-commerce)
-3. Statistical validation (surveys, adoption rates, failure rates)
-4. Recency (2025-2026 publications)
+**Financial Systems:**
+- [Common Accounting Problems 2026 (Spendflo)](https://www.spendflo.com/blog/accounting-problems) — Manual entry error patterns
+- [B2B Invoicing Best Practices (Paystand)](https://www.paystand.com/blog/b2b-invoicing) — Invoice generation recommendations
 
-Cross-validation was performed by checking multiple sources for each major finding. Where sources conflicted, preference given to official documentation and recent authoritative sources over older blog posts.
+### Tertiary (LOW confidence, needs validation)
+
+**Cargo Tracking:**
+- [B2B Cargo Complexity (Trizbi)](https://www.trizbi.com/en/blog/cargo-at-b2b-companies-on-special-days) — Cargo integration challenges mentioned but limited detail on Turkish carriers
+
+**Mobile PDF Viewing:**
+- [React Native PDF Viewer Guide (The App Market)](https://theappmarket.io/blog/react-native-pdf-viewer) — WebView vs native PDF tradeoffs (community guide, not official docs)
 
 ---
 
-**Research completed:** 2026-01-25
-**Ready for roadmap:** Yes
-**Synthesized by:** GSD Research Synthesizer
-**Next step:** Roadmap creation with phase structure, features, and dependencies
+*Research completed: 2026-02-08*
+*Ready for roadmap: yes*
+*Synthesized from: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md*

@@ -1,801 +1,627 @@
-# Feature Landscape: B2B Dealer Order Management System
+# Features Research: v2.0 - Bayi Dashboard ve Finansal Takip
 
-**Domain:** Manufacturer-to-Dealer Order Management
-**Project:** Bayi Yönetimi (Dealer Management)
-**Researched:** 2026-01-25
+**Domain:** B2B Dealer Portal - Dealer Experience & Financial Tracking
+**Project:** Bayi Yönetimi v2.0
+**Researched:** 2026-02-08
 **Overall Confidence:** HIGH
 
-## Executive Summary
+## Summary
 
-Based on research into B2B dealer order management systems in 2026, this document categorizes features into table stakes (must-have or dealers won't adopt), differentiators (competitive advantages), and anti-features (avoid for MVP to prevent over-engineering).
+This research focuses on five new feature categories for v2.0: **Dealer Dashboard**, **Finansal Bilgiler (Cari Hesap)**, **Favori Ürünler**, **Kampanyalar/Duyurular**, and **Destek/İletişim**. These features transform the portal from a basic ordering system to a comprehensive dealer relationship platform.
 
-**Key Insight:** 74% of B2B buyers switch to competitors for a smoother buying experience. 83% prefer digital ordering over phone/email. The current pain points (phone/WhatsApp orders, no after-hours ordering, no stock visibility) align precisely with what 2026 dealers demand as table stakes.
+**Key Findings:**
+
+1. **Dealer dashboards are table stakes in 2026** - 71% of B2B buyers expect personalized experiences, with dashboard widgets showing spending, order status, and performance metrics.
+
+2. **Cari Hesap (current account) is critical for Turkish B2B** - Described as "the backbone of Turkish B2B relationships," financial transparency (debt/credit balance, invoice access) is non-negotiable for dealer trust.
+
+3. **Favorites/wishlists reduce reorder friction** - B2B portals with saved product lists show 50% faster reorder times and are now standard features across platforms.
+
+4. **Campaign management drives engagement** - Modern dealer portals serve as marketing hubs where manufacturers push targeted campaigns, with automated rollouts showing higher dealer engagement than email-only approaches.
+
+5. **Support messaging is evolving from tickets to conversations** - 2026 B2B support platforms favor async messaging over traditional ticketing, with native integration into business tools (Slack/Teams) becoming standard.
 
 ---
 
-## Table Stakes
+## Feature Categories
 
-Features users expect. Missing = product feels incomplete or dealers won't adopt.
+### Bayi Dashboard
 
-### 1. 24/7 Self-Service Ordering
-**Why Expected:** 83% of B2B buyers prefer digital ordering, and 61% prefer rep-free experiences. After-hours ordering is explicitly listed as a current pain point.
+The dealer dashboard is the landing page after login - their command center for business metrics and quick actions.
 
-**Complexity:** Medium
-- Product catalog with search/filter
-- Shopping cart functionality
-- Checkout process
-- Order confirmation
+#### Table Stakes
 
-**Notes:**
-- Directly addresses current pain: "no after-hours ordering"
-- Dealer portals that provide 24/7 access reduce customer service inquiries by 40%
-- CRITICAL for MVP - this is the core value proposition
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|-----------|--------------|-------|
+| **Toplam Harcama Özeti (Spending Summary)** | 71% of B2B buyers expect personalized experiences; spending overview is baseline personalization | Low | Order history data | Show current month/year totals. Compare to previous period. |
+| **Son Siparişler Widget** | Dealers need immediate visibility into recent activity without navigating to order history | Low | Order data | Show last 3-5 orders with status, date, total. Link to full order detail. |
+| **Bekleyen Sipariş Sayısı** | Actionable metric - shows what needs attention | Low | Order status data | Count of orders in "Beklemede", "Onaylandı", "Hazırlanıyor" states. One-click to filtered list. |
+| **Hızlı Aksiyonlar (Quick Actions)** | Portal friction = dealers revert to phone orders. Quick actions reduce clicks to common tasks. | Low | Existing features | "Yeni Sipariş", "Hızlı Sipariş", "Siparişlerim", "Faturalar" buttons. Mobile-friendly large touch targets. |
 
 **Sources:**
-- [B2B Order Management (BigCommerce)](https://www.bigcommerce.com/articles/b2b-ecommerce/b2b-order-management/)
-- [The New B2B Buyer 2026 (Nishtech)](https://www.nishtech.com/Blog/2025/December/The-New-B2B-Buyer-2026-Insights)
+- [B2B Portal Features 2026 (B2Bridge)](https://b2bridge.io/blog/b2b-portal/)
+- [Top 5 B2B Portal Features (Asabix)](https://asabix.com/blog/top-5-features-b2b-portal-in-2026/)
 
----
+#### Differentiators
 
-### 2. Real-Time Stock Visibility
-**Why Expected:** "Real-time visibility is non-negotiable" per 2026 research. Current pain explicitly states "no real-time stock visibility."
-
-**Complexity:** Medium-High
-- Live inventory integration
-- Stock level display per product
-- Low stock warnings
-- Multi-location inventory (if applicable)
-
-**Notes:**
-- Prevents overselling and builds dealer trust
-- Must integrate with manufacturer's inventory system
-- Update frequency: Real-time or near-real-time (max 5-minute lag acceptable for MVP)
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|-----------|-------|
+| **En Çok Aldığı Ürünler (Top Products Widget)** | Proactive assistance - surface dealer's favorites for one-click reorder | Medium | Requires order item aggregation query. "Add to cart" buttons on each product. |
+| **Grup Performans Karşılaştırması** | Gamification - show dealer's metrics vs. their tier average (e.g., "You spent 15% more than average Altın dealers this month") | Medium | Competitive advantage: Few portals show peer comparisons. Privacy concern: Don't reveal specific dealer names. |
+| **Stok Uyarıları Widget** | Proactive - show which favorited/frequently-ordered products are low stock or out of stock | Medium | Requires product favorite tracking + stock monitoring. Drives urgency for orders. |
 
 **Sources:**
-- [B2B Order Management Trends (Silicon Slopes)](https://www.siliconslopes.com/c/posts/top-7-b2b-order-management-software-trends-to-transform-your-business-in-2026)
-- [Dealer Portal Benefits (GenAlpha)](https://www.genalpha.com/post/start-your-digital-commerce-journey-with-a-dealer-portal-5-benefits-for-manufacturers)
+- [Modern B2B Distributors 2026 (Shopify)](https://www.shopify.com/enterprise/blog/b2b-distributors)
+- [Dealer Portal Guide (OroCommerce)](https://oroinc.com/b2b-ecommerce/blog/the-complete-guide-to-b2b-dealer-portals/)
 
 ---
 
-### 3. Tiered Pricing by Dealer Group (Gold/Silver/Bronze)
-**Why Expected:** Explicitly stated in project context. B2B systems must support "customer-specific pricing agreements and complex pricing tiers."
+### Finansal Bilgiler (Cari Hesap)
 
-**Complexity:** Medium
-- Customer group assignment (Gold/Silver/Bronze)
-- Automated price application based on group
-- Price display shows dealer's specific price
-- No manual price calculation
+"Cari hesap" is **the backbone of Turkish B2B relationships** - dealers need transparency into their financial position with the manufacturer.
 
-**Notes:**
-- 78% of SaaS companies use tiered pricing models successfully
-- Must be transparent: dealers see their tier's prices immediately
-- For MVP: Simple 3-tier system (Gold/Silver/Bronze) is sufficient
-- Defer: Dynamic pricing, promotional pricing, volume discounts beyond tier
+#### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|-----------|--------------|-------|
+| **Cari Bakiye Görüntüleme (Current Balance)** | Turkish B2B standard. Dealers cannot operate without knowing their debt/credit balance. | Low | ERP-ready schema: `dealer_balance` table with `debit`, `credit`, `balance` columns. Admin manually enters initially, ERP sync later. | Show: Total Debt (Borç), Total Credit (Alacak), Net Balance (Bakiye). Multi-currency support if needed. |
+| **Cari Hesap Hareketleri (Account Movements)** | Dealers need transaction history: invoices, payments, adjustments | Medium | Schema: `account_movements` with date, document_number, transaction_type (invoice/payment/adjustment), debit, credit, balance, description | Table showing: Date, Document #, Type, Debit, Credit, Running Balance. Filter by date range, transaction type. Export to Excel. |
+| **Fatura Görüntüleme / PDF İndirme** | "24/7 access to invoice history" is table stakes per 2026 research. Reduces support calls. | Medium | File storage (Supabase Storage), `invoices` table with PDF URL. Admin uploads PDFs manually initially. | List invoices (paid/unpaid/partially paid + due dates). Click to view/download PDF. Filter by status, date. |
+| **Ödeme Geçmişi (Payment History)** | Transparency builds trust. Dealers need proof of payments made. | Low | Account movements filtered by payment type. | Show payments with date, amount, method, reference number. Link to associated invoice. |
 
 **Sources:**
-- [Tiered Pricing for B2B (InfluenceFlow)](https://influenceflow.io/resources/creating-tiered-pricing-structures-a-complete-guide-for-2026/)
-- [B2B Customer Groups & Pricing (Shopaccino)](https://www.shopaccino.com/blog/how-manufacturers-can-manage-b2b-customer-groups-and-custom-pricing)
+- [Turkish B2B Cari Hesap (B2B Store)](https://tr.b2bstore.com/cari-hesap-takibi/)
+- [Cari Hesap Takibi Features (B2B.net.tr)](https://www.b2b.net.tr/moduller/detayli-cari-hareketler)
+- [B2B Invoice Management (Microsoft Dynamics 365)](https://learn.microsoft.com/en-us/dynamics365/commerce/b2b/invoice-management)
+
+#### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|-----------|-------|
+| **Online Ödeme Entegrasyonu** | Dealers can pay outstanding invoices directly from portal via credit card or bank transfer | High | Payment gateway integration (iyzico, PayTR). Reduces DSO (days sales outstanding). Defer to post-v2 unless critical. |
+| **Ödeme Planı Görüntüleme** | For dealers with payment terms (e.g., net 30, net 60), show upcoming due dates and amounts | Low | Useful for cash flow planning. Reduces late payments. |
+| **Cari Hesap Bildirimleri** | Notify dealer when balance exceeds threshold or invoice is overdue | Low | Email/push notification when: invoice due soon, payment overdue, balance limit approaching. |
+
+**Notes on ERP Integration:**
+- v2.0 uses **ERP-ready schema** - admin manually enters financial data
+- Post-v2: Real-time sync with Logo/Netsis via API (when ERP integration milestone happens)
+- Critical: Data structure must match ERP export format for easy migration
 
 ---
 
-### 4. Quick/Bulk Order Entry
-**Why Expected:** Dealers reorder frequently with known SKUs. Manual one-by-one addition is friction that drives them back to phone orders.
+### Favori Ürünler (Product Favorites)
 
-**Complexity:** Low-Medium
-- CSV upload for bulk orders
-- Quick order form (SKU + Quantity entry)
-- Copy from previous order
-- Frequently ordered items shortcut
+Favorites/wishlists are **standard B2B features in 2026** - not differentiators, but expected functionality.
 
-**Notes:**
-- AI-driven bulk order processing shows 50% faster processing, 85% fewer errors
-- For MVP: Quick order form (paste SKU list) is sufficient
-- CSV upload can be added post-MVP if needed
-- Reduces order entry time from minutes to seconds
+#### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|-----------|--------------|-------|
+| **Favorilere Ekle Butonu** | One-click save from product card/detail page | Low | `product_favorites` table (dealer_id, product_id, added_at) | Heart icon on product cards. Toggle on/off. |
+| **Favori Listesi Sayfası** | Dedicated page to view/manage all favorites | Low | Query favorites with product details | Grid/list view matching catalog. "Sepete Ekle" buttons. Remove from favorites option. |
+| **Favorilerden Sipariş** | Bulk add favorites to cart for quick reorder | Low | Core value: 50% faster reorder times per research | "Tümünü Sepete Ekle" or individual "Sepete Ekle" per item. |
 
 **Sources:**
-- [Future of Order Management (Netguru)](https://www.netguru.com/blog/oms-future-trends)
-- [B2B Order Management (BigCommerce)](https://www.bigcommerce.com/articles/b2b-ecommerce/b2b-order-management/)
+- [B2B Wholesale Wishlist Features (Shopify Apps)](https://apps.shopify.com/wishlist-project-planner)
+- [B2B Order Portals 2026 (Moxo)](https://www.moxo.com/blog/b2b-order-portals-manufacturing)
+
+#### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|-----------|-------|
+| **Çoklu Favori Listeleri** | Power users create themed lists (e.g., "Yaz Ürünleri", "Hızlı Satanlar", "Promosyon Ürünleri") | Medium | Multiple lists add complexity. Defer unless dealers request. B2C feature more than B2B. |
+| **Favori Listesi Paylaşma** | Dealers with multiple users can share lists within their team | Medium | Useful for dealers with purchasing manager + sales staff. Requires team collaboration features. |
+| **Stok Uyarıları (Favoriler İçin)** | Notify when favorited out-of-stock product is back in stock | Low | High value, low complexity. Recommended for v2. Captures demand that would go to competitors. |
+
+**Anti-Features:**
+- **Public/Social Wishlists** - This is B2B, not consumer marketplace. No public sharing or social features needed.
 
 ---
 
-### 5. Order Tracking & Status Updates
-**Why Expected:** "73% of customers consider experience a key factor" and "real-time tracking is no longer optional—it's expected."
+### Kampanyalar / Duyurular (Campaigns & Announcements)
 
-**Complexity:** Medium
-- Order status workflow (Pending → Confirmed → Processing → Shipped → Delivered)
-- Status history timeline
-- Estimated delivery date
-- Order search/filter by status, date, etc.
+Modern dealer portals are **marketing hubs**, not just ordering tools. Campaigns drive engagement and repeat visits.
 
-**Notes:**
-- Dealers need to know "where's my order?" without calling
-- For MVP: Basic status tracking with manual admin updates is acceptable
-- Post-MVP: Automated status updates via warehouse integration
+#### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|-----------|--------------|-------|
+| **Aktif Kampanyalar Sayfası** | Dealers expect to see current promotions, special pricing, new products | Low | `campaigns` table with title, description, start_date, end_date, active status. Admin creates campaigns. | List view with campaign cards. Filter by active/expired. Detail page with full description, terms, featured products. |
+| **Duyuru Sistemi** | Manufacturer needs to communicate important updates (policy changes, holiday closures, new product launches) | Low | `announcements` table similar to campaigns, but for informational (not sales) content | Show unread announcements as badge/notification. Announcement feed page. Mark as read functionality. |
+| **Yeni Ürün Vurgulama** | Highlight new products added to catalog | Low | `products.is_new` flag or `created_at` filter for last 30 days | "Yeni Ürünler" section on dashboard or catalog. Badge on product cards. |
 
 **Sources:**
-- [B2B Order Tracking Transparency (IF Global)](https://www.ifglobal.com/resources/blog/how-smart-order-management-accelerates-dtc-b2b-expansion)
-- [B2B Buyer Behavior 2026 (Vendict)](https://vendict.com/blog/b2b-buyer-behavior-why-verifiable-trust-digital-transparency-are-the-real-dealbreakers)
+- [Dealer Portal Campaign Features (i95dev)](https://www.i95dev.com/who-benefits-from-dealer-portals-and-how/)
+- [B2B Portal Marketing Hub (Shopaccino)](https://www.shopaccino.com/blog/how-b2b-brands-can-improve-dealer-relationships-with-selfserve-ordering-portals)
+
+#### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|-----------|-------|
+| **Hedefli Kampanyalar (Targeted Campaigns)** | Show campaigns only to specific dealer tiers (e.g., "Altın dealers only") or specific dealers | Medium | Requires campaign targeting rules: by tier, by dealer group, by region. Increases relevance. |
+| **İndirimli Ürünler Filtresi** | Dedicated "Kampanyalı Ürünler" filter in catalog showing discounted items | Low | Requires `products.on_sale` flag or campaign-product association table. Quick win for dealers hunting deals. |
+| **Push Bildirimi (Yeni Kampanya)** | Notify dealers immediately when new campaign launches | Low | Mobile push (already built in v1) or email. Drives portal engagement. |
+| **Kampanya Performans Takibi (Admin)** | Admin sees which campaigns drive most orders, which dealers engage | Medium | Analytics feature. Post-v2 unless admin explicitly needs campaign ROI tracking. |
+
+**Anti-Features:**
+- **Dealer-Created Campaigns** - Campaigns are manufacturer-controlled. Dealers don't create their own.
+- **Complex Promotion Engine** - Avoid coupon codes, stacking rules, automated discounts. Keep campaigns informational with manual pricing if needed.
 
 ---
 
-### 6. Push Notifications for Order Updates
-**Why Expected:** Explicitly stated in project context. "Automatic updates on order status are essential" per research.
+### Destek / İletişim (Support & Communication)
 
-**Complexity:** Low-Medium
-- Order confirmed notification
-- Order shipped notification
-- Order delivered notification
-- Low stock alert for reorder reminders
+2026 B2B support is **moving from tickets to conversations** - async messaging preferred over formal ticketing systems.
 
-**Notes:**
-- Multi-channel: In-app, email, SMS (prioritize by dealer preference)
-- For MVP: Email + in-app notifications sufficient
-- Reduces "where's my order?" support calls
-- Mobile push requires mobile app (defer to post-MVP unless web push used)
+#### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|-----------|--------------|-------|
+| **Admin'e Mesaj Gönderme** | Dealers need communication channel for questions, issues, requests that don't fit phone/email | Medium | `support_messages` table with conversation threading. Admin inbox to view/reply. | Simple message form: subject, message body, optional attachment. Admin replies via admin panel. Email notification to dealer on reply. |
+| **Mesaj Geçmişi** | Dealers view conversation history with admin | Low | List dealer's messages with status (pending/replied), timestamp, subject. Click to view full thread. | Filter by status, search by keyword. |
+| **SSS Sayfası (FAQ)** | Self-service for common questions reduces support load | Low | Static content page or `faq` table with categories. Admin manages FAQs. | Categories: Sipariş, Ödeme, Teslimat, Ürünler, Hesap. Search functionality helpful. |
 
 **Sources:**
-- [Push Notifications B2B (SuprSend)](https://www.suprsend.com/post/what-is-an-effective-notification-service-in-b2b-context---selecting-implementing-and-optimizing-notification-services-for-saas-business)
-- [B2B Commerce Notifications (Salesforce)](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-notifications-other-custom.html)
+- [B2B Support Ticketing 2026 (Thena)](https://www.thena.ai/post/a-complete-guide-to-b2b-customer-service-ticketing-systems)
+- [B2B Customer Support Platform (Pylon)](https://www.usepylon.com/blog/b2b-customer-support-platform-2026)
+
+#### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|-----------|-------|
+| **Ürün Talebi (Product Request)** | Dealer can request products not in catalog or out-of-stock items | Low | Separate form from general support. Admin sees product requests separately for demand planning. High business value. |
+| **Canlı Durum Göstergesi** | Show if admin is online for faster response expectations | Low | Presence indicator. Sets expectations: if admin offline, expect delayed response. |
+| **Dosya Ekleme (Attachments)** | Dealers attach images (e.g., damaged product photo) or documents to messages | Medium | File upload to Supabase Storage. Link to message. Virus scanning recommended. |
+| **WhatsApp Bildirimi** | Notify admin via WhatsApp when dealer sends message (since current workflow uses WhatsApp) | Low | WhatsApp Business API. Admin gets instant notification. Differentiator given current practices. |
+
+**Anti-Features:**
+- **Realtime Chat Widget** - Out of scope for v2. Async messaging is sufficient. Dealers don't expect instant chat from manufacturers.
+- **Complex Ticket System** - No SLA tracking, priority levels, ticket assignment rules. Keep it simple conversation-based messaging.
+- **Public Forum/Community** - Dealers don't need peer-to-peer support. This is manufacturer-dealer 1:1 communication.
+
+**Notes on Architecture:**
+- Use **async messaging pattern**, not synchronous chat
+- Admin doesn't need real-time WebSocket updates - periodic polling or manual refresh acceptable
+- Mobile push for dealers on new admin reply (leverage v1 push infrastructure)
 
 ---
 
-### 7. Order History & Reordering
-**Why Expected:** Dealers place repeat orders. Not having history forces them to recreate orders manually or call.
+### Sipariş Detayları Geliştirmeleri (Order Detail Enhancements)
 
-**Complexity:** Low
-- View past orders with details
-- Search/filter order history
-- "Reorder" button copies items to cart
-- Download order as PDF/CSV
+These features extend existing v1 order functionality with document management.
 
-**Notes:**
-- Simple feature with high dealer value
-- For MVP: Basic order history with reorder function
-- Post-MVP: Predictive reordering, subscription orders
+#### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|-----------|--------------|-------|
+| **Fatura PDF İndirme (Sipariş Detayında)** | Dealers need invoice for accounting, tax purposes | Low | Same as Finansal Bilgiler > Fatura. Link invoice to order. | "Faturayı İndir" button on order detail page if invoice exists. |
+| **İrsaliye PDF İndirme** | Waybill/delivery note required for goods receipt | Low | `order_documents` table with type (invoice/waybill), file URL. Admin uploads. | "İrsaliyeyi İndir" button on shipped/delivered orders. |
 
 **Sources:**
-- [Dealer Portal Benefits (I95Dev)](https://www.i95dev.com/who-benefits-from-dealer-portals-and-how/)
-- [B2B Ordering Trends (DueTrade)](https://www.duetrade.co.uk/blog-posts/our-prediction-6-b2b-ordering-trends-shaping-2026)
+- [B2B Invoice Portal (Cloudfy)](https://cloudfy.com/platform/features/invoice-payment-portal/)
+
+#### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|-----------|-------|
+| **Kargo Takip Bilgisi** | For manufacturer's own vehicles (not 3rd party carriers with API), manual tracking info entry | Low | Text field for tracking notes (e.g., "Araç plakası: 34 ABC 123, Sürücü: Mehmet, Tel: 555-1234"). |
+| **E-Fatura Entegrasyonu** | Turkey's e-invoice system compliance. Auto-generate e-invoice from order. | High | Requires GİB (Revenue Administration) integration or e-invoice provider. Complex compliance. Defer unless legally required. |
 
 ---
 
-### 8. Secure Authentication & Role-Based Access
-**Why Expected:** "Dealer portals provide heightened security with unique logins for every dealer." B2B systems require multi-user access per dealer.
+### Bayi Raporları (Dealer-Facing Reports)
 
-**Complexity:** Medium
-- User authentication (email/password)
-- Role-based permissions (Owner, Manager, Staff)
-- Password reset
-- Session management
+Self-service analytics empower dealers and reduce support questions.
 
-**Notes:**
-- Each dealer may have multiple users (owner, purchasing manager, sales staff)
-- For MVP: Simple roles (Admin, Dealer Admin, Dealer Staff)
-- Post-MVP: Fine-grained permissions, SSO, 2FA
+#### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|-----------|--------------|-------|
+| **Kendi Harcama Analizi** | Dealers want to see their own spending patterns | Medium | Aggregate order data by month, product category, etc. Simple bar/line charts or tabular data. | Show: Monthly spending trend, spending by product category, top 10 products by spend. Export to Excel. |
 
 **Sources:**
-- [Dealer Portal Security (I95Dev)](https://www.i95dev.com/who-benefits-from-dealer-portals-and-how/)
-- [Dealer Management 2026 (DealerClick)](https://dealerclick.com/blog/dealer-management-software-buyers-guide-2026)
+- [B2B Reporting 2026 (AgencyAnalytics)](https://agencyanalytics.com/blog/b2b-reporting)
+
+#### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|-----------|-------|
+| **Dönemsel Karşılaştırma** | Compare current period vs. previous period (e.g., "This month vs. last month", "This year vs. last year") | Low | Useful for dealers tracking their own growth. Simple percentage change calculations. |
+| **Ürün Kategori Analizi** | Breakdown of spending by product category to identify purchasing patterns | Medium | Requires product categorization (if not already exists). Helps dealers plan inventory. |
+
+**Anti-Features:**
+- **Complex BI Dashboards** - No drill-down, pivot tables, or interactive visualizations. Keep it simple tabular reports + basic charts.
+- **Predictive Analytics** - No AI/ML forecasting. Defer to much later phases.
 
 ---
 
-### 9. Admin: Product Management
-**Why Expected:** Manufacturer needs to control catalog, pricing, and availability. Core admin function.
+## Anti-Features (v2.0)
 
-**Complexity:** Medium
-- Create/edit/delete products
-- Product details (name, SKU, description, images)
-- Category management
-- Set base price + tier prices
-- Set stock levels
+Features to deliberately **NOT** build in v2.0.
 
-**Notes:**
-- For MVP: Basic CRUD operations sufficient
-- Bulk product upload via CSV can be post-MVP
-- Product images: Optional for MVP if SKU-based ordering is primary
-
-**Sources:**
-- [Dealer Portal Features (Digital Hill)](https://www.digitalhill.com/blog/how-manufacturers-can-benefit-from-a-dealer-portal/)
-
----
-
-### 10. Admin: Order Management
-**Why Expected:** Manufacturer must process, confirm, and update orders. Core operational requirement.
-
-**Complexity:** Medium
-- View all orders with filters
-- Update order status
-- View order details
-- Cancel/modify orders
-- Export orders for processing
-
-**Notes:**
-- For MVP: Manual status updates acceptable
-- Integration with warehouse/shipping systems is post-MVP
-- Critical: Clear workflow to prevent orders from being forgotten
-
-**Sources:**
-- [Order Management Best Practices (Sharp Commerce)](https://sharpcommerce.com/common-order-management-mistakes/)
-
----
-
-### 11. Admin: Dealer Management
-**Why Expected:** ~700 dealers need onboarding, tier assignment, and management.
-
-**Complexity:** Medium
-- Create/edit dealer accounts
-- Assign dealer tier (Gold/Silver/Bronze)
-- Activate/deactivate dealers
-- View dealer details
-- Search/filter dealers
-
-**Notes:**
-- For MVP: Manual dealer creation by admin
-- Bulk import via CSV useful given 700 dealers (consider for MVP if onboarding all at once)
-- Self-registration can be post-MVP
-
-**Sources:**
-- [B2B Customer Groups (Shopaccino)](https://www.shopaccino.com/blog/how-manufacturers-can-manage-b2b-customer-groups-and-custom-pricing)
-
----
-
-### 12. Basic Reporting
-**Why Expected:** "Comprehensive reporting and analytics tools provide insights for data-driven decisions."
-
-**Complexity:** Medium
-- Sales by period (daily, weekly, monthly)
-- Top products
-- Top dealers
-- Order status summary
-- Export to CSV/Excel
-
-**Notes:**
-- For MVP: Basic tabular reports with export
-- Post-MVP: Interactive dashboards, charts, advanced analytics
-- Critical metrics: Total sales, order count, average order value
-
-**Sources:**
-- [Dealer Analytics (Titan DMS)](https://www.titandms.com/solution/dealer-analytics)
-- [Dealer Reporting Features (DashThis)](https://dashthis.com/reporting-tools-car-dealership/)
-
----
-
-## Differentiators
-
-Features that set the product apart. Not expected, but provide competitive advantage if implemented well.
-
-### 1. WhatsApp Integration for Order Notifications
-**Value Proposition:** Current workflow uses WhatsApp. Integrating notifications via WhatsApp meets dealers where they already are.
-
-**Complexity:** Low-Medium
-- WhatsApp Business API integration
-- Send order confirmations via WhatsApp
-- Send status updates via WhatsApp
-- Allow dealers to choose notification channel
-
-**Notes:**
-- Unique differentiator given current WhatsApp-based ordering
-- Reduces friction: dealers already check WhatsApp constantly
-- Cost: WhatsApp Business API has per-message costs (evaluate ROI)
-- For MVP: Consider as "quick win" if API integration is straightforward
-
-**Competitive Edge:** Most B2B systems don't integrate WhatsApp for notifications—email/SMS only.
-
----
-
-### 2. Smart Reorder Suggestions
-**Value Proposition:** AI-driven predictive ordering reduces dealer cognitive load and prevents stockouts.
-
-**Complexity:** High
-- Analyze dealer order history
-- Predict reorder timing
-- Suggest order quantities
-- "Smart reorder" button pre-fills cart
-
-**Notes:**
-- Research shows AI-driven bulk processing delivers 50% faster processing
-- Requires sufficient historical data (defer until post-MVP when order history exists)
-- High value for repeat/predictable orders
-- Competitive advantage: Moves from passive portal to proactive partner
-
-**Competitive Edge:** Few dealer portals offer predictive reordering in 2026.
-
----
-
-### 3. Mobile-First Design / Progressive Web App
-**Value Proposition:** Dealers order on-the-go from their phones. Mobile-optimized experience provides convenience.
-
-**Complexity:** Low-Medium (if designed mobile-first from start)
-- Responsive design
-- Touch-friendly UI
-- Offline capability (PWA)
-- Add to home screen
-
-**Notes:**
-- "Mobile-first" is table stakes for consumer apps, differentiator for B2B
-- For MVP: Fully responsive web design is sufficient
-- PWA features (offline, push) can be added incrementally
-- Native app is overkill for MVP
-
-**Competitive Edge:** Many B2B portals still desktop-only or poorly optimized for mobile.
-
----
-
-### 4. Product Availability Alerts
-**Value Proposition:** Dealers subscribe to out-of-stock products, get notified when back in stock.
-
-**Complexity:** Low
-- "Notify me" button on out-of-stock products
-- Email notification when back in stock
-- Dealer can order immediately from email
-
-**Notes:**
-- Captures demand that would otherwise go to competitors
-- Low complexity, high dealer satisfaction
-- Consider for MVP as "quick win"
-
-**Competitive Edge:** Proactive communication builds loyalty.
-
----
-
-### 5. Dealer Performance Dashboard
-**Value Proposition:** Show dealers their own metrics (YTD orders, spending, top products). Gamification + transparency.
-
-**Complexity:** Medium
-- Dealer-specific analytics
-- Year-to-date spending
-- Order frequency
-- Comparison to their tier average (optional)
-- Downloadable reports
-
-**Notes:**
-- Empowers dealers with self-service insights
-- Reduces "how much have I ordered?" support calls
-- For MVP: Defer to post-MVP (nice-to-have, not must-have)
-
-**Competitive Edge:** Few portals provide dealer-facing analytics—usually admin-only.
-
----
-
-### 6. Multi-Language Support
-**Value Proposition:** If dealers operate in multiple regions/languages, native language support improves adoption.
-
-**Complexity:** Medium-High
-- UI translation (Turkish + others)
-- Multi-language product data
-- Language switcher
-
-**Notes:**
-- ONLY a differentiator if dealers need it (check: do all dealers speak Turkish?)
-- For MVP: Single language (Turkish) unless multi-language is confirmed requirement
-- Complexity increases with content translation and maintenance
-
-**Competitive Edge:** Only relevant if competitor portals are English-only and dealers prefer Turkish.
-
----
-
-### 7. Credit Limit & Payment Terms Display
-**Value Proposition:** Dealers see their credit limit, outstanding balance, and payment terms in real-time.
-
-**Complexity:** High
-- Integration with accounting/ERP system
-- Real-time credit limit calculation
-- Display available credit
-- Block orders if credit exceeded
-- Payment terms per dealer
-
-**Notes:**
-- High value for manufacturers extending credit to dealers
-- Requires ERP/accounting integration (complex)
-- For MVP: Defer unless credit management is critical pain point
-- Alternative for MVP: Manual credit approval by admin
-
-**Competitive Edge:** Transparency in credit/payment builds trust.
-
----
-
-### 8. Order Approval Workflows
-**Value Proposition:** For dealers with internal hierarchy, orders require approval before submission.
-
-**Complexity:** Medium-High
-- Multi-step approval chain
-- Manager approval notifications
-- Approve/reject interface
-- Approval history
-
-**Notes:**
-- Relevant for large dealers with purchasing managers ≠ order placers
-- Research indicates "approval workflows need to follow buyer's actual hierarchy"
-- For MVP: Defer (most dealers likely don't need this for ~700 dealer network)
-- Post-MVP: Offer as optional feature for enterprise dealers
-
-**Competitive Edge:** Enterprise-grade feature that competitors may lack.
-
----
-
-## Anti-Features (Avoid for MVP)
-
-Features that seem good but add complexity without value for MVP. Defer or avoid entirely.
-
-### 1. Advanced Promotions Engine
-**What:** Coupon codes, flash sales, bundle discounts, BOGO offers, time-limited promotions.
+### 1. Online Payment Processing (İyzico/PayTR Integration)
+**What:** Credit card or bank transfer payment from portal.
 
 **Why Avoid:**
-- Tier-based pricing already provides discount structure
-- Complexity: Stacking rules, expiration, conflict resolution
-- Maintenance burden: Managing active promotions
-- B2B relationships are about negotiated pricing, not consumer-style promotions
+- High complexity: PCI compliance, payment gateway integration, reconciliation
+- Current payment processes work (offline payments, bank transfers)
+- Not in v2.0 scope per PROJECT.md ("Ödeme sistemi entegrasyonu sonraki milestone")
 
-**Instead:** Use tiered pricing (Gold/Silver/Bronze). Manually adjust tier if special pricing needed.
+**Instead:** Show outstanding balance and invoice PDFs. Dealers pay via existing offline methods.
 
-**Defer to:** Post-MVP, only if manufacturer runs seasonal promotions for dealers.
-
-**Sources:**
-- [B2B Pricing Strategy (DealHub)](https://dealhub.io/glossary/b2b-pricing/)
+**Defer to:** v3.0 or later if requested.
 
 ---
 
-### 2. Complex Product Configurator
-**What:** Build custom products with options, variants, add-ons, and dynamic pricing.
+### 2. ERP Real-Time Sync (Logo/Netsis)
+**What:** Live bidirectional sync of orders, inventory, financials with ERP.
 
 **Why Avoid:**
-- High complexity: UI for configuration, pricing logic, inventory per variant
-- Only needed if manufacturer sells highly customizable products (e.g., made-to-order furniture)
-- Project context doesn't mention product customization
+- Complex integration, varies by ERP system
+- v2.0 explicitly states "ERP-ready schema" but not actual integration
+- Financial data manually entered by admin initially
 
-**Instead:** Standard catalog with fixed products. If variants exist (e.g., sizes/colors), model as separate SKUs.
+**Instead:** Build **ERP-ready database schema** that matches ERP export formats. Admin manually imports/exports data.
 
-**Defer to:** Only if product customization is confirmed requirement (verify with stakeholders).
-
-**Sources:**
-- [Engineer-to-Order Complexity (Tacton)](https://www.tacton.com/cpq-blog/engineering-to-order-2/)
+**Defer to:** Dedicated ERP integration milestone after v2.0.
 
 ---
 
-### 3. Integrated Logistics / Real-Time Shipping Tracking
-**What:** Live GPS tracking of shipments, carrier API integration, delivery route optimization.
+### 3. Canlı Chat (Realtime Chat)
+**What:** Instant messaging widget with typing indicators, online status, read receipts.
 
 **Why Avoid:**
-- High complexity: Integration with carrier APIs, real-time data sync
-- Dependency on logistics partners having compatible systems
-- MVP doesn't require this level of transparency
-- "Order shipped" status + estimated delivery date is sufficient for MVP
+- Out of scope per PROJECT.md: "v2'de mesajlaşma var ama async, canlı chat yok"
+- Complexity: WebSocket infrastructure, presence tracking, typing indicators
+- B2B doesn't require instant response - async messaging sufficient
 
-**Instead:** Basic order status ("Shipped" + tracking number if available). Dealers contact carrier for detailed tracking.
+**Instead:** Async message system with email notifications on replies.
 
-**Defer to:** Post-MVP, if dealers demand live tracking.
-
-**Sources:**
-- [Order Management Mistakes (Smart Logistics)](https://www.unigis.com/en/order-management-5-mistakes-to-avoid/)
+**Defer to:** Only if dealers explicitly request real-time chat (unlikely).
 
 ---
 
-### 4. Advanced Warehouse Management
-**What:** Multi-warehouse allocation, stock transfers, bin/location tracking, pick/pack/ship workflows.
+### 4. Dealer Self-Service Financial Adjustments
+**What:** Dealers can dispute invoices, request credit notes, adjust their balance.
 
 **Why Avoid:**
-- This is warehouse software (WMS), not a dealer portal
-- Manufacturer likely has existing warehouse processes
-- MVP only needs to display stock availability, not manage warehouse operations
+- Financial adjustments require manufacturer approval
+- Audit trail and compliance concerns
+- Dealers should request adjustments, admin approves
 
-**Instead:** Integrate with existing warehouse/inventory system for stock levels. Warehouse operations remain in existing system.
-
-**Defer to:** Never (out of scope—this is a dealer ordering system, not a WMS).
-
-**Sources:**
-- [B2B Order Management Scope (Unleashed Software)](https://www.unleashedsoftware.com/blog/b2b-order-management-system/)
+**Instead:** Dealers send message to admin requesting adjustment. Admin makes changes in financial system.
 
 ---
 
-### 5. Built-In CRM
-**What:** Lead tracking, sales pipeline, contact management, opportunity scoring.
+### 5. Advanced Campaign Automation
+**What:** Scheduled campaigns, A/B testing, personalization rules, conversion tracking.
 
 **Why Avoid:**
-- This is a dealer ordering system, not a manufacturer sales CRM
-- Manufacturer likely has existing CRM for managing dealer relationships
-- Scope creep: CRM is a separate product category
+- Marketing automation complexity
+- v2.0 needs basic campaign publishing, not full marketing platform
+- Over-engineering for ~700 dealers
 
-**Instead:** If CRM integration is needed (e.g., sync dealer contact info), integrate with existing CRM via API.
+**Instead:** Admin manually creates campaigns with start/end dates. Simple targeted visibility by tier.
 
-**Defer to:** Never (out of scope—buy/integrate CRM if needed).
-
-**Sources:**
-- [CRM Integration Best Practices (DealHub)](https://dealhub.io/glossary/b2b-pricing/)
+**Defer to:** Only if manufacturer has dedicated marketing team needing advanced tools.
 
 ---
 
-### 6. Dealer Self-Registration
-**What:** Dealers can sign up for an account themselves without manufacturer approval.
+### 6. Multi-User Collaboration (per Dealer)
+**What:** Multiple users per dealer with role-based permissions, approval workflows, shared carts.
 
 **Why Avoid:**
-- Manufacturer needs to vet dealers, assign tiers, negotiate terms
-- Open registration invites spam, competitors, or unauthorized resellers
-- B2B is relationship-based, not open marketplace
+- v1 already has basic multi-user (admin vs. dealer roles)
+- Collaboration features (shared carts, approvals) add significant complexity
+- Most dealers likely single-user or informal multi-user
 
-**Instead:** Admin manually creates dealer accounts after offline approval process.
+**Instead:** Keep existing simple role model. Multiple users from same dealer can all access same data.
 
-**Defer to:** Post-MVP, if manufacturer wants "apply to become a dealer" workflow with admin approval.
-
-**Sources:**
-- [Dealer Portal Security (I95Dev)](https://www.i95dev.com/who-benefits-from-dealer-portals-and-how/)
+**Defer to:** Post-v2 if large dealers request internal approval workflows.
 
 ---
 
-### 7. Multi-Currency / Multi-Region
-**What:** Support for multiple currencies, tax jurisdictions, international shipping.
+### 7. Public API for Dealers
+**What:** REST API for dealers to integrate portal with their own systems.
 
 **Why Avoid:**
-- Complexity: Currency conversion, exchange rates, international tax rules
-- ONLY needed if manufacturer sells internationally
-- Project context doesn't mention international dealers
+- Dealers unlikely to have technical sophistication for API integration
+- Security concerns (rate limiting, authentication, documentation)
+- Maintenance burden
 
-**Instead:** Single currency (Turkish Lira assumed). Single tax jurisdiction.
+**Instead:** Dealers use web/mobile UI. Export functionality (CSV, PDF) for data portability.
 
-**Defer to:** Only if international expansion is confirmed roadmap item (verify with stakeholders).
-
-**Notes:** If manufacturer already has international dealers, this becomes table stakes—verify before deferring.
-
----
-
-### 8. EDI (Electronic Data Interchange) Integration
-**What:** Standards-based B2B data exchange (EDI 850 purchase orders, EDI 810 invoices, etc.).
-
-**Why Avoid:**
-- High complexity: EDI standards, mapping, translation, partner onboarding
-- Primarily used by large enterprises and retailers (e.g., Walmart mandates EDI)
-- 700 dealers unlikely to demand EDI (they're calling/WhatsApp now)
-
-**Instead:** Web-based ordering portal. Export orders to CSV for processing.
-
-**Defer to:** Only if large enterprise dealers demand EDI (unlikely for MVP).
-
-**Sources:**
-- [B2B Order Management Complexity (Unleashed Software)](https://www.unleashedsoftware.com/blog/b2b-order-management-system/)
-
----
-
-### 9. Custom Dealer Storefronts
-**What:** Each dealer gets a customized branded portal (white-label, custom domain, custom branding).
-
-**Why Avoid:**
-- High complexity: Multi-tenancy, theme customization, domain management
-- Maintenance burden: Supporting N different storefronts
-- Not needed: This is manufacturer → dealer, not dealer → end customer
-
-**Instead:** Single unified dealer portal. All dealers use the same interface.
-
-**Defer to:** Never (out of scope—dealers sell to end customers via their own channels).
-
----
-
-### 10. Advanced Analytics / BI Dashboards
-**What:** Interactive dashboards, drill-down reports, predictive analytics, data visualization.
-
-**Why Avoid:**
-- High complexity: Charting libraries, dashboard builders, query performance
-- MVP needs basic reports (sales totals, order counts), not BI tool
-- Over-engineering: Manufacturers can export to Excel for ad-hoc analysis
-
-**Instead:** Basic tabular reports with CSV export. Stakeholders use Excel/Google Sheets for advanced analysis.
-
-**Defer to:** Post-MVP, if reporting becomes a bottleneck or stakeholders demand interactive dashboards.
-
-**Sources:**
-- [Dealer Analytics Features (Titan DMS)](https://www.titandms.com/solution/dealer-analytics)
+**Defer to:** Only if enterprise dealers request API access (very unlikely for this market).
 
 ---
 
 ## Feature Dependencies
 
-Understanding which features depend on others to function properly.
+Understanding which v2.0 features depend on existing v1 features or other v2.0 features.
 
 ### Dependency Graph
 
 ```
-Authentication & Authorization
-├── Dealer Management (admin creates dealer accounts)
-│   ├── Tiered Pricing (dealers assigned to tier)
-│   │   └── Product Catalog (prices displayed per tier)
-│   │       └── Shopping Cart
-│   │           └── Order Placement
-│   │               ├── Order Management (admin processes orders)
-│   │               ├── Order Tracking (dealers view status)
-│   │               └── Order History (dealers view past orders)
-│   │                   └── Reordering (copy from history)
-│   └── Push Notifications (notify dealer users)
+[v1 Foundation]
+├── Orders (existing)
+│   ├── Dashboard > Son Siparişler Widget
+│   ├── Dashboard > Bekleyen Sipariş Sayısı
+│   ├── Dashboard > Toplam Harcama Özeti
+│   ├── Bayi Raporları > Harcama Analizi
+│   ├── Sipariş Detayları > Fatura/İrsaliye PDF
+│   └── Dashboard > En Çok Aldığı Ürünler
 │
-├── Product Management (admin creates catalog)
-│   ├── Real-Time Stock Visibility (products show stock)
-│   └── Search & Filter (products searchable)
+├── Products (existing)
+│   ├── Favoriler > Favorilere Ekle
+│   ├── Favoriler > Favori Listesi
+│   ├── Kampanyalar > İndirimli Ürünler Filtresi
+│   └── Dashboard > Stok Uyarıları Widget
 │
-└── Reporting (aggregates order/dealer data)
+├── Authentication (existing)
+│   ├── Finansal Bilgiler (dealer-specific data)
+│   ├── Destek > Mesaj Gönderme
+│   └── All dealer-specific features
+│
+└── Push Notifications (existing)
+    ├── Kampanyalar > Yeni Kampanya Bildirimi
+    ├── Destek > Yeni Mesaj Bildirimi
+    └── Finansal > Cari Hesap Bildirimleri
+
+[v2 New Features - Internal Dependencies]
+├── Favoriler
+│   └── Dashboard > Stok Uyarıları Widget (requires favorites tracking)
+│
+└── Finansal Bilgiler
+    └── Sipariş Detayları > Fatura PDF (shared invoice table)
 ```
 
-### Critical Path for MVP
+### Critical Path for v2.0
 
-**Must be built in this order:**
+**Build order recommendation:**
 
-1. **Authentication** (foundation for everything)
-2. **Product Management** (admin creates catalog)
-3. **Dealer Management** (admin creates dealers, assigns tiers)
-4. **Tiered Pricing** (products show correct prices per dealer)
-5. **Product Catalog + Cart** (dealers browse and add to cart)
-6. **Order Placement** (dealers submit orders)
-7. **Order Management** (admin processes orders)
-8. **Order Tracking** (dealers check status)
-9. **Notifications** (automated status updates)
-10. **Order History** (dealers view past orders)
-11. **Reporting** (business insights)
+1. **Finansal Bilgiler (ERP-ready schema)** - Foundation for financial tracking
+   - Cari bakiye schema
+   - Account movements schema
+   - Invoice document management
 
-**Can be built in parallel (no dependencies):**
-- Real-Time Stock Visibility (integrates with Product Catalog)
-- Quick Order Entry (alternate ordering UI)
-- Push Notifications (notification delivery channel)
+2. **Favoriler** - Simple, high-value feature with no external dependencies
+   - Favorites table
+   - UI components (heart icon, favorites page)
 
----
+3. **Kampanyalar/Duyurular** - Marketing content system
+   - Campaigns table
+   - Announcements table
+   - Admin UI for creating campaigns
 
-## MVP Feature Prioritization
+4. **Destek/İletişim** - Communication infrastructure
+   - Messages table with threading
+   - Admin inbox
+   - FAQ management
 
-Based on complexity, impact, and project pain points:
+5. **Bayi Dashboard** - Aggregates data from above features
+   - Spending summary (uses orders)
+   - Top products (uses orders + favorites)
+   - Quick actions (links to features)
+   - Stock alerts (uses favorites + products)
 
-### Phase 1: Core Ordering (Must-Have)
-**Goal:** Replace phone/WhatsApp orders with digital ordering.
+6. **Bayi Raporları** - Analytics layer on top of orders
+   - Spending analysis
+   - Period comparison
 
-| Feature | Complexity | Impact | Priority |
-|---------|-----------|---------|----------|
-| Authentication & User Management | Medium | High | P0 |
-| Product Management (Admin) | Medium | High | P0 |
-| Dealer Management (Admin) | Medium | High | P0 |
-| Tiered Pricing (Gold/Silver/Bronze) | Medium | High | P0 |
-| Product Catalog (Dealer) | Medium | High | P0 |
-| Shopping Cart | Low | High | P0 |
-| Order Placement | Medium | High | P0 |
-| Order Management (Admin) | Medium | High | P0 |
-
-**Outcome:** Dealers can place orders 24/7 with correct pricing. Admin can process orders.
+**Parallel Development Opportunities:**
+- Favoriler and Kampanyalar can be built in parallel (no dependencies)
+- Finansal Bilgiler and Destek can be built in parallel
+- Bayi Dashboard should be last (aggregates all other features)
 
 ---
 
-### Phase 2: Visibility & Trust (High Value)
-**Goal:** Address "no real-time stock/price visibility" pain point.
+## MVP Recommendations for v2.0
 
-| Feature | Complexity | Impact | Priority |
-|---------|-----------|---------|----------|
-| Real-Time Stock Visibility | Medium-High | High | P1 |
-| Order Tracking & Status | Medium | High | P1 |
-| Order History | Low | High | P1 |
-| Reorder from History | Low | Medium | P1 |
-| Email Notifications | Low | High | P1 |
+Based on complexity vs. impact analysis:
 
-**Outcome:** Dealers trust stock availability and can track their orders without calling.
+### Must-Have (P0) - Core v2.0 Value
+
+| Feature Category | Specific Features | Rationale |
+|-----------------|-------------------|-----------|
+| **Finansal Bilgiler** | Cari bakiye, Account movements, Invoice PDF access, Payment history | **Non-negotiable for Turkish B2B.** Without cari hesap tracking, dealers won't trust the platform for financial transparency. |
+| **Bayi Dashboard** | Spending summary, Recent orders widget, Pending orders count, Quick actions | **Landing page experience.** Empty dashboard = feels like unfinished product. Low complexity, high perceived value. |
+| **Favoriler** | Add to favorites, Favorites list, Order from favorites | **Quick win.** Low complexity, high dealer convenience. 50% faster reorder times per research. |
+
+### High Value (P1) - Complete the Experience
+
+| Feature Category | Specific Features | Rationale |
+|-----------------|-------------------|-----------|
+| **Kampanyalar** | Active campaigns page, Announcements, New product highlighting | **Engagement driver.** Gives dealers reason to log in regularly beyond ordering. |
+| **Destek** | Message admin, Message history, FAQ page | **Communication channel.** Dealers need support path beyond phone. Reduces support load with FAQ. |
+| **Sipariş Detayları** | Invoice PDF on order, Waybill PDF | **Document access.** Dealers need these for accounting. Leverages financial schema. |
+
+### Nice-to-Have (P2) - Differentiators
+
+| Feature Category | Specific Features | Rationale |
+|-----------------|-------------------|-----------|
+| **Dashboard Advanced** | Top products widget, Stock alerts for favorites | **Proactive assistance.** Surfaces useful info, but not critical. |
+| **Kampanyalar Advanced** | Targeted campaigns (by tier), Discounted products filter | **Personalization.** Increases relevance but adds complexity. |
+| **Destek Advanced** | Product request form, File attachments | **Enhanced communication.** Useful but can be added post-launch. |
+| **Bayi Raporları** | Spending analysis, Period comparison | **Self-service analytics.** Nice-to-have for power users. |
+
+### Defer Post-v2.0 (P3)
+
+| Feature | Reason to Defer |
+|---------|-----------------|
+| Cari hesap online payment | Complex payment gateway integration, not in scope |
+| Multi-tier comparison | Privacy concerns, complex calculations |
+| WhatsApp notifications | Requires Business API setup, evaluate ROI first |
+| E-fatura integration | Complex compliance, only if legally required |
+| Advanced campaign targeting | Marketing automation complexity |
 
 ---
 
-### Phase 3: Efficiency & Retention (Nice-to-Have)
-**Goal:** Make ordering faster and more convenient.
+## Implementation Complexity vs. Business Value
 
-| Feature | Complexity | Impact | Priority |
-|---------|-----------|---------|----------|
-| Quick/Bulk Order Entry | Low-Medium | Medium | P2 |
-| Push Notifications (In-App) | Low-Medium | Medium | P2 |
-| Basic Reporting | Medium | Medium | P2 |
-| Product Search & Filter | Low | Medium | P2 |
+Prioritization matrix:
 
-**Outcome:** Power users order faster. Manufacturer has business insights.
+```
+High Value
+│
+│  [Must Do]              [Plan Carefully]
+│  • Cari Bakiye          • Bayi Raporları
+│  • Fatura PDF           • Targeted Campaigns
+│  • Favoriler
+│  • Dashboard Widgets
+│  • Kampanyalar
+│  • Destek Mesajlaşma
+│
+│  [Quick Wins]           [Defer]
+│  • SSS Sayfası          • Online Payment
+│  • Duyurular            • E-Fatura
+│  • Sipariş PDF'leri     • Advanced Analytics
+│                         • WhatsApp Integration
+│
+└────────────────────────────────────────> Complexity
+                                            (Low → High)
+```
 
----
+**Quick Wins (Low Complexity, High Value):**
+- Favorilere Ekle / Favori Listesi
+- Kampanyalar Sayfası
+- Duyurular
+- SSS (Static FAQ)
+- Dashboard: Spending summary, Recent orders, Pending count
 
-### Phase 4: Differentiators (Post-MVP)
-**Goal:** Competitive advantage and dealer delight.
+**Must Do (Medium Complexity, Critical Value):**
+- Cari Hesap Bakiyesi
+- Cari Hesap Hareketleri
+- Fatura PDF Görüntüleme
+- Destek Mesajlaşma
 
-| Feature | Complexity | Impact | Priority |
-|---------|-----------|---------|----------|
-| WhatsApp Notifications | Low-Medium | Medium | P3 |
-| Product Availability Alerts | Low | Low | P3 |
-| Dealer Performance Dashboard | Medium | Low | P3 |
-| Smart Reorder Suggestions | High | Medium | P3 |
+**Strategic (Higher Complexity, High Long-Term Value):**
+- Bayi Raporları (spending analysis)
+- Targeted Campaigns
 
-**Outcome:** Features that competitors don't have.
+**Defer (High Complexity, Lower Immediate Value):**
+- Online Payment Integration
+- E-Fatura Entegrasyonu
+- Advanced Analytics/BI
 
 ---
 
 ## Key Recommendations
 
-### For MVP Success
+### For v2.0 Success
 
-1. **Start narrow, not wide:** Build Phases 1-2 exceptionally well. Don't build Phase 4 features until Phases 1-2 are proven.
+1. **Prioritize Finansal Bilgiler first** - This is the highest-value differentiator for Turkish B2B. Without cari hesap transparency, dealers won't fully trust/adopt the platform.
 
-2. **Solve the pain:** Current pains are after-hours ordering, no stock visibility, no price visibility. These are table stakes—nail them first.
+2. **Build ERP-ready schema from day one** - Even though ERP sync is post-v2.0, the database structure must match ERP data models for easy future integration. Work with actual Logo/Netsis export formats.
 
-3. **Avoid over-engineering:** Resist adding promotions, configurators, or advanced workflows. Manufacturer-dealer relationships are simpler than B2C ecommerce.
+3. **Keep dashboard simple but complete** - Don't build an empty dashboard. Include at least 4 widgets: spending, recent orders, pending count, quick actions. Avoid the temptation to add complex charts.
 
-4. **Data quality matters:** Research shows "data errors in order size, status, location" make systems obsolete. Ensure accurate stock and pricing from day one.
+4. **Favorites are table stakes, not optional** - Research shows this is expected in 2026 B2B portals. Low complexity, high adoption.
 
-5. **Mobile-friendly is table stakes:** Even if not "mobile-first," ensure responsive design. Dealers will order from phones.
+5. **Async messaging > ticket system** - Don't build complex support ticketing. Simple threaded conversations with email notifications is sufficient and matches 2026 B2B patterns.
 
-6. **WhatsApp consideration:** Given current WhatsApp usage, WhatsApp notifications could be a "quick win" differentiator if API integration is straightforward.
+6. **Leverage v1 infrastructure** - v1 already has push notifications, file storage, auth. Reuse these for v2 features (campaign notifications, invoice PDFs, message attachments).
+
+7. **Mobile-first for dashboard** - Dealers will check dashboard on mobile. Ensure responsive design with large touch targets for quick actions.
+
+8. **Start with manual admin workflow** - Admin manually uploads invoices, enters balances, creates campaigns. Automation/integration comes later. Validate the UX first.
 
 ### Red Flags to Avoid
 
-Based on research into common mistakes:
+**Based on B2B portal research:**
 
-- **Lack of centralized system** → Build one unified portal, not fragmented tools
-- **Poor inventory visibility** → Real-time stock is non-negotiable (Phase 2 priority)
-- **Manual processes** → Automate tier-based pricing (no manual calculations)
-- **Inadequate training** → Plan dealer onboarding and documentation
-- **Ignoring analytics** → Basic reporting must be in MVP (Phase 3)
-- **Poor communication** → Order status updates prevent "where's my order?" calls
+- **Empty dashboard** → Feels unfinished, low perceived value
+- **Fake real-time data** → If cari hesap isn't real ERP data, clearly label as "demo" or "manual entry"
+- **Over-promising payment features** → Don't show "Pay Now" buttons if online payment isn't implemented
+- **Complex campaign rules** → Keep campaigns simple (title, description, dates). Avoid discount automation.
+- **Realtime chat expectations** → Clearly set async messaging expectations. Don't use "chat" terminology.
+- **Missing FAQ** → Without FAQ, all dealer questions go to messaging, overwhelming admin
 
 ---
 
 ## Confidence Assessment
 
-| Category | Confidence | Reasoning |
-|----------|-----------|-----------|
-| Table Stakes | **HIGH** | Multiple 2026 sources confirm these features. Aligned with project pain points. |
-| Differentiators | **MEDIUM** | WhatsApp integration is context-specific. AI features are emerging (less proven ROI). |
-| Anti-Features | **HIGH** | Clear scope boundaries. These features are out of scope for manufacturer-dealer ordering. |
-| Dependencies | **HIGH** | Logical build order based on technical dependencies. |
+| Category | Confidence Level | Reasoning |
+|----------|-----------------|-----------|
+| **Finansal Bilgiler** | **HIGH** | Multiple Turkish B2B sources confirm cari hesap as critical. Invoice access is universal B2B requirement. |
+| **Bayi Dashboard** | **HIGH** | 71% of B2B buyers expect personalized dashboards per 2026 research. Standard across all modern B2B portals. |
+| **Favoriler** | **HIGH** | Wishlist/favorites features are table stakes per 2026 B2B ecommerce platform reviews. |
+| **Kampanyalar** | **MEDIUM** | Campaign/announcement features are common but implementation patterns vary. Turkish-specific research limited. |
+| **Destek** | **MEDIUM-HIGH** | 2026 B2B support trending toward async messaging. Pattern validated across multiple platforms (Thena, Pylon, Plain). |
+| **Bayi Raporları** | **MEDIUM** | Dealer-facing analytics less common than admin analytics. Value validated but not universal table stakes. |
 
----
-
-## Sources
-
-### Primary Research Sources
-
-**B2B Order Management Trends & Features:**
-- [How B2B Ordering Tools Boost Buyer Experience (BigCommerce)](https://www.bigcommerce.com/articles/b2b-ecommerce/b2b-order-management/)
-- [Top 7 B2B Order Management Software Trends (Silicon Slopes)](https://www.siliconslopes.com/c/posts/top-7-b2b-order-management-software-trends-to-transform-your-business-in-2026)
-- [B2B Order Management Software: What Works (Netguru)](https://www.netguru.com/blog/b2b-order-management-software)
-- [Future of Order Management Systems (Netguru)](https://www.netguru.com/blog/oms-future-trends)
-- [What is a B2B Order Management System (Unleashed)](https://www.unleashedsoftware.com/blog/b2b-order-management-system/)
-
-**Dealer Portal Specific:**
-- [Who Benefits From Dealer Portals (I95Dev)](https://www.i95dev.com/who-benefits-from-dealer-portals-and-how/)
-- [Dealer Portal Benefits for Manufacturers (GenAlpha)](https://www.genalpha.com/post/start-your-digital-commerce-journey-with-a-dealer-portal-5-benefits-for-manufacturers)
-- [How Manufacturers Benefit from Dealer Portals (Digital Hill)](https://www.digitalhill.com/blog/how-manufacturers-can-benefit-from-a-dealer-portal/)
-
-**Pricing & Tiering:**
-- [Creating Tiered Pricing Structures (InfluenceFlow)](https://influenceflow.io/resources/creating-tiered-pricing-structures-a-complete-guide-for-2026/)
-- [B2B Customer Groups & Custom Pricing (Shopaccino)](https://www.shopaccino.com/blog/how-manufacturers-can-manage-b2b-customer-groups-and-custom-pricing)
-- [Tiered Pricing for B2B eCommerce (Turis)](https://turis.app/b2b-ecommerce/tiered-pricing-strategies-b2b-wholesale/)
-
-**Order Tracking & Transparency:**
-- [Smart Order Management for B2B (IF Global)](https://www.ifglobal.com/resources/blog/how-smart-order-management-accelerates-dtc-b2b-expansion)
-- [B2B Buyer Behavior: Trust & Transparency (Vendict)](https://vendict.com/blog/b2b-buyer-behavior-why-verifiable-trust-digital-transparency-are-the-real-dealbreakers)
-- [The New B2B Buyer 2026 (Nishtech)](https://www.nishtech.com/Blog/2025/December/The-New-B2B-Buyer-2026-Insights)
-
-**MVP Best Practices:**
-- [What Is a Minimum Viable Product 2026 (Presta)](https://wearepresta.com/what-is-a-minimum-viable-product-the-complete-2026-guide-to-strategic-startup-validation/)
-- [Why You Need MVP Approach to B2B eCommerce (OroCommerce)](https://oroinc.com/b2b-ecommerce/blog/why-you-need-a-minimum-viable-product-approach-to-b2b-ecommerce/)
-
-**Common Mistakes & Pitfalls:**
-- [8 Common Order Management Mistakes (Sharp Commerce)](https://sharpcommerce.com/common-order-management-mistakes/)
-- [Order Management: 5 Mistakes to Avoid (Unigis)](https://www.unigis.com/en/order-management-5-mistakes-to-avoid/)
-- [10 Common Dealership Mistakes (AutoCorp)](https://autocorp.ai/blog/10-common-dealership-mistakes-and-how-to-fix-them)
-
-**Notifications & Communication:**
-- [What is an Effective Notification Service in B2B (SuprSend)](https://www.suprsend.com/post/what-is-an-effective-notification-service-in-b2b-context---selecting-implementing-and-optimizing-notification-services-for-saas-business)
-- [B2B Commerce Notifications (Salesforce)](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-notifications-other-custom.html)
-
-**Analytics & Reporting:**
-- [Dealer Analytics (Titan DMS)](https://www.titandms.com/solution/dealer-analytics)
-- [Best Reporting Tool for Dealerships (DashThis)](https://dashthis.com/reporting-tools-car-dealership/)
+**Overall v2.0 Feature Confidence: HIGH** - All major feature categories are validated by 2026 B2B portal research and align with Turkish market expectations.
 
 ---
 
 ## Open Questions for Stakeholders
 
-Research reveals these questions should be validated before finalizing roadmap:
+Before finalizing v2.0 roadmap, validate these assumptions:
 
-1. **International dealers?** → If yes, multi-currency/multi-language moves from anti-feature to table stakes
-2. **Credit/payment terms?** → Do dealers buy on credit, or prepay? Affects if credit limit feature is needed
-3. **WhatsApp priority?** → Given current WhatsApp usage, is WhatsApp notification integration worth early investment?
-4. **Product catalog size?** → How many SKUs? Affects search/filter complexity
-5. **Warehouse integration?** → Does manufacturer have existing inventory system? Integration complexity affects real-time stock timeline
-6. **Mobile app need?** → Do dealers demand native mobile app, or is responsive web sufficient?
-7. **Approval workflows?** → Do any large dealers need internal approval chains before placing orders?
+### Finansal Bilgiler
+1. **ERP system in use?** → Logo, Netsis, SAP, or other? Need to match schema to actual system.
+2. **Current financial workflow?** → How does manufacturer currently track dealer balances? Manual spreadsheet, ERP, accounting software?
+3. **Credit terms?** → Do dealers buy on credit (net 30/60) or prepay? Affects balance display and urgency.
+4. **Multi-currency?** → All dealers in Turkey with TRY, or international dealers exist?
+
+### Dashboard
+5. **KPI priorities?** → Which metrics matter most to manufacturer? (Total sales, order frequency, average order value, etc.)
+6. **Benchmark data available?** → Can we show tier averages for comparison, or privacy concerns?
+
+### Kampanyalar
+7. **Campaign frequency?** → How often does manufacturer run promotions/campaigns? Daily, weekly, monthly, seasonally?
+8. **Target audience?** → Do campaigns target all dealers, or specific tiers/regions?
+
+### Destek
+9. **Support team size?** → Is there dedicated support staff, or does admin handle all dealer questions?
+10. **Response time expectations?** → Same-day, 24-hour, or best-effort response to dealer messages?
+
+### General
+11. **Document volume?** → How many invoices/waybills per month? Affects storage planning.
+12. **Mobile usage?** → What percentage of dealers primarily use mobile vs. desktop? Affects UI prioritization.
+
+---
+
+## Sources
+
+### Dealer Dashboards & Personalization
+- [B2B Portal Meaning, Key Features, Examples [Updated 2026] - B2Bridge](https://b2bridge.io/blog/b2b-portal/)
+- [Top 5 Features of a Modern B2B Portal in 2026 | Asabix](https://asabix.com/blog/top-5-features-b2b-portal-in-2026/)
+- [How Modern B2B Distributors Scale in 2026 - Shopify](https://www.shopify.com/enterprise/blog/b2b-distributors)
+- [The Complete Guide to B2B Dealer Portals | OroCommerce](https://oroinc.com/b2b-ecommerce/blog/the-complete-guide-to-b2b-dealer-portals/)
+- [Who Benefits From Dealer Portals and How | B2B Portal Solutions by i95dev](https://www.i95dev.com/who-benefits-from-dealer-portals-and-how/)
+
+### Financial Tracking & Cari Hesap
+- [B2B Store Cari Hesap ile E Ticaret Sürecinizi Maksimize Edin](https://tr.b2bstore.com/cari-hesap-takibi/)
+- [Cari Hesap Takibi - B2B.net.tr](https://www.b2b.net.tr/moduller/detayli-cari-hareketler)
+- [Invoice management for B2B e-commerce websites - Commerce | Dynamics 365 | Microsoft Learn](https://learn.microsoft.com/en-us/dynamics365/commerce/b2b/invoice-management)
+- [Simplify B2B Transactions with Invoice Payment Portal | Cloudfy](https://cloudfy.com/platform/features/invoice-payment-portal/)
+- [2026 B2B Payment Trends for Manufacturers and Distributors](https://oroinc.com/b2b-ecommerce/blog/b2b-payment-trends-where-b2b-payments-are-heading-in-2026/)
+- [B2B Dealer Portal, Dealer Management Systems - Trizbi](https://www.trizbi.com/en/system-features/b2b-dealer-portal)
+
+### Favorites & Wishlists
+- [Wishlist & B2B Project Planner - Shopify App Store](https://apps.shopify.com/wishlist-project-planner)
+- [The List - The ultimate wishlist app for customers and B2B companies. | Shopify App Store](https://apps.shopify.com/on-the-business-portal)
+- [10 Best B2B Wholesale Apps For Your Shopify Store (2026)](https://multivariants.com/blog/best-b2b-wholesale-apps/)
+- [5 B2B order portals for manufacturing in 2026 | Moxo](https://www.moxo.com/blog/b2b-order-portals-manufacturing)
+
+### Campaigns & Announcements
+- [Self-Serve Dealer Portals: Transform B2B Relationships in 2026](https://www.shopaccino.com/blog/how-b2b-brands-can-improve-dealer-relationships-with-selfserve-ordering-portals)
+- [B2B Portal Development in 2026: Features, Benefits & Enterprise Architecture](https://www.techvoot.com/blog/b2b-portal-development-enterprise-architecture)
+- [How a B2B dealer portal can change how manufacturers promote their products](https://www.digitaljournal.com/pr/news/indnewswire/b2b-dealer-portal-change-manufacturers-1742456640.html)
+
+### Support & Messaging
+- [Modren B2B Customer Support Ticketing System | Thena](https://www.thena.ai/post/a-complete-guide-to-b2b-customer-service-ticketing-systems)
+- [What to Look for in a B2B Customer Support Platform for 2026 | Pylon](https://www.usepylon.com/blog/b2b-customer-support-platform-2026)
+- [Plain — AI-Powered Support for B2B Teams](https://www.plain.com/)
+- [Beyond Tickets: How Plain is Transforming B2B Customer Support - Battery Ventures](https://www.battery.com/blog/beyond-tickets-how-plain-is-transforming-b2b-customer-support/)
+- [Best customer portal software for B2B teams [Guide]](https://www.thena.ai/post/best-customer-portal-software-guide)
+
+### Reporting & Analytics
+- [B2B Reporting: Tools, Strategies & Dashboards for 2025 - AgencyAnalytics](https://agencyanalytics.com/blog/b2b-reporting)
+
+### General B2B Portal Trends
+- [Top 7 B2B Marketplace Features in 2026: Why They Matter & Best Practices | Rigby Blog](https://www.rigbyjs.com/blog/b2b-marketplace-features)
+- [B2B Order Management (BigCommerce)](https://www.bigcommerce.com/articles/b2b-ecommerce/b2b-order-management/)
 
 ---
 
