@@ -100,53 +100,59 @@ Kapsam dışı özellikler ve nedenleri.
 
 ## Traceability
 
-Hangi fazlar hangi gereksinimleri kapsıyor. Roadmap oluşturulunca doldurulacak.
+Hangi fazlar hangi gereksinimleri kapsıyor.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DASH-01 | — | Pending |
-| DASH-02 | — | Pending |
-| DASH-03 | — | Pending |
-| DASH-04 | — | Pending |
-| DASH-05 | — | Pending |
-| DASH-06 | — | Pending |
-| FIN-01 | — | Pending |
-| FIN-02 | — | Pending |
-| FIN-03 | — | Pending |
-| FIN-04 | — | Pending |
-| FIN-05 | — | Pending |
-| FIN-06 | — | Pending |
-| FAV-01 | — | Pending |
-| FAV-02 | — | Pending |
-| FAV-03 | — | Pending |
-| FAV-04 | — | Pending |
-| CAMP-01 | — | Pending |
-| CAMP-02 | — | Pending |
-| CAMP-03 | — | Pending |
-| CAMP-04 | — | Pending |
-| CAMP-05 | — | Pending |
-| CAMP-06 | — | Pending |
-| CAMP-07 | — | Pending |
-| SUP-01 | — | Pending |
-| SUP-02 | — | Pending |
-| SUP-03 | — | Pending |
-| SUP-04 | — | Pending |
-| SUP-05 | — | Pending |
-| SUP-06 | — | Pending |
-| ORD-01 | — | Pending |
-| ORD-02 | — | Pending |
-| ORD-03 | — | Pending |
-| ORD-04 | — | Pending |
-| ORD-05 | — | Pending |
-| REP-01 | — | Pending |
-| REP-02 | — | Pending |
-| REP-03 | — | Pending |
+| FAV-01 | Phase 4 | Pending |
+| FAV-02 | Phase 4 | Pending |
+| FAV-03 | Phase 4 | Pending |
+| FAV-04 | Phase 4 | Pending |
+| FIN-01 | Phase 5 | Pending |
+| FIN-02 | Phase 5 | Pending |
+| FIN-03 | Phase 5 | Pending |
+| FIN-04 | Phase 5 | Pending |
+| FIN-05 | Phase 5 | Pending |
+| FIN-06 | Phase 5 | Pending |
+| DASH-01 | Phase 6 | Pending |
+| DASH-02 | Phase 6 | Pending |
+| DASH-03 | Phase 6 | Pending |
+| DASH-04 | Phase 6 | Pending |
+| DASH-05 | Phase 6 | Pending |
+| DASH-06 | Phase 6 | Pending |
+| CAMP-01 | Phase 6 | Pending |
+| CAMP-02 | Phase 6 | Pending |
+| CAMP-03 | Phase 6 | Pending |
+| CAMP-04 | Phase 6 | Pending |
+| CAMP-05 | Phase 6 | Pending |
+| CAMP-06 | Phase 6 | Pending |
+| CAMP-07 | Phase 6 | Pending |
+| ORD-01 | Phase 6 | Pending |
+| ORD-02 | Phase 6 | Pending |
+| ORD-03 | Phase 6 | Pending |
+| ORD-04 | Phase 6 | Pending |
+| ORD-05 | Phase 6 | Pending |
+| SUP-01 | Phase 7 | Pending |
+| SUP-02 | Phase 7 | Pending |
+| SUP-03 | Phase 7 | Pending |
+| SUP-04 | Phase 7 | Pending |
+| SUP-05 | Phase 7 | Pending |
+| SUP-06 | Phase 7 | Pending |
+| REP-01 | Phase 7 | Pending |
+| REP-02 | Phase 7 | Pending |
+| REP-03 | Phase 7 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 36 total
-- Mapped to phases: 0
-- Unmapped: 36 ⚠️
+- Mapped to phases: 36 ✓
+- Unmapped: 0 ✓
+
+**Phase Distribution:**
+- Phase 4 (Favorites Quick Win): 4 requirements
+- Phase 5 (Financial Backbone): 6 requirements
+- Phase 6 (Dashboard, Campaigns & Order Documents): 18 requirements
+- Phase 7 (Support & Reports): 9 requirements
 
 ---
 *Requirements defined: 2026-02-08*
-*Last updated: 2026-02-08 after research synthesis*
+*Last updated: 2026-02-08 after roadmap creation*
