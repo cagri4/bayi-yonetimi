@@ -6,13 +6,15 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/store/cart'
 import { useToast } from '@/hooks/use-toast'
+import { FavoriteToggle } from '@/components/favorites/favorite-toggle'
 import type { CatalogProduct } from '@/lib/actions/catalog'
 
 interface ProductCardProps {
   product: CatalogProduct
+  isFavorited?: boolean
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, isFavorited }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
   const { toast } = useToast()
 
@@ -25,12 +27,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const getStockStatus = () => {
     if (product.stock_quantity === 0) {
-      return { label: 'Stok Yok', variant: 'destructive' as const, canOrder: false }
+      return { label: 'Stok Yok', className: 'bg-red-500 text-white hover:bg-red-600', canOrder: false }
     }
     if (product.stock_quantity <= product.low_stock_threshold) {
-      return { label: 'Az Stok', variant: 'secondary' as const, canOrder: true }
+      return { label: 'Az Stok', className: 'bg-amber-500 text-white hover:bg-amber-600', canOrder: true }
     }
-    return { label: 'Stokta', variant: 'default' as const, canOrder: true }
+    return { label: 'Stokta', className: 'bg-emerald-500 text-white hover:bg-emerald-600', canOrder: true }
   }
 
   const stockStatus = getStockStatus()
@@ -54,14 +56,14 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <Card className="flex flex-col h-full">
-      <div className="relative aspect-square bg-gray-100">
+    <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer group">
+      <div className="relative h-48 bg-gray-50 overflow-hidden rounded-t-lg">
         {product.image_url ? (
           <Image
             src={product.image_url}
             alt={product.name}
             fill
-            className="object-contain p-4"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
@@ -80,31 +82,38 @@ export function ProductCard({ product }: ProductCardProps) {
             </svg>
           </div>
         )}
+        <div className="absolute top-2 left-2 z-10">
+          <FavoriteToggle
+            productId={product.id}
+            productName={product.name}
+            initialFavorited={isFavorited ?? false}
+          />
+        </div>
         {hasDiscount && (
-          <Badge className="absolute top-2 right-2 bg-red-500">
+          <Badge className="absolute top-2 right-2 bg-rose-500 text-white font-semibold shadow-md">
             %{discountPercent} indirim
           </Badge>
         )}
       </div>
 
-      <CardContent className="flex-grow pt-4 space-y-2">
-        <p className="text-xs text-gray-500 font-mono">{product.code}</p>
-        <h3 className="font-medium line-clamp-2">{product.name}</h3>
+      <CardContent className="flex-grow pt-4 space-y-3">
+        <p className="text-xs text-gray-400 font-mono tracking-wide">{product.code}</p>
+        <h3 className="font-semibold text-gray-800 line-clamp-2 leading-tight">{product.name}</h3>
 
-        <div className="flex items-center gap-2">
-          <Badge variant={stockStatus.variant}>{stockStatus.label}</Badge>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge className={stockStatus.className}>{stockStatus.label}</Badge>
           {product.category && (
-            <Badge variant="outline">{product.category.name}</Badge>
+            <Badge variant="outline" className="text-xs">{product.category.name}</Badge>
           )}
         </div>
 
-        <div className="pt-2">
+        <div className="pt-2 space-y-1">
           {hasDiscount && (
             <p className="text-sm text-gray-400 line-through">
               {formatCurrency(product.base_price)}
             </p>
           )}
-          <p className="text-lg font-bold text-primary">
+          <p className="text-xl font-bold text-primary">
             {formatCurrency(product.dealer_price)}
           </p>
         </div>
