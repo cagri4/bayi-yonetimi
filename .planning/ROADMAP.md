@@ -57,10 +57,11 @@ Plans:
   2. Dealer can view all favorited products in dedicated favorites page
   3. Dealer can add products from favorites list directly to cart
   4. Dealer sees stock status for favorited products
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md — Database schema and Server Actions for favorites
+- [ ] 04-02-PLAN.md — Client state, UI components, and favorites page
 
 #### Phase 5: Financial Backbone
 **Goal**: Dealers can view cari hesap balance and financial transactions with ERP-ready schema
@@ -125,7 +126,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | 1. Foundation & Basic Ordering | v1 | 6/6 | Complete | 2026-01-26 |
 | 2. Order Management & Tracking | v1 | 3/3 | Complete | 2026-01-27 |
 | 3. Insights & Mobile | v1 | 5/5 | Complete | 2026-02-03 |
-| 4. Favorites Quick Win | v2.0 | 0/TBD | Not started | - |
+| 4. Favorites Quick Win | v2.0 | 0/2 | Planned | - |
 | 5. Financial Backbone | v2.0 | 0/TBD | Not started | - |
 | 6. Dashboard, Campaigns & Order Documents | v2.0 | 0/TBD | Not started | - |
 | 7. Support & Reports | v2.0 | 0/TBD | Not started | - |
