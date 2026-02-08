@@ -11,12 +11,12 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 4 of 7 (Favorites Quick Win)
-Plan: Ready to plan Phase 4
-Status: Roadmap complete, ready for phase planning
-Last activity: 2026-02-08 — v2.0 roadmap created
+Plan: 1 of TBD in phase 4 complete
+Status: Phase 4 in progress
+Last activity: 2026-02-08 — Completed 04-01-PLAN.md
 
-Progress: [███████████████░░░░░] 64% (14/22 total plans complete from v1)
-Overall: v1 shipped (14 plans), v2.0 roadmap defined (4 phases, 36 requirements)
+Progress: [███████████████░░░░░] 65% (15/23 total plans complete)
+Overall: v1 shipped (14 plans), v2.0 in progress (1 plan complete)
 
 ## Milestones
 
@@ -42,9 +42,13 @@ Overall: v1 shipped (14 plans), v2.0 roadmap defined (4 phases, 36 requirements)
 | 03-insights-mobile | 5 | ~5h | 2026-02-03 |
 
 **v2.0 Milestone:**
-- Total plans: TBD (to be determined during phase planning)
+- Total plans: TBD (phase 4 started)
 - Phases: 4 (04-07)
 - Requirements: 36/36 mapped
+
+**Current Phase (04-favorites-quick-win):**
+- Plans completed: 1
+- Duration so far: 17min
 
 ## Accumulated Context
 
@@ -70,6 +74,12 @@ Overall: v1 shipped (14 plans), v2.0 roadmap defined (4 phases, 36 requirements)
 
 ### Decisions
 
+| ID | Decision | Rationale | Phase-Plan | Date |
+|----|----------|-----------|------------|------|
+| RLS-wrapped-auth | Use wrapped (SELECT auth.uid()) in RLS policies | 94-99% performance improvement per Supabase docs | 04-01 | 2026-02-08 |
+| composite-index | Composite index on (dealer_id, product_id) for favorites | 10x faster toggle checks vs. separate indexes | 04-01 | 2026-02-08 |
+| pricing-consistency | Reuse exact pricing logic from getCatalogProducts | Consistent dealer pricing across all features | 04-01 | 2026-02-08 |
+
 Recent decisions from PROJECT.md affecting v2.0:
 - v1 established Supabase RLS multi-tenant pattern (extends to financial tables)
 - Zustand + localStorage for client state (applies to favorites)
@@ -86,9 +96,9 @@ None yet. Research flagged critical pitfalls but all have known prevention patte
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: v2.0 roadmap created, all 36 requirements mapped to phases
-Resume command: /gsd:plan-phase 4
+Stopped at: Completed 04-01-PLAN.md (favorites database foundation)
+Resume file: None
 
 ---
-*v2.0 roadmap created: 2026-02-08*
-*Next: Plan Phase 4 (Favorites Quick Win)*
+*Last updated: 2026-02-08*
+*Next: Plan 04-02 (Favorites UI)*
