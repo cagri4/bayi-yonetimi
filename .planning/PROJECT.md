@@ -55,13 +55,48 @@ Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis ve
 
 ### Active
 
-(None — planning next milestone)
+**Current Milestone: v2.0 — Bayi Deneyimi ve Finansal Takip**
+
+**Goal:** Bayilerin kendi finansal durumlarini takip edebilmesi, favori urunleri yonetebilmesi, kampanyalardan haberdar olabilmesi ve admin ile iletisim kurabilmesi.
+
+**Bayi Dashboard:**
+- [ ] Toplam harcama ozeti (bu ay/yil)
+- [ ] Son siparisler widget'i
+- [ ] En cok aldigi urunler
+- [ ] Bekleyen siparis sayisi
+
+**Finansal Bilgiler (ERP-ready):**
+- [ ] Cari hesap bakiyesi (borc/alacak) — admin manuel girer, ERP-ready sema
+- [ ] Odeme gecmisi
+- [ ] Fatura goruntuleme / PDF indirme
+
+**Favori Urunler:**
+- [ ] Favorilere ekle butonu
+- [ ] Favori listesi sayfasi
+
+**Kampanyalar / Duyurular:**
+- [ ] Aktif kampanyalar sayfasi
+- [ ] Admin'den gelen duyurular
+- [ ] Indirimli urunler filtresi
+
+**Destek / Iletisim:**
+- [ ] Admin'e mesaj gonderme
+- [ ] SSS sayfasi
+- [ ] Urun talebi (stokta yoksa)
+
+**Siparis Detaylari (gelistirme):**
+- [ ] Fatura/irsaliye PDF (admin yukler)
+- [ ] Kargo takip bilgisi (kendi araclar icin)
+
+**Bayi Raporlari:**
+- [ ] Kendi harcama analizi
+- [ ] Donemsel karsilastirma
 
 ### Out of Scope
 
-- ERP entegrasyonu (Logo/Netsis) — MVP sonrasi, v2'de
+- ERP entegrasyonu (Logo/Netsis) — Finansal veriler ERP-ready sema ile hazir, API baglantisi sonraki milestone
 - Odeme sistemi entegrasyonu — Mevcut odeme surecleri devam edecek
-- Canli chat / destek sistemi — Ilk versiyonda yok
+- Canli chat (realtime) — v2'de mesajlasma var ama async, canli chat yok
 - Coklu dil destegi — Sadece Turkce
 - Offline mobil calisma — Internet baglantisi gerekli
 
@@ -107,4 +142,4 @@ Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis ve
 | Edge Function for push | Client-side push yerine server-triggered | Good — Guvenli ve olceklenebilir |
 
 ---
-*Last updated: 2026-02-03 after v1 milestone*
+*Last updated: 2026-02-08 after v2.0 milestone start*

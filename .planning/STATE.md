@@ -6,25 +6,25 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis verebilmesi — "siparisim nerede?" sorusuna son.
 
-**Current focus:** v1 Milestone Complete — Planning next milestone
+**Current focus:** v2.0 — Bayi Deneyimi ve Finansal Takip
 
 ## Current Position
 
-Phase: Not started (v2 planning)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-02-03 — v1 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-08 — Milestone v2.0 started
 
-Progress: Milestone complete
-Overall: v1 shipped (3 phases, 14 plans)
+Progress: Milestone started
+Overall: v1 shipped, v2.0 in progress
 
 ## Milestones
 
 **Shipped:**
 - v1 MVP (2026-02-03) — 3 phases, 14 plans, 38 requirements
 
-**Next:**
-- v2 (planning) — ERP integration and enhanced features
+**In Progress:**
+- v2.0 — Bayi Deneyimi ve Finansal Takip (7 feature groups, ~18 requirements)
 
 ## Performance Metrics
 
@@ -64,9 +64,9 @@ Current deployment requirements:
 
 ## Session Continuity
 
-Last session: 2026-02-03
-Stopped at: v1 milestone complete
-Resume command: /gsd:new-milestone
+Last session: 2026-02-08
+Stopped at: Defining requirements for v2.0
+Resume command: Continue requirements definition
 
 ---
-*v1 MVP SHIPPED: 2026-02-03*
+*v2.0 started: 2026-02-08*
