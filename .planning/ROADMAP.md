@@ -78,7 +78,9 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Database schema (tables, functions, RLS, storage)
+- [ ] 05-02-PLAN.md — Dealer financials UI (balance, transactions, invoices)
+- [ ] 05-03-PLAN.md — Admin financials UI (transaction entry, invoice upload)
 
 #### Phase 6: Dashboard, Campaigns & Order Documents
 **Goal**: Personalized dealer dashboard, marketing hub, and enhanced order documentation
@@ -128,7 +130,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | 2. Order Management & Tracking | v1 | 3/3 | Complete | 2026-01-27 |
 | 3. Insights & Mobile | v1 | 5/5 | Complete | 2026-02-03 |
 | 4. Favorites Quick Win | v2.0 | 3/3 | Complete | 2026-02-09 |
-| 5. Financial Backbone | v2.0 | 0/TBD | Not started | - |
+| 5. Financial Backbone | v2.0 | 0/3 | In Progress | - |
 | 6. Dashboard, Campaigns & Order Documents | v2.0 | 0/TBD | Not started | - |
 | 7. Support & Reports | v2.0 | 0/TBD | Not started | - |
 
