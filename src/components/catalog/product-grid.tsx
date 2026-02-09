@@ -1,4 +1,5 @@
 import { getCatalogProducts, type CatalogProduct } from '@/lib/actions/catalog'
+import { getFavoriteIds } from '@/lib/actions/favorites'
 import { ProductCard } from './product-card'
 
 interface ProductGridProps {
@@ -8,11 +9,14 @@ interface ProductGridProps {
 }
 
 export async function ProductGrid({ search, categoryId, brandId }: ProductGridProps) {
-  const products = await getCatalogProducts({
-    search,
-    category_id: categoryId,
-    brand_id: brandId,
-  })
+  const [products, favoriteIds] = await Promise.all([
+    getCatalogProducts({
+      search,
+      category_id: categoryId,
+      brand_id: brandId,
+    }),
+    getFavoriteIds(),
+  ])
 
   if (products.length === 0) {
     return (
@@ -27,9 +31,13 @@ export async function ProductGrid({ search, categoryId, brandId }: ProductGridPr
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard
+          key={product.id}
+          product={product}
+          isFavorited={favoriteIds.includes(product.id)}
+        />
       ))}
     </div>
   )
