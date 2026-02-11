@@ -75,12 +75,12 @@ Plans:
   4. Admin can manually enter financial transactions with validation and audit logging
   5. Admin can upload invoice PDFs to specific dealers
   6. Financial data is isolated per dealer (RLS prevents cross-dealer leakage)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Database schema (tables, functions, RLS, storage)
-- [ ] 05-02-PLAN.md — Dealer financials UI (balance, transactions, invoices)
-- [ ] 05-03-PLAN.md — Admin financials UI (transaction entry, invoice upload)
+- [x] 05-01-PLAN.md — Database schema (tables, functions, RLS, storage)
+- [x] 05-02-PLAN.md — Dealer financials UI (balance, transactions, invoices)
+- [x] 05-03-PLAN.md — Admin financials UI (transaction entry, invoice upload)
 
 #### Phase 6: Dashboard, Campaigns & Order Documents
 **Goal**: Personalized dealer dashboard, marketing hub, and enhanced order documentation
@@ -95,10 +95,14 @@ Plans:
   6. Dealer sees cargo tracking information (vehicle plate, driver info) when available
   7. Admin can create/edit campaigns with linked products
   8. Admin can upload order documents (invoice, irsaliye) and enter cargo details
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md — Database schema (campaigns, announcements, order_documents, materialized views)
+- [ ] 06-02-PLAN.md — Dealer dashboard (spending summary, orders, quick actions, top products)
+- [ ] 06-03-PLAN.md — Campaigns and announcements (dealer browsing, admin CRUD, read receipts)
+- [ ] 06-04-PLAN.md — Order documents and cargo (admin upload, dealer download, cargo tracking)
+- [ ] 06-05-PLAN.md — New products filter and integration verification
 
 #### Phase 7: Support & Reports
 **Goal**: Async dealer-admin messaging and self-service spending analytics
@@ -130,8 +134,8 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | 2. Order Management & Tracking | v1 | 3/3 | Complete | 2026-01-27 |
 | 3. Insights & Mobile | v1 | 5/5 | Complete | 2026-02-03 |
 | 4. Favorites Quick Win | v2.0 | 3/3 | Complete | 2026-02-09 |
-| 5. Financial Backbone | v2.0 | 0/3 | In Progress | - |
-| 6. Dashboard, Campaigns & Order Documents | v2.0 | 0/TBD | Not started | - |
+| 5. Financial Backbone | v2.0 | 3/3 | Complete | 2026-02-09 |
+| 6. Dashboard, Campaigns & Order Documents | v2.0 | 0/5 | Not started | - |
 | 7. Support & Reports | v2.0 | 0/TBD | Not started | - |
 
 ---
