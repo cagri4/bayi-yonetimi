@@ -27,6 +27,15 @@ export default async function LoginPage() {
         </p>
       </div>
       <LoginForm />
+
+      {/* Demo Giriş Bilgileri */}
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <p className="text-xs text-gray-500 font-medium mb-2">Demo Giris Bilgileri:</p>
+        <div className="space-y-1 text-xs text-gray-600">
+          <p><span className="font-medium">Bayi:</span> bayi@test.com / bayi1234</p>
+          <p><span className="font-medium">Admin:</span> admin@test.com / admin123</p>
+        </div>
+      </div>
     </>
   )
 }

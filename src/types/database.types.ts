@@ -31,6 +31,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       dealer_groups: {
         Row: {
@@ -60,6 +61,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       dealers: {
         Row: {
@@ -98,6 +100,15 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "dealers_dealer_group_id_fkey"
+            columns: ["dealer_group_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_groups"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       categories: {
         Row: {
@@ -124,6 +135,7 @@ export interface Database {
           is_active?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       brands: {
         Row: {
@@ -147,6 +159,7 @@ export interface Database {
           is_active?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       products: {
         Row: {
@@ -194,6 +207,22 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       dealer_prices: {
         Row: {
@@ -220,6 +249,22 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_prices_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dealer_prices_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       order_statuses: {
         Row: {
@@ -246,6 +291,7 @@ export interface Database {
           is_active?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       orders: {
         Row: {
@@ -296,6 +342,22 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "orders_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "order_statuses"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       order_items: {
         Row: {
@@ -331,6 +393,22 @@ export interface Database {
           total_price?: number
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       order_status_history: {
         Row: {
@@ -357,6 +435,22 @@ export interface Database {
           notes?: string | null
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_status_history_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "order_statuses"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       order_status_transitions: {
         Row: {
@@ -374,6 +468,22 @@ export interface Database {
           from_status_id?: string | null
           to_status_id?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_transitions_from_status_id_fkey"
+            columns: ["from_status_id"]
+            isOneToOne: false
+            referencedRelation: "order_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_status_transitions_to_status_id_fkey"
+            columns: ["to_status_id"]
+            isOneToOne: false
+            referencedRelation: "order_statuses"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       dealer_favorites: {
         Row: {
@@ -394,6 +504,7 @@ export interface Database {
           product_id?: string
           created_at?: string
         }
+        Relationships: []
       }
       transaction_types: {
         Row: {
@@ -423,6 +534,7 @@ export interface Database {
           is_active?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       dealer_transactions: {
         Row: {
@@ -470,6 +582,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       dealer_invoices: {
         Row: {
@@ -514,6 +627,7 @@ export interface Database {
           uploaded_by?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       campaigns: {
         Row: {
@@ -549,6 +663,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       campaign_products: {
         Row: {
@@ -569,6 +684,7 @@ export interface Database {
           product_id?: string
           discount_percent?: number | null
         }
+        Relationships: []
       }
       announcements: {
         Row: {
@@ -604,6 +720,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       announcement_reads: {
         Row: {
@@ -624,6 +741,7 @@ export interface Database {
           dealer_id?: string
           read_at?: string
         }
+        Relationships: []
       }
       order_documents: {
         Row: {
@@ -659,6 +777,7 @@ export interface Database {
           uploaded_by?: string | null
           uploaded_at?: string
         }
+        Relationships: []
       }
     }
     Views: {
@@ -671,6 +790,7 @@ export interface Database {
           total_credit: number
           net_balance: number
         }
+        Relationships: []
       }
     }
     Functions: {
