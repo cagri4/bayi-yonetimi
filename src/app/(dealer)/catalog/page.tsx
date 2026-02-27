@@ -15,13 +15,13 @@ interface CatalogPageProps {
 
 function ProductGridSkeleton() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="border rounded-lg p-4 space-y-4">
-          <Skeleton className="w-full h-48 rounded" />
+        <div key={i} className="bg-white border rounded-xl p-4 space-y-4 shadow-sm">
+          <Skeleton className="w-full h-48 rounded-lg" />
           <Skeleton className="h-4 w-3/4" />
           <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-10 w-full rounded-lg" />
         </div>
       ))}
     </div>
@@ -36,13 +36,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   ])
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Urun Katalogu</h1>
-        <p className="text-gray-500">Tum urunlerimizi goruntuleyebilir ve siparis verebilirsiniz.</p>
+    <div className="space-y-8">
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h1 className="text-3xl font-bold text-gray-800">Urun Katalogu</h1>
+        <p className="text-gray-500 mt-1">Tum urunlerimizi goruntuleyebilir ve siparis verebilirsiniz.</p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-between">
+      <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
         <ProductSearch />
         <ProductFilters categories={categories} brands={brands} />
       </div>
