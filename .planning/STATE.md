@@ -87,6 +87,8 @@ Recent decisions from PROJECT.md affecting v2.0:
 - v1 established Supabase RLS multi-tenant pattern (extends to financial tables)
 - Zustand + localStorage for client state (applies to favorites)
 - Server Actions for mutations (applies to all v2.0 features)
+- [Phase 06]: Soft delete for campaigns/announcements (is_active=false) to preserve data history
+- [Phase 06]: useOptimistic for announcement read-state to provide instant UI feedback without server round-trip
 
 ### Pending Todos
 
