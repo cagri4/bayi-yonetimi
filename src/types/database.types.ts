@@ -13,22 +13,57 @@ export interface Database {
         Row: {
           id: string
           email: string
-          role: 'admin' | 'dealer'
+          role: 'admin' | 'dealer' | 'superadmin'
+          company_id: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id: string
           email: string
-          role: 'admin' | 'dealer'
+          role: 'admin' | 'dealer' | 'superadmin'
+          company_id?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           email?: string
-          role?: 'admin' | 'dealer'
+          role?: 'admin' | 'dealer' | 'superadmin'
+          company_id?: string | null
           created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      companies: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          plan: 'starter' | 'pro' | 'enterprise'
+          is_active: boolean
+          settings: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          plan?: 'starter' | 'pro' | 'enterprise'
+          is_active?: boolean
+          settings?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          plan?: 'starter' | 'pro' | 'enterprise'
+          is_active?: boolean
+          settings?: Json
           updated_at?: string
         }
         Relationships: []
