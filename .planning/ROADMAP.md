@@ -135,7 +135,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | 3. Insights & Mobile | v1 | 5/5 | Complete | 2026-02-03 |
 | 4. Favorites Quick Win | v2.0 | 3/3 | Complete | 2026-02-09 |
 | 5. Financial Backbone | v2.0 | 3/3 | Complete | 2026-02-09 |
-| 6. Dashboard, Campaigns & Order Documents | v2.0 | 0/5 | Not started | - |
+| 6. Dashboard, Campaigns & Order Documents | 3/5 | In Progress|  | - |
 | 7. Support & Reports | v2.0 | 0/TBD | Not started | - |
 
 ---
