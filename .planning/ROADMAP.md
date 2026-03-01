@@ -188,7 +188,12 @@ Plans:
   3. A dealer asks the Satis Temsilcisi for current campaign information and receives accurate campaign details without fabrication
   4. The Egitimci bot refuses any request to modify data — read-only behavior is enforced at the tool level, not just the prompt
   5. Both agents respond in Turkish for all interactions regardless of the language the dealer uses
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Egitimci (Trainer) tool definitions and handlers (get_product_info, get_faq)
+- [ ] 10-02-PLAN.md — Satis Temsilcisi (Sales) tool definitions and handlers (get_catalog, create_order, get_order_status, get_campaigns, check_stock, get_dealer_profile)
+- [ ] 10-03-PLAN.md — Dispatcher integration, webhook routes, and agent_definitions SQL seed
 
 ### Phase 11: Financial and Operations Agents
 **Goal**: Dealers and admins can query financial data, warehouse inventory, and executive summaries via Telegram — Muhasebeci, Depo Sorumlusu, and Genel Mudur Danismani agents are live
@@ -230,7 +235,7 @@ Phases execute in strict dependency order: 8 → 9 → 10 → 11 → 12
 | 7. Support & Reports | v2.0 | 4/4 | Complete | 2026-03-01 |
 | 8. Multi-Tenant Database Migration | v3.0 | 5/5 | Complete | 2026-03-01 |
 | 9. Agent Infrastructure Foundation | 5/5 | Complete   | 2026-03-01 | — |
-| 10. First Agent Group — Trainer + Sales | v3.0 | 0/? | Pending | — |
+| 10. First Agent Group — Trainer + Sales | v3.0 | 0/3 | Pending | — |
 | 11. Financial and Operations Agents | v3.0 | 0/? | Pending | — |
 | 12. Extended Agent Ecosystem | v3.0 | 0/? | Pending | — |
 
