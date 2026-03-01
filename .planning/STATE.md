@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 8 — Multi-Tenant Database Migration
-Plan: 05 of 05 complete
-Status: COMPLETE — All 5 plans executed, all Dashboard actions done, verification passed
-Last activity: 2026-03-01 — Phase 8 complete (all migrations, indexes, RLS policies, JWT hook applied)
+Phase: 9 — Agent Infrastructure Foundation
+Plan: 01 of 05 complete
+Status: IN PROGRESS — Plan 01 executed (migration SQL, service client, TypeScript types)
+Last activity: 2026-03-01 — Phase 9 Plan 01 complete (agent tables migration, createServiceClient, database.types.ts)
 
-Progress: [██████░░░░] 20% — Phase 8 complete, Phase 9 next
+Progress: [██████░░░░] 22% — Phase 9 Plan 01 complete, Plan 02 next
 
 ## Milestones
 
@@ -86,6 +86,13 @@ Progress: [██████░░░░] 20% — Phase 8 complete, Phase 9 nex
 - Cross-agent calls: AgentBridge (direct DB query, not Claude invocation) for data; full loop for reasoning
 - Rejected: LangChain, LangGraph, Redis, pgvector, schema-per-tenant, WhatsApp (v4.0)
 
+### Phase 9 Decisions (from Plan 09-01)
+- Service role client: module-level singleton (not per-request) for agent serverless reuse; persistSession: false, autoRefreshToken: false
+- agent_conversations/messages/daily_token_usage/processed_telegram_updates: service role only RLS (no user-facing queries — agents run via service role)
+- agent_definitions: company admins can manage (needed for UI config); agent_calls: company admins can SELECT (audit log)
+- increment_daily_token_usage uses LANGUAGE sql (not plpgsql) — simpler, no variable overhead for atomic upsert
+- processed_telegram_updates uses Telegram's own BIGINT update_id as PRIMARY KEY (natural idempotency key, no UUID needed)
+
 ### v3.0 Phase Dependencies (strict)
 - Phase 8 (Multi-Tenant) → blocks Phase 9
 - Phase 9 (Agent Infrastructure) → blocks Phase 10
@@ -105,7 +112,7 @@ Progress: [██████░░░░] 20% — Phase 8 complete, Phase 9 nex
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 8 COMPLETE — all 5 plans executed, all Dashboard steps done, verification passed (1 company, 21 indexes, 56 policies). Ready for Phase 9 planning.
+Stopped at: Phase 9 Plan 01 COMPLETE — migration SQL (010_agent_tables.sql), createServiceClient() factory, database.types.ts updated with 6 agent tables + RPC type. Ready for Plan 09-02.
 Resume file: None
 
 ---

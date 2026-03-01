@@ -26,9 +26,9 @@
 - [ ] **AI-06**: AgentBridge cross-agent tool call yapar (direkt DB sorgusu, Claude invocation olmadan)
 - [ ] **AI-07**: Per-dealer gunluk token budget tracking (50K soft / 100K hard limit) calisir
 - [ ] **AI-08**: Agent-to-agent deadlock korumasi (depth limit 5, cycle detection, 10 tool call cap)
-- [ ] **AI-09**: agent_definitions, agent_conversations, agent_messages, agent_calls tablolari olusturulur
+- [x] **AI-09**: agent_definitions, agent_conversations, agent_messages, agent_calls tablolari olusturulur
 - [ ] **AI-10**: Prompt caching konfigurasyonu (system prompt + tool definition uzerine cache_control)
-- [ ] **AI-11**: Service role client (createServiceClient) sadece agent layer icin olusturulur
+- [x] **AI-11**: Service role client (createServiceClient) sadece agent layer icin olusturulur
 
 ### Egitimci (Trainer Agent)
 
@@ -168,9 +168,9 @@
 | AI-06 | Phase 9 | Pending |
 | AI-07 | Phase 9 | Pending |
 | AI-08 | Phase 9 | Pending |
-| AI-09 | Phase 9 | Pending |
+| AI-09 | Phase 9 | Complete |
 | AI-10 | Phase 9 | Pending |
-| AI-11 | Phase 9 | Pending |
+| AI-11 | Phase 9 | Complete |
 | TR-01 | Phase 10 | Pending |
 | TR-02 | Phase 10 | Pending |
 | TR-03 | Phase 10 | Pending |
