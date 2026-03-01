@@ -99,6 +99,13 @@ Progress: [█████████░] 80% — Phase 9 Plan 04 complete, Pla
 - ToolRegistry exposes getToolsWithCaching convenience method — AgentRunner should use this instead of calling applyPromptCaching manually
 - @anthropic-ai/sdk installed at ^0.78.0 per v3.0 architecture decision (raw SDK, not Vercel AI SDK)
 
+### Phase 9 Decisions (from Plan 09-03)
+- AgentRunner receives toolHandlers as Map<string, handler> — handlers get both input AND AgentContext for company_id scoping
+- System prompt uses array format [{ type:'text', text:..., cache_control:{ type:'ephemeral' } }] not plain string (required for prompt caching to activate)
+- ConversationManager.summarizeAndTruncate is private; triggered automatically by saveMessage when count > SUMMARIZE_THRESHOLD (50)
+- Summary messages use role='system' in DB but excluded from getMessages() — dispatcher injects them into system prompt separately
+- metadata cast to Json via type assertion — Record<string,unknown> is structurally compatible but TypeScript requires explicit cast
+
 ### Phase 9 Decisions (from Plan 09-04)
 - checkDeadlock() is synchronous — no DB access needed, only inspects in-memory callStack (fast guard before async operations)
 - callAgent() is a Phase 9 placeholder returning stub result; Phase 10 will replace stub with AgentRunner invocation using extended callStack and depth+1
@@ -124,8 +131,8 @@ Progress: [█████████░] 80% — Phase 9 Plan 04 complete, Pla
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 9 Plan 04 COMPLETE — AgentBridge (checkDeadlock, logAgentCall, callAgent placeholder, getDealerInfo/getRecentOrders/getProductInfo). Ready for Plan 09-05.
+Stopped at: Phase 9 Plan 03 COMPLETE — AgentRunner (tool-use loop, prompt caching, token recording), ConversationManager (rolling-50, Haiku summarization). Plan 04 previously complete. Ready for Plan 09-05.
 Resume file: None
 
 ---
-*Last updated: 2026-03-01 (Plan 09-04 complete)*
+*Last updated: 2026-03-01 (Plan 09-03 complete)*
