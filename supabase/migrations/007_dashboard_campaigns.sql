@@ -10,7 +10,7 @@
 -- Pattern: Campaign-to-products many-to-many relationship
 
 CREATE TABLE campaigns (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT,
   image_url TEXT,
@@ -23,7 +23,7 @@ CREATE TABLE campaigns (
 
 -- Campaign-Product Junction Table (many-to-many)
 CREATE TABLE campaign_products (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   campaign_id UUID NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
   product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   discount_percent DECIMAL(5,2),  -- Optional per-product discount
@@ -37,7 +37,7 @@ CREATE TABLE campaign_products (
 -- Pattern: Announcement-to-dealer reads junction table
 
 CREATE TABLE announcements (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   priority INTEGER DEFAULT 0,  -- Higher = more prominent
@@ -50,7 +50,7 @@ CREATE TABLE announcements (
 
 -- Announcement Read Receipts Junction Table
 CREATE TABLE announcement_reads (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   announcement_id UUID NOT NULL REFERENCES announcements(id) ON DELETE CASCADE,
   dealer_id UUID NOT NULL REFERENCES dealers(id) ON DELETE CASCADE,
   read_at TIMESTAMPTZ DEFAULT NOW(),
@@ -64,7 +64,7 @@ CREATE TABLE announcement_reads (
 -- Pattern: File storage reference with metadata tracking
 
 CREATE TABLE order_documents (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
   document_type TEXT NOT NULL CHECK (document_type IN ('invoice', 'irsaliye')),
   file_name TEXT NOT NULL,

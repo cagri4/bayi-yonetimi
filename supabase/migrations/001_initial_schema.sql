@@ -11,7 +11,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Order statuses (lookup table, not ENUM)
 CREATE TABLE order_statuses (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   display_order INT NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE order_statuses (
 
 -- Valid order status transitions
 CREATE TABLE order_status_transitions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   from_status_id UUID REFERENCES order_statuses(id),
   to_status_id UUID REFERENCES order_statuses(id),
   UNIQUE(from_status_id, to_status_id)
@@ -46,7 +46,7 @@ CREATE TABLE users (
 
 -- Dealer groups (Altin, Gumus, Bronz)
 CREATE TABLE dealer_groups (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT UNIQUE NOT NULL,
   discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0,
   min_order_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
@@ -57,7 +57,7 @@ CREATE TABLE dealer_groups (
 
 -- Dealers
 CREATE TABLE dealers (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE,
   company_name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE dealers (
 
 -- Categories
 CREATE TABLE categories (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   parent_id UUID REFERENCES categories(id),
@@ -85,7 +85,7 @@ CREATE TABLE categories (
 
 -- Brands
 CREATE TABLE brands (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT UNIQUE NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   is_active BOOLEAN DEFAULT true,
@@ -94,7 +94,7 @@ CREATE TABLE brands (
 
 -- Products
 CREATE TABLE products (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   description TEXT,
@@ -111,7 +111,7 @@ CREATE TABLE products (
 
 -- Dealer-specific price overrides
 CREATE TABLE dealer_prices (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dealer_id UUID REFERENCES dealers(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
   custom_price DECIMAL(10,2) NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE dealer_prices (
 
 -- Orders
 CREATE TABLE orders (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_number TEXT UNIQUE NOT NULL,
   dealer_id UUID REFERENCES dealers(id),
   status_id UUID REFERENCES order_statuses(id),
@@ -140,7 +140,7 @@ CREATE TABLE orders (
 
 -- Order items
 CREATE TABLE order_items (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id),
   product_code TEXT NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE order_items (
 
 -- Order status history
 CREATE TABLE order_status_history (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
   status_id UUID REFERENCES order_statuses(id),
   changed_by UUID REFERENCES users(id),

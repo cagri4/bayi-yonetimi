@@ -55,9 +55,15 @@ CREATE TRIGGER order_status_change_trigger
 
 -- Grant SELECT permissions to supabase_realtime role
 -- Required for Realtime postgres_changes to work with RLS
-GRANT SELECT ON orders TO supabase_realtime;
-GRANT SELECT ON order_status_history TO supabase_realtime;
-GRANT SELECT ON order_statuses TO supabase_realtime;
+-- Wrapped in DO block to handle case where role doesn't exist yet
+DO $$
+BEGIN
+  EXECUTE 'GRANT SELECT ON orders TO supabase_realtime';
+  EXECUTE 'GRANT SELECT ON order_status_history TO supabase_realtime';
+  EXECUTE 'GRANT SELECT ON order_statuses TO supabase_realtime';
+EXCEPTION WHEN undefined_object THEN
+  RAISE NOTICE 'supabase_realtime role not found, skipping grants';
+END $$;
 
 -- ============================================
 -- REALTIME PUBLICATION

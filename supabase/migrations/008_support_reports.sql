@@ -10,7 +10,7 @@
 -- Pattern: Single-level messaging (not threaded); admin replies atomically update status
 
 CREATE TABLE support_messages (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dealer_id UUID NOT NULL REFERENCES dealers(id) ON DELETE CASCADE,
 
   -- Message content
@@ -36,7 +36,7 @@ CREATE TABLE support_messages (
 -- Pattern: Global content, no dealer_id — all dealers see same FAQ
 
 CREATE TABLE faq_categories (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   display_order INT NOT NULL DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
@@ -49,7 +49,7 @@ CREATE TABLE faq_categories (
 -- Purpose: Individual Q&A items organized under categories
 
 CREATE TABLE faq_items (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   category_id UUID NOT NULL REFERENCES faq_categories(id) ON DELETE CASCADE,
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE faq_items (
 -- Pattern: product_id nullable — dealer may request item not yet in catalog
 
 CREATE TABLE product_requests (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dealer_id UUID NOT NULL REFERENCES dealers(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE SET NULL, -- nullable: product may not exist in catalog yet
 
@@ -282,7 +282,12 @@ CREATE POLICY "Admins can update product requests"
 -- Pattern: Same as orders table in migration 002_realtime_setup.sql
 
 -- Grant SELECT permissions to supabase_realtime role
-GRANT SELECT ON support_messages TO supabase_realtime;
+DO $$
+BEGIN
+  EXECUTE 'GRANT SELECT ON support_messages TO supabase_realtime';
+EXCEPTION WHEN undefined_object THEN
+  RAISE NOTICE 'supabase_realtime role not found, skipping grant';
+END $$;
 
 -- Add support_messages to supabase_realtime publication (idempotent)
 DO $$

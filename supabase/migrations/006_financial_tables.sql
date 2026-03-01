@@ -9,7 +9,7 @@
 
 -- Transaction type lookup table for extensibility
 CREATE TABLE transaction_types (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,        -- Turkish name for display
   balance_effect TEXT NOT NULL CHECK (balance_effect IN ('debit', 'credit')),
@@ -33,7 +33,7 @@ INSERT INTO transaction_types (code, name, balance_effect, display_order) VALUES
 -- Pattern: Double-entry inspired with debit/credit balance effects
 
 CREATE TABLE dealer_transactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dealer_id UUID NOT NULL REFERENCES dealers(id) ON DELETE CASCADE,
   transaction_type_id UUID NOT NULL REFERENCES transaction_types(id),
 
@@ -64,7 +64,7 @@ CREATE TABLE dealer_transactions (
 -- Purpose: Store invoice PDF metadata, link to transactions and storage
 
 CREATE TABLE dealer_invoices (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dealer_id UUID NOT NULL REFERENCES dealers(id) ON DELETE CASCADE,
   transaction_id UUID REFERENCES dealer_transactions(id) ON DELETE SET NULL,
 
