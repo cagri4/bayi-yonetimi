@@ -432,3 +432,91 @@ RETURNS TABLE (
 $$ LANGUAGE sql STABLE SECURITY INVOKER;
 
 GRANT EXECUTE ON FUNCTION get_dealer_spending_summary(UUID) TO authenticated;
+
+
+-- ============================================
+-- BLOCK 11: Composite indexes for company_id scoping
+-- CRITICAL: Paste EACH statement INDIVIDUALLY in Supabase Dashboard SQL Editor
+-- CREATE INDEX CONCURRENTLY cannot run inside a transaction block
+-- Run them one at a time — each takes a few seconds on a small dataset
+-- ============================================
+
+-- dealers
+CREATE INDEX CONCURRENTLY idx_dealers_company_id
+  ON dealers(company_id);
+
+-- orders (compound: company_id + dealer_id for admin queries by dealer within company)
+CREATE INDEX CONCURRENTLY idx_orders_company_dealer
+  ON orders(company_id, dealer_id);
+
+-- order_items (company_id only — no dealer_id column on this table)
+CREATE INDEX CONCURRENTLY idx_order_items_company_id
+  ON order_items(company_id);
+
+-- order_status_history (company_id only — no dealer_id column on this table)
+CREATE INDEX CONCURRENTLY idx_order_status_history_company_id
+  ON order_status_history(company_id);
+
+-- dealer_prices
+CREATE INDEX CONCURRENTLY idx_dealer_prices_company_dealer
+  ON dealer_prices(company_id, dealer_id);
+
+-- dealer_transactions
+CREATE INDEX CONCURRENTLY idx_dealer_transactions_company_dealer
+  ON dealer_transactions(company_id, dealer_id);
+
+-- dealer_invoices
+CREATE INDEX CONCURRENTLY idx_dealer_invoices_company_dealer
+  ON dealer_invoices(company_id, dealer_id);
+
+-- dealer_favorites
+CREATE INDEX CONCURRENTLY idx_dealer_favorites_company_dealer
+  ON dealer_favorites(company_id, dealer_id);
+
+-- announcement_reads
+CREATE INDEX CONCURRENTLY idx_announcement_reads_company_dealer
+  ON announcement_reads(company_id, dealer_id);
+
+-- support_messages
+CREATE INDEX CONCURRENTLY idx_support_messages_company_dealer
+  ON support_messages(company_id, dealer_id);
+
+-- product_requests
+CREATE INDEX CONCURRENTLY idx_product_requests_company_dealer
+  ON product_requests(company_id, dealer_id);
+
+-- dealer_groups (company-scoped, no dealer_id)
+CREATE INDEX CONCURRENTLY idx_dealer_groups_company_id
+  ON dealer_groups(company_id);
+
+-- categories (company-scoped)
+CREATE INDEX CONCURRENTLY idx_categories_company_id
+  ON categories(company_id);
+
+-- brands (company-scoped)
+CREATE INDEX CONCURRENTLY idx_brands_company_id
+  ON brands(company_id);
+
+-- products (company-scoped)
+CREATE INDEX CONCURRENTLY idx_products_company_id
+  ON products(company_id);
+
+-- campaigns (company-scoped)
+CREATE INDEX CONCURRENTLY idx_campaigns_company_id
+  ON campaigns(company_id);
+
+-- campaign_products (company-scoped)
+CREATE INDEX CONCURRENTLY idx_campaign_products_company_id
+  ON campaign_products(company_id);
+
+-- announcements (company-scoped)
+CREATE INDEX CONCURRENTLY idx_announcements_company_id
+  ON announcements(company_id);
+
+-- order_documents (company-scoped via orders)
+CREATE INDEX CONCURRENTLY idx_order_documents_company_id
+  ON order_documents(company_id);
+
+-- users (company_id for admin lookup in hook + admin RLS)
+CREATE INDEX CONCURRENTLY idx_users_company_id
+  ON users(company_id);
