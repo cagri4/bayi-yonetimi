@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 9 — Agent Infrastructure Foundation
-Plan: 01 of 05 complete
-Status: IN PROGRESS — Plan 01 executed (migration SQL, service client, TypeScript types)
-Last activity: 2026-03-01 — Phase 9 Plan 01 complete (agent tables migration, createServiceClient, database.types.ts)
+Plan: 02 of 05 complete
+Status: IN PROGRESS — Plan 02 executed (agent types, tool registry, token budget)
+Last activity: 2026-03-01 — Phase 9 Plan 02 complete (AgentRole taxonomy, ToolRegistry, TokenBudget, applyPromptCaching)
 
-Progress: [██████░░░░] 22% — Phase 9 Plan 01 complete, Plan 02 next
+Progress: [███████░░░] 33% — Phase 9 Plan 02 complete, Plan 03 next
 
 ## Milestones
 
@@ -93,6 +93,12 @@ Progress: [██████░░░░] 22% — Phase 9 Plan 01 complete, Pla
 - increment_daily_token_usage uses LANGUAGE sql (not plpgsql) — simpler, no variable overhead for atomic upsert
 - processed_telegram_updates uses Telegram's own BIGINT update_id as PRIMARY KEY (natural idempotency key, no UUID needed)
 
+### Phase 9 Decisions (from Plan 09-02)
+- applyPromptCaching marks last tool in array with cache_control:ephemeral — consistent with Anthropic caching docs (last breakpoint gets cached content)
+- TokenBudget fails open on DB errors — returns allowed:true to prevent blocking dealers on transient Supabase issues
+- ToolRegistry exposes getToolsWithCaching convenience method — AgentRunner should use this instead of calling applyPromptCaching manually
+- @anthropic-ai/sdk installed at ^0.78.0 per v3.0 architecture decision (raw SDK, not Vercel AI SDK)
+
 ### v3.0 Phase Dependencies (strict)
 - Phase 8 (Multi-Tenant) → blocks Phase 9
 - Phase 9 (Agent Infrastructure) → blocks Phase 10
@@ -112,8 +118,8 @@ Progress: [██████░░░░] 22% — Phase 9 Plan 01 complete, Pla
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 9 Plan 01 COMPLETE — migration SQL (010_agent_tables.sql), createServiceClient() factory, database.types.ts updated with 6 agent tables + RPC type. Ready for Plan 09-02.
+Stopped at: Phase 9 Plan 02 COMPLETE — AgentRole (12 roles), AGENT_MODELS, AgentContext, TokenBudget, ToolRegistry, applyPromptCaching, placeholder tools. Ready for Plan 09-03.
 Resume file: None
 
 ---
-*Last updated: 2026-03-01*
+*Last updated: 2026-03-01 (Plan 09-02 complete)*
