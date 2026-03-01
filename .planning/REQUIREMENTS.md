@@ -32,10 +32,10 @@
 
 ### Egitimci (Trainer Agent)
 
-- [ ] **TR-01**: Egitimci ajani urun bilgisi sorgusuna yanitlar verir (get_product_info tool)
-- [ ] **TR-02**: Egitimci ajani FAQ sorularina yanitlar verir (get_faq tool)
-- [ ] **TR-03**: Egitimci ajani Telegram uzerinden bayilerle Turkce konusur
-- [ ] **TR-04**: Egitimci ajani read-only calisir, hicbir veriyi degistirmez
+- [x] **TR-01**: Egitimci ajani urun bilgisi sorgusuna yanitlar verir (get_product_info tool)
+- [x] **TR-02**: Egitimci ajani FAQ sorularina yanitlar verir (get_faq tool)
+- [x] **TR-03**: Egitimci ajani Telegram uzerinden bayilerle Turkce konusur
+- [x] **TR-04**: Egitimci ajani read-only calisir, hicbir veriyi degistirmez
 
 ### Satis Temsilcisi (Sales Agent)
 
@@ -171,10 +171,10 @@
 | AI-09 | Phase 9 | Complete |
 | AI-10 | Phase 9 | Complete |
 | AI-11 | Phase 9 | Complete |
-| TR-01 | Phase 10 | Pending |
-| TR-02 | Phase 10 | Pending |
-| TR-03 | Phase 10 | Pending |
-| TR-04 | Phase 10 | Pending |
+| TR-01 | Phase 10 | Complete |
+| TR-02 | Phase 10 | Complete |
+| TR-03 | Phase 10 | Complete |
+| TR-04 | Phase 10 | Complete |
 | SR-01 | Phase 10 | Pending |
 | SR-02 | Phase 10 | Pending |
 | SR-03 | Phase 10 | Pending |

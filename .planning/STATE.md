@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 9 — Agent Infrastructure Foundation
-Plan: 05 of 05 complete
-Status: COMPLETE — All 5 plans executed; Phase 9 Agent Infrastructure Foundation done
-Last activity: 2026-03-01 — Phase 9 Plan 05 complete (Telegram webhook route + agent dispatcher; grammy@1.41.0 installed)
+Phase: 10 — First Agent Group: Trainer + Sales Representative
+Plan: 01 of 05 complete
+Status: IN PROGRESS — Plan 01 executed; Egitimci tools implemented
+Last activity: 2026-03-01 — Phase 10 Plan 01 complete (Egitimci agent tools: get_product_info + get_faq handlers)
 
-Progress: [██████████] 100% — Phase 9 complete
+Progress: [██░░░░░░░░] 20% — Plan 01/05 complete
 
 ## Milestones
 
@@ -120,6 +120,14 @@ Progress: [██████████] 100% — Phase 9 complete
 - getDealerInfo/getRecentOrders/getProductInfo use direct DB queries (not Claude) per AI-06 cross-agent data pattern
 - orders.status_id used (not status) — TypeScript Supabase query builder caught column name mismatch at compile time
 
+### Phase 10 Decisions (from Plan 10-01)
+- TR-04 read-only enforced at file level: egitimci-tools.ts has ONLY SELECT queries; no INSERT/UPDATE/DELETE code paths
+- safeQuery sanitization (replace(/[%_]/g, '')) applied before all ilike queries to prevent wildcard injection
+- dealer_group join typed explicitly as { discount_percent: number } | null — Supabase TypeScript builder returns Json for nested join results, requires explicit cast
+- void context in handleGetFaq: preserves AgentContext parameter for future audit logging while suppressing TS unused variable warning
+- createEgitimciHandlers closes over supabase client — handlers do NOT receive supabase directly (matches Phase 9 dispatcher closure pattern)
+- HandlerFn factory pattern established: createXxxHandlers(supabase) returns Map<string, HandlerFn> — Phase 10+ tool files follow this shape
+
 ### v3.0 Phase Dependencies (strict)
 - Phase 8 (Multi-Tenant) → blocks Phase 9
 - Phase 9 (Agent Infrastructure) → blocks Phase 10
@@ -139,8 +147,8 @@ Progress: [██████████] 100% — Phase 9 complete
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 9 Plan 05 COMPLETE — Telegram webhook (POST /api/telegram, after(), idempotency 23505) + Agent dispatcher (dealer identity resolution, token budget check, ConversationManager, AgentRunner, Telegram sendMessage). Phase 9 Agent Infrastructure Foundation fully complete.
+Stopped at: Phase 10 Plan 01 COMPLETE — Egitimci agent tools (egitimci-tools.ts): get_product_info with company-scoped product search + dealer pricing, get_faq with global faq_items lookup. HandlerFn factory pattern established for Phase 10+.
 Resume file: None
 
 ---
-*Last updated: 2026-03-01 (Plan 09-05 complete — Phase 9 done)*
+*Last updated: 2026-03-01 (Plan 10-01 complete — Egitimci tools done)*
