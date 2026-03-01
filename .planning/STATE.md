@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 7 of 7 (Support & Reports)
-Plan: 1 of 4 in phase 7 complete
+Plan: 2 of 4 in phase 7 complete
 Status: Phase 7 in progress
-Last activity: 2026-03-01 — Completed 07-01-PLAN.md
+Last activity: 2026-03-01 — Completed 07-02-PLAN.md
 
 Progress: [████████████████████] 85% (17/20 total plans complete)
 Overall: v1 shipped (14 plans), v2.0 in progress (phases 04-06 complete, phase 07 started)
@@ -56,6 +56,7 @@ Overall: v1 shipped (14 plans), v2.0 in progress (phases 04-06 complete, phase 0
 **Current Phase (07-support-reports):**
 - Plans completed: 1 of 4
 - Duration so far: 3min
+| Phase 07-support-reports P02 | 720 | 2 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,8 @@ Recent decisions from PROJECT.md affecting v2.0:
 - [Phase 07-01]: replied_by references users(id) not auth.users(id) — consistent with existing project pattern
 - [Phase 07-01]: product_id nullable on product_requests — handles both in-catalog (out-of-stock) and new-catalog requests
 - [Phase 07-01]: Realtime publication uses idempotent DO block pattern from migration 002
+- [Phase 07-support-reports]: replyToMessage uses atomic single UPDATE (reply_body + status=answered) — avoids race condition
+- [Phase 07-support-reports]: useSupportRealtime subscribes to INSERT only on support_messages for admin new-message notifications
 
 ### Pending Todos
 

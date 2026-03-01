@@ -44,12 +44,12 @@ v2.0 milestone için gereksinimler. Her biri roadmap fazlarına eşlenecek.
 
 ### Destek ve İletişim
 
-- [ ] **SUP-01**: Bayi admin'e mesaj gönderebilir (konu, içerik)
-- [ ] **SUP-02**: Bayi mesaj geçmişini görür (bekleyen/cevaplanan)
-- [ ] **SUP-03**: Admin bayi mesajlarını görür ve cevaplar
-- [ ] **SUP-04**: Bayi SSS sayfasını görür (kategorilere ayrılmış)
-- [ ] **SUP-05**: Admin SSS içeriğini yönetir
-- [ ] **SUP-06**: Bayi ürün talebi gönderebilir (stokta olmayan ürün için)
+- [x] **SUP-01**: Bayi admin'e mesaj gönderebilir (konu, içerik)
+- [x] **SUP-02**: Bayi mesaj geçmişini görür (bekleyen/cevaplanan)
+- [x] **SUP-03**: Admin bayi mesajlarını görür ve cevaplar
+- [x] **SUP-04**: Bayi SSS sayfasını görür (kategorilere ayrılmış)
+- [x] **SUP-05**: Admin SSS içeriğini yönetir
+- [x] **SUP-06**: Bayi ürün talebi gönderebilir (stokta olmayan ürün için)
 
 ### Sipariş Detayları Geliştirme
 
@@ -132,12 +132,12 @@ Hangi fazlar hangi gereksinimleri kapsıyor.
 | ORD-03 | Phase 6 | Pending |
 | ORD-04 | Phase 6 | Pending |
 | ORD-05 | Phase 6 | Pending |
-| SUP-01 | Phase 7 | Pending |
-| SUP-02 | Phase 7 | Pending |
-| SUP-03 | Phase 7 | Pending |
-| SUP-04 | Phase 7 | Pending |
-| SUP-05 | Phase 7 | Pending |
-| SUP-06 | Phase 7 | Pending |
+| SUP-01 | Phase 7 | Complete |
+| SUP-02 | Phase 7 | Complete |
+| SUP-03 | Phase 7 | Complete |
+| SUP-04 | Phase 7 | Complete |
+| SUP-05 | Phase 7 | Complete |
+| SUP-06 | Phase 7 | Complete |
 | REP-01 | Phase 7 | Pending |
 | REP-02 | Phase 7 | Pending |
 | REP-03 | Phase 7 | Pending |
