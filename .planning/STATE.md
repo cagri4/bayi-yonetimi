@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 8 — Multi-Tenant Database Migration
-Plan: 01 of 05 complete
-Status: In progress — Plan 08-01 complete, ready for Plan 08-02
-Last activity: 2026-03-01 — Plan 08-01 complete (009_multi_tenant.sql foundation migration)
+Plan: 02 of 05 (checkpoint: awaiting human action on Task 2)
+Status: In progress — Plan 08-02 Task 1 complete; BLOCK 11 documented; awaiting Dashboard index execution
+Last activity: 2026-03-01 — Plan 08-02 Task 1 complete (BLOCK 11 appended to 009_multi_tenant.sql)
 
-Progress: [█░░░░░░░░░] 2% — Phase 8 of 12 (1/5 plans complete in phase)
+Progress: [█░░░░░░░░░] 2% — Phase 8 of 12 (2/5 plans in progress in phase)
 
 ## Milestones
 
@@ -56,6 +56,12 @@ Progress: [█░░░░░░░░░] 2% — Phase 8 of 12 (1/5 plans compl
 - UNIQUE INDEX on (company_id, dealer_id, month DESC NULLS LAST) required for REFRESH MATERIALIZED VIEW CONCURRENTLY
 - 9 migrations applied after Plan 08-01 execution (009_multi_tenant.sql)
 
+### Phase 8 Decisions (from Plan 08-02)
+- Each CREATE INDEX CONCURRENTLY must be run as standalone Dashboard statement — cannot batch inside a transaction block
+- 11 dealer-scoped tables get composite (company_id, dealer_id) indexes for compound predicate efficiency
+- 9 direct-assign tables get single-column (company_id) indexes (no dealer_id present)
+- users.company_id indexed for JWT hook lookup and admin RLS performance
+
 ### v3.0 Architecture Decisions
 - Multi-tenancy: shared-schema with company_id on all 20+ tables (NOT schema-per-tenant)
 - RLS anchor: current_company_id() SECURITY DEFINER function via JWT claim injection
@@ -88,7 +94,7 @@ Progress: [█░░░░░░░░░] 2% — Phase 8 of 12 (1/5 plans compl
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 08-01-PLAN.md — 009_multi_tenant.sql created, ready for Dashboard execution and Plan 08-02
+Stopped at: Checkpoint 08-02 Task 2 — BLOCK 11 documented, awaiting human execution of 20 CONCURRENTLY indexes in Supabase Dashboard. Resume after typing "indexes created".
 Resume file: None
 
 ---
