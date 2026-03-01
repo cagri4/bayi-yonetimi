@@ -12,10 +12,10 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 Phase: 8 — Multi-Tenant Database Migration
 Plan: 05 of 05 complete
-Status: In progress — Plans 08-01, 08-02, 08-03, 08-05 complete; 08-04 is manual Dashboard step (JWT hook registration)
-Last activity: 2026-03-01 — Plan 08-05 complete (TypeScript types updated for post-migration schema)
+Status: COMPLETE — All 5 plans executed, all Dashboard actions done, verification passed
+Last activity: 2026-03-01 — Phase 8 complete (all migrations, indexes, RLS policies, JWT hook applied)
 
-Progress: [████░░░░░░] 4% — Phase 8 of 12 (5/5 plans executed in phase, 08-04 pending Dashboard action)
+Progress: [██████░░░░] 20% — Phase 8 complete, Phase 9 next
 
 ## Milestones
 
@@ -32,8 +32,9 @@ Progress: [████░░░░░░] 4% — Phase 8 of 12 (5/5 plans execu
 - Project ref: neqcuhejmornybmbclwt (restored, West EU London)
 - URL: https://neqcuhejmornybmbclwt.supabase.co
 - Auth users: admin@test.com (admin), bayi@test.com (dealer)
-- RLS: Uses is_admin() SECURITY DEFINER function
-- All 8 migrations applied, seed data present
+- RLS: Company-scoped with current_company_id(), is_company_admin(), is_superadmin()
+- JWT Hook: inject_company_claim registered (Custom Access Token Hook)
+- All 9 migrations applied (001-009), seed data present, 1 company active
 
 ### Deployment
 - Vercel: https://bayi-yonetimi.vercel.app (38 routes)
@@ -104,7 +105,7 @@ Progress: [████░░░░░░] 4% — Phase 8 of 12 (5/5 plans execu
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 08-05-PLAN.md — TypeScript types updated for post-migration schema; companies table type, superadmin role, and company_id on all 19 tenant-scoped tables; Phase 8 code plans done, awaiting 08-04 Dashboard manual step (JWT hook registration)
+Stopped at: Phase 8 COMPLETE — all 5 plans executed, all Dashboard steps done, verification passed (1 company, 21 indexes, 56 policies). Ready for Phase 9 planning.
 Resume file: None
 
 ---

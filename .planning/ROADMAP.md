@@ -132,7 +132,7 @@ Plans:
 
 **Milestone Goal:** Transform the single-tenant dealer management platform into a multi-tenant SaaS with 12 AI digital workers accessible via Telegram — enabling 7/24 autonomous business operations independent of business hours.
 
-- [ ] **Phase 8: Multi-Tenant Database Migration** - Isolate all data by company_id; secure platform for multiple tenants
+- [x] **Phase 8: Multi-Tenant Database Migration** - Isolate all data by company_id; secure platform for multiple tenants
 - [ ] **Phase 9: Agent Infrastructure Foundation** - Build the shared AgentRunner, ToolRegistry, and Telegram webhook framework all 12 agents depend on
 - [ ] **Phase 10: First Agent Group — Trainer + Sales** - Validate the full agent pipeline with two production agents before touching financial data
 - [ ] **Phase 11: Financial and Operations Agents** - Add Accountant, Warehouse, and Executive Advisor agents with cross-agent tool calls
@@ -153,11 +153,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Foundation SQL: companies table, security functions, users extensions, backfill all 19 tables, materialized view rebuild
-- [ ] 08-02-PLAN.md — Composite indexes: CREATE INDEX CONCURRENTLY on all tenant-scoped tables (manual Dashboard execution, one at a time)
-- [ ] 08-03-PLAN.md — RLS policy replacement: drop old admin policies, create company-scoped + superadmin bypass policies on all tables
-- [ ] 08-04-PLAN.md — Hook registration and end-to-end isolation verification (manual Supabase Dashboard step)
-- [ ] 08-05-PLAN.md — TypeScript types update: companies table type, company_id on 19 tables, superadmin role
+- [x] 08-01-PLAN.md — Foundation SQL: companies table, security functions, users extensions, backfill all 19 tables, materialized view rebuild
+- [x] 08-02-PLAN.md — Composite indexes: CREATE INDEX CONCURRENTLY on all tenant-scoped tables (manual Dashboard execution, one at a time)
+- [x] 08-03-PLAN.md — RLS policy replacement: drop old admin policies, create company-scoped + superadmin bypass policies on all tables
+- [x] 08-04-PLAN.md — Hook registration and end-to-end isolation verification (manual Supabase Dashboard step)
+- [x] 08-05-PLAN.md — TypeScript types update: companies table type, company_id on 19 tables, superadmin role
 
 ### Phase 9: Agent Infrastructure Foundation
 **Goal**: A shared agent execution layer exists that any of the 12 agent roles can use — with cost controls, security boundaries, and deadlock guards built in from the start
@@ -221,7 +221,7 @@ Phases execute in strict dependency order: 8 → 9 → 10 → 11 → 12
 | 5. Financial Backbone | v2.0 | 3/3 | Complete | 2026-02-09 |
 | 6. Dashboard, Campaigns & Order Documents | v2.0 | 5/5 | Complete | 2026-03-01 |
 | 7. Support & Reports | v2.0 | 4/4 | Complete | 2026-03-01 |
-| 8. Multi-Tenant Database Migration | 4/5 | In Progress|  | — |
+| 8. Multi-Tenant Database Migration | v3.0 | 5/5 | Complete | 2026-03-01 |
 | 9. Agent Infrastructure Foundation | v3.0 | 0/? | Pending | — |
 | 10. First Agent Group — Trainer + Sales | v3.0 | 0/? | Pending | — |
 | 11. Financial and Operations Agents | v3.0 | 0/? | Pending | — |
