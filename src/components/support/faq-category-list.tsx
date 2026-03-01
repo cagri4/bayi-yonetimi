@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import type { FaqCategoryWithItems } from '@/lib/actions/support'
+import type { FaqCategoryWithItems } from '@/types/database.types'
 
 interface FaqItemProps {
   question: string

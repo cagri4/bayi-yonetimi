@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { MessageStatusBadge } from './message-status-badge'
 import { ChevronDown, ChevronUp, MessageSquare } from 'lucide-react'
-import type { SupportMessage } from '@/lib/actions/support'
+import type { SupportMessage } from '@/types/database.types'
 
 const CATEGORY_LABELS: Record<string, string> = {
   siparis: 'Siparis',

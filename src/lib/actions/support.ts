@@ -7,11 +7,9 @@ import type {
   SupportMessage,
   SupportMessageWithDealer,
   FaqCategoryWithItems,
+  FaqItem,
   ProductRequest,
 } from '@/types/database.types'
-
-// Re-export types for consumers
-export type { SupportMessage, SupportMessageWithDealer, FaqCategoryWithItems, ProductRequest }
 
 // ============================================
 // VALIDATION SCHEMAS
