@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 
 ## Current Position
 
-Phase: 4 of 7 (Favorites Quick Win)
-Plan: 2 of TBD in phase 4 complete
-Status: Phase 4 in progress
-Last activity: 2026-02-08 — Completed 04-02-PLAN.md
+Phase: 7 of 7 (Support & Reports)
+Plan: 1 of 4 in phase 7 complete
+Status: Phase 7 in progress
+Last activity: 2026-03-01 — Completed 07-01-PLAN.md
 
-Progress: [████████████████░░░░] 70% (16/23 total plans complete)
-Overall: v1 shipped (14 plans), v2.0 in progress (2 plans complete)
+Progress: [████████████████████] 85% (17/20 total plans complete)
+Overall: v1 shipped (14 plans), v2.0 in progress (phases 04-06 complete, phase 07 started)
 
 ## Milestones
 
@@ -46,10 +46,16 @@ Overall: v1 shipped (14 plans), v2.0 in progress (2 plans complete)
 - Phases: 4 (04-07)
 - Requirements: 36/36 mapped
 
-**Current Phase (04-favorites-quick-win):**
-- Plans completed: 2
-- Duration so far: 27min
-| Phase 06-dashboard-campaigns-docs P06-02 | 25 | 3 tasks | 8 files |
+**By Plan (recent):**
+
+| Phase-Plan | Duration | Tasks | Files |
+|------------|----------|-------|-------|
+| Phase 06-dashboard-campaigns-docs P06-02 | 25min | 3 tasks | 8 files |
+| Phase 07-support-reports P07-01 | 3min | 2 tasks | 2 files |
+
+**Current Phase (07-support-reports):**
+- Plans completed: 1 of 4
+- Duration so far: 3min
 
 ## Accumulated Context
 
@@ -92,6 +98,9 @@ Recent decisions from PROJECT.md affecting v2.0:
 - [Phase 06]: useOptimistic for announcement read-state to provide instant UI feedback without server round-trip
 - [Phase 06-dashboard-campaigns-docs]: Single DashboardContent async component with Promise.all for zero-waterfall parallel fetching — simpler than per-widget Suspense
 - [Phase 06-dashboard-campaigns-docs]: TopProductsWidget links to catalog instead of inline add-to-cart — top products RPC lacks price data
+- [Phase 07-01]: replied_by references users(id) not auth.users(id) — consistent with existing project pattern
+- [Phase 07-01]: product_id nullable on product_requests — handles both in-catalog (out-of-stock) and new-catalog requests
+- [Phase 07-01]: Realtime publication uses idempotent DO block pattern from migration 002
 
 ### Pending Todos
 
@@ -104,10 +113,10 @@ None. Research flagged critical pitfalls but all have known prevention patterns.
 
 ## Session Continuity
 
-Last session: 2026-02-08
-Stopped at: Completed 04-02-PLAN.md (favorites UI and client state)
+Last session: 2026-03-01
+Stopped at: Completed 07-01-PLAN.md (Phase 7 database schema and TypeScript types)
 Resume file: None
 
 ---
-*Last updated: 2026-02-08*
-*Next: Catalog hydration or continue phase 04*
+*Last updated: 2026-03-01*
+*Next: 07-02-PLAN.md (Support messaging UI)*
