@@ -152,83 +152,91 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MT-01 | — | Pending |
-| MT-02 | — | Pending |
-| MT-03 | — | Pending |
-| MT-04 | — | Pending |
-| MT-05 | — | Pending |
-| MT-06 | — | Pending |
-| MT-07 | — | Pending |
-| MT-08 | — | Pending |
-| AI-01 | — | Pending |
-| AI-02 | — | Pending |
-| AI-03 | — | Pending |
-| AI-04 | — | Pending |
-| AI-05 | — | Pending |
-| AI-06 | — | Pending |
-| AI-07 | — | Pending |
-| AI-08 | — | Pending |
-| AI-09 | — | Pending |
-| AI-10 | — | Pending |
-| AI-11 | — | Pending |
-| TR-01 | — | Pending |
-| TR-02 | — | Pending |
-| TR-03 | — | Pending |
-| TR-04 | — | Pending |
-| SR-01 | — | Pending |
-| SR-02 | — | Pending |
-| SR-03 | — | Pending |
-| SR-04 | — | Pending |
-| SR-05 | — | Pending |
-| SR-06 | — | Pending |
-| SR-07 | — | Pending |
-| MH-01 | — | Pending |
-| MH-02 | — | Pending |
-| MH-03 | — | Pending |
-| MH-04 | — | Pending |
-| MH-05 | — | Pending |
-| MH-06 | — | Pending |
-| DS-01 | — | Pending |
-| DS-02 | — | Pending |
-| DS-03 | — | Pending |
-| DS-04 | — | Pending |
-| DS-05 | — | Pending |
-| GM-01 | — | Pending |
-| GM-02 | — | Pending |
-| GM-03 | — | Pending |
-| GM-04 | — | Pending |
-| GM-05 | — | Pending |
-| TU-01 | — | Pending |
-| TU-02 | — | Pending |
-| TU-03 | — | Pending |
-| TU-04 | — | Pending |
-| DK-01 | — | Pending |
-| DK-02 | — | Pending |
-| DK-03 | — | Pending |
-| SS-01 | — | Pending |
-| SS-02 | — | Pending |
-| SS-03 | — | Pending |
-| PZ-01 | — | Pending |
-| PZ-02 | — | Pending |
-| PZ-03 | — | Pending |
-| UY-01 | — | Pending |
-| UY-02 | — | Pending |
-| UY-03 | — | Pending |
-| SA-01 | — | Pending |
-| SA-02 | — | Pending |
-| SA-03 | — | Pending |
-| IK-01 | — | Pending |
-| IK-02 | — | Pending |
-| IK-03 | — | Pending |
-| AO-01 | — | Pending |
-| AO-02 | — | Pending |
-| AO-03 | — | Pending |
+| MT-01 | Phase 8 | Pending |
+| MT-02 | Phase 8 | Pending |
+| MT-03 | Phase 8 | Pending |
+| MT-04 | Phase 8 | Pending |
+| MT-05 | Phase 8 | Pending |
+| MT-06 | Phase 8 | Pending |
+| MT-07 | Phase 8 | Pending |
+| MT-08 | Phase 8 | Pending |
+| AI-01 | Phase 9 | Pending |
+| AI-02 | Phase 9 | Pending |
+| AI-03 | Phase 9 | Pending |
+| AI-04 | Phase 9 | Pending |
+| AI-05 | Phase 9 | Pending |
+| AI-06 | Phase 9 | Pending |
+| AI-07 | Phase 9 | Pending |
+| AI-08 | Phase 9 | Pending |
+| AI-09 | Phase 9 | Pending |
+| AI-10 | Phase 9 | Pending |
+| AI-11 | Phase 9 | Pending |
+| TR-01 | Phase 10 | Pending |
+| TR-02 | Phase 10 | Pending |
+| TR-03 | Phase 10 | Pending |
+| TR-04 | Phase 10 | Pending |
+| SR-01 | Phase 10 | Pending |
+| SR-02 | Phase 10 | Pending |
+| SR-03 | Phase 10 | Pending |
+| SR-04 | Phase 10 | Pending |
+| SR-05 | Phase 10 | Pending |
+| SR-06 | Phase 10 | Pending |
+| SR-07 | Phase 10 | Pending |
+| MH-01 | Phase 11 | Pending |
+| MH-02 | Phase 11 | Pending |
+| MH-03 | Phase 11 | Pending |
+| MH-04 | Phase 11 | Pending |
+| MH-05 | Phase 11 | Pending |
+| MH-06 | Phase 11 | Pending |
+| DS-01 | Phase 11 | Pending |
+| DS-02 | Phase 11 | Pending |
+| DS-03 | Phase 11 | Pending |
+| DS-04 | Phase 11 | Pending |
+| DS-05 | Phase 11 | Pending |
+| GM-01 | Phase 11 | Pending |
+| GM-02 | Phase 11 | Pending |
+| GM-03 | Phase 11 | Pending |
+| GM-04 | Phase 11 | Pending |
+| GM-05 | Phase 11 | Pending |
+| TU-01 | Phase 12 | Pending |
+| TU-02 | Phase 12 | Pending |
+| TU-03 | Phase 12 | Pending |
+| TU-04 | Phase 12 | Pending |
+| DK-01 | Phase 12 | Pending |
+| DK-02 | Phase 12 | Pending |
+| DK-03 | Phase 12 | Pending |
+| SS-01 | Phase 12 | Pending |
+| SS-02 | Phase 12 | Pending |
+| SS-03 | Phase 12 | Pending |
+| PZ-01 | Phase 12 | Pending |
+| PZ-02 | Phase 12 | Pending |
+| PZ-03 | Phase 12 | Pending |
+| UY-01 | Phase 12 | Pending |
+| UY-02 | Phase 12 | Pending |
+| UY-03 | Phase 12 | Pending |
+| SA-01 | Phase 12 | Pending |
+| SA-02 | Phase 12 | Pending |
+| SA-03 | Phase 12 | Pending |
+| IK-01 | Phase 12 | Pending |
+| IK-02 | Phase 12 | Pending |
+| IK-03 | Phase 12 | Pending |
+| AO-01 | Phase 12 | Pending |
+| AO-02 | Phase 12 | Pending |
+| AO-03 | Phase 12 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 68 total
-- Mapped to phases: 0 (awaiting roadmap)
-- Unmapped: 68
+- v3.0 requirements: 71 total (8 MT + 11 AI + 4 TR + 7 SR + 6 MH + 5 DS + 5 GM + 4 TU + 3 DK + 3 SS + 3 PZ + 3 UY + 3 SA + 3 IK + 3 AO)
+- Mapped to phases: 71/71
+- Unmapped: 0
+
+| Phase | Requirements | Count |
+|-------|-------------|-------|
+| Phase 8 — Multi-Tenant Database Migration | MT-01 through MT-08 | 8 |
+| Phase 9 — Agent Infrastructure Foundation | AI-01 through AI-11 | 11 |
+| Phase 10 — First Agent Group (Trainer + Sales) | TR-01..04, SR-01..07 | 11 |
+| Phase 11 — Financial and Operations Agents | MH-01..06, DS-01..05, GM-01..05 | 16 |
+| Phase 12 — Extended Agent Ecosystem | TU-01..04, DK-01..03, SS-01..03, PZ-01..03, UY-01..03, SA-01..03, IK-01..03, AO-01..03 | 25 |
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after research synthesis*
+*Last updated: 2026-03-01 — traceability mapped to Phases 8-12*
