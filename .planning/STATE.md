@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 8 — Multi-Tenant Database Migration
-Plan: —
-Status: Not started (roadmap complete, ready for planning)
-Last activity: 2026-03-01 — v3.0 roadmap created (5 phases, 68 requirements mapped)
+Plan: 01 of 05 complete
+Status: In progress — Plan 08-01 complete, ready for Plan 08-02
+Last activity: 2026-03-01 — Plan 08-01 complete (009_multi_tenant.sql foundation migration)
 
-Progress: [░░░░░░░░░░] 0% — Phase 8 of 12
+Progress: [█░░░░░░░░░] 2% — Phase 8 of 12 (1/5 plans complete in phase)
 
 ## Milestones
 
@@ -46,6 +46,15 @@ Progress: [░░░░░░░░░░] 0% — Phase 8 of 12
 - @supabase/supabase-js v2.91+ requires Relationships: [] on all table types
 - Server Actions pattern for mutations
 - Zustand + localStorage for client state
+
+### Phase 8 Decisions (from Plan 08-01)
+- categories and brands company-scoped (not global) — full catalog isolation; seed and clone on new tenant onboarding
+- users.company_id added directly (admins may lack dealers record); inject_company_claim checks users.company_id first, falls back to dealers
+- dealer_spending_summary dropped and rebuilt with company_id; RPC wrapper get_dealer_spending_summary() is only safe API path (PostgreSQL matview RLS unsupported)
+- REVOKE EXECUTE on inject_company_claim FROM anon, authenticated, public — only supabase_auth_admin may call hook
+- Seed company slug='default' used as stable subquery key for direct-assign table backfill
+- UNIQUE INDEX on (company_id, dealer_id, month DESC NULLS LAST) required for REFRESH MATERIALIZED VIEW CONCURRENTLY
+- 9 migrations applied after Plan 08-01 execution (009_multi_tenant.sql)
 
 ### v3.0 Architecture Decisions
 - Multi-tenancy: shared-schema with company_id on all 20+ tables (NOT schema-per-tenant)
@@ -79,7 +88,7 @@ Progress: [░░░░░░░░░░] 0% — Phase 8 of 12
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: v3.0 roadmap created — ready to plan Phase 8
+Stopped at: Completed 08-01-PLAN.md — 009_multi_tenant.sql created, ready for Dashboard execution and Plan 08-02
 Resume file: None
 
 ---

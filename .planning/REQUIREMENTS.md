@@ -7,13 +7,13 @@
 
 ### Multi-Tenant Altyapi
 
-- [ ] **MT-01**: Sistem birden fazla firmayi tek deployment uzerinden bagimsiz olarak destekler (company_id izolasyonu)
+- [x] **MT-01**: Sistem birden fazla firmayi tek deployment uzerinden bagimsiz olarak destekler (company_id izolasyonu)
 - [ ] **MT-02**: Her firma kendi bayilerini, urunlerini ve siparislerini yalnizca kendisi gorebilir (RLS ile izolasyon)
-- [ ] **MT-03**: Mevcut 20+ tabloya company_id eklenir ve tum veriler backfill edilir (zero downtime)
+- [x] **MT-03**: Mevcut 20+ tabloya company_id eklenir ve tum veriler backfill edilir (zero downtime)
 - [ ] **MT-04**: Admin kullanicisi yalnizca kendi firmasinin verilerini yonetebilir (is_company_admin)
-- [ ] **MT-05**: Platform operatoru (superadmin) tum firmalari gorebilir ve yonetebilir
-- [ ] **MT-06**: JWT claim injection ile tenant izolasyonu saglanan current_company_id() fonksiyonu calisir
-- [ ] **MT-07**: Materialized view (dealer_spending_summary) company_id ile yeniden olusturulur ve RPC ile sarmalanir
+- [x] **MT-05**: Platform operatoru (superadmin) tum firmalari gorebilir ve yonetebilir
+- [x] **MT-06**: JWT claim injection ile tenant izolasyonu saglanan current_company_id() fonksiyonu calisir
+- [x] **MT-07**: Materialized view (dealer_spending_summary) company_id ile yeniden olusturulur ve RPC ile sarmalanir
 - [ ] **MT-08**: Composite index'ler (company_id, dealer_id) tum tenant-scoped tablolara eklenir
 
 ### Ajan Altyapisi
@@ -152,13 +152,13 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MT-01 | Phase 8 | Pending |
+| MT-01 | Phase 8 | Complete |
 | MT-02 | Phase 8 | Pending |
-| MT-03 | Phase 8 | Pending |
+| MT-03 | Phase 8 | Complete |
 | MT-04 | Phase 8 | Pending |
-| MT-05 | Phase 8 | Pending |
-| MT-06 | Phase 8 | Pending |
-| MT-07 | Phase 8 | Pending |
+| MT-05 | Phase 8 | Complete |
+| MT-06 | Phase 8 | Complete |
+| MT-07 | Phase 8 | Complete |
 | MT-08 | Phase 8 | Pending |
 | AI-01 | Phase 9 | Pending |
 | AI-02 | Phase 9 | Pending |
