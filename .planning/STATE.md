@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 9 — Agent Infrastructure Foundation
-Plan: 04 of 05 complete
-Status: IN PROGRESS — Plan 04 executed (AgentBridge, deadlock detection, cross-agent call logging)
-Last activity: 2026-03-01 — Phase 9 Plan 04 complete (AgentBridge: checkDeadlock, logAgentCall, callAgent placeholder, direct DB query helpers)
+Plan: 05 of 05 complete
+Status: COMPLETE — All 5 plans executed; Phase 9 Agent Infrastructure Foundation done
+Last activity: 2026-03-01 — Phase 9 Plan 05 complete (Telegram webhook route + agent dispatcher; grammy@1.41.0 installed)
 
-Progress: [█████████░] 80% — Phase 9 Plan 04 complete, Plan 05 next
+Progress: [██████████] 100% — Phase 9 complete
 
 ## Milestones
 
@@ -106,6 +106,14 @@ Progress: [█████████░] 80% — Phase 9 Plan 04 complete, Pla
 - Summary messages use role='system' in DB but excluded from getMessages() — dispatcher injects them into system prompt separately
 - metadata cast to Json via type assertion — Record<string,unknown> is structurally compatible but TypeScript requires explicit cast
 
+### Phase 9 Decisions (from Plan 09-05)
+- grammy used for types only (grammy/types Update) — no Bot instance in webhook route; Update body parsed via request.json()
+- Idempotency INSERT runs synchronously before after() and before return — ensures dedup record is committed before any background processing
+- Non-23505 idempotency DB errors still return 200 — prevents Telegram retry storm on transient Supabase issues
+- Agent role resolved from agent_definitions (first active record per company); 'destek' is Phase 9 fallback; Phase 10+ will map bot tokens to roles
+- TELEGRAM_BOT_TOKEN from env vars — sendTelegramMessage logs error if missing but never throws
+- Placeholder tool handlers (echo/get_current_time/lookup_dealer) defined inline in dispatchAgentUpdate to close over supabase client for lookup_dealer scoping
+
 ### Phase 9 Decisions (from Plan 09-04)
 - checkDeadlock() is synchronous — no DB access needed, only inspects in-memory callStack (fast guard before async operations)
 - callAgent() is a Phase 9 placeholder returning stub result; Phase 10 will replace stub with AgentRunner invocation using extended callStack and depth+1
@@ -131,8 +139,8 @@ Progress: [█████████░] 80% — Phase 9 Plan 04 complete, Pla
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 9 Plan 03 COMPLETE — AgentRunner (tool-use loop, prompt caching, token recording), ConversationManager (rolling-50, Haiku summarization). Plan 04 previously complete. Ready for Plan 09-05.
+Stopped at: Phase 9 Plan 05 COMPLETE — Telegram webhook (POST /api/telegram, after(), idempotency 23505) + Agent dispatcher (dealer identity resolution, token budget check, ConversationManager, AgentRunner, Telegram sendMessage). Phase 9 Agent Infrastructure Foundation fully complete.
 Resume file: None
 
 ---
-*Last updated: 2026-03-01 (Plan 09-03 complete)*
+*Last updated: 2026-03-01 (Plan 09-05 complete — Phase 9 done)*

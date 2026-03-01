@@ -133,7 +133,7 @@ Plans:
 **Milestone Goal:** Transform the single-tenant dealer management platform into a multi-tenant SaaS with 12 AI digital workers accessible via Telegram — enabling 7/24 autonomous business operations independent of business hours.
 
 - [x] **Phase 8: Multi-Tenant Database Migration** - Isolate all data by company_id; secure platform for multiple tenants
-- [ ] **Phase 9: Agent Infrastructure Foundation** - Build the shared AgentRunner, ToolRegistry, and Telegram webhook framework all 12 agents depend on
+- [x] **Phase 9: Agent Infrastructure Foundation** - Build the shared AgentRunner, ToolRegistry, and Telegram webhook framework all 12 agents depend on (completed 2026-03-01)
 - [ ] **Phase 10: First Agent Group — Trainer + Sales** - Validate the full agent pipeline with two production agents before touching financial data
 - [ ] **Phase 11: Financial and Operations Agents** - Add Accountant, Warehouse, and Executive Advisor agents with cross-agent tool calls
 - [ ] **Phase 12: Extended Agent Ecosystem** - Complete all remaining 7 agents, new database tables, agent orchestration, and proactive notifications
@@ -229,7 +229,7 @@ Phases execute in strict dependency order: 8 → 9 → 10 → 11 → 12
 | 6. Dashboard, Campaigns & Order Documents | v2.0 | 5/5 | Complete | 2026-03-01 |
 | 7. Support & Reports | v2.0 | 4/4 | Complete | 2026-03-01 |
 | 8. Multi-Tenant Database Migration | v3.0 | 5/5 | Complete | 2026-03-01 |
-| 9. Agent Infrastructure Foundation | 4/5 | In Progress|  | — |
+| 9. Agent Infrastructure Foundation | 5/5 | Complete   | 2026-03-01 | — |
 | 10. First Agent Group — Trainer + Sales | v3.0 | 0/? | Pending | — |
 | 11. Financial and Operations Agents | v3.0 | 0/? | Pending | — |
 | 12. Extended Agent Ecosystem | v3.0 | 0/? | Pending | — |
