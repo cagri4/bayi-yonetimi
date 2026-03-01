@@ -49,6 +49,7 @@ Overall: v1 shipped (14 plans), v2.0 in progress (2 plans complete)
 **Current Phase (04-favorites-quick-win):**
 - Plans completed: 2
 - Duration so far: 27min
+| Phase 06-dashboard-campaigns-docs P06-02 | 25 | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,8 @@ Recent decisions from PROJECT.md affecting v2.0:
 - Server Actions for mutations (applies to all v2.0 features)
 - [Phase 06]: Soft delete for campaigns/announcements (is_active=false) to preserve data history
 - [Phase 06]: useOptimistic for announcement read-state to provide instant UI feedback without server round-trip
+- [Phase 06-dashboard-campaigns-docs]: Single DashboardContent async component with Promise.all for zero-waterfall parallel fetching — simpler than per-widget Suspense
+- [Phase 06-dashboard-campaigns-docs]: TopProductsWidget links to catalog instead of inline add-to-cart — top products RPC lacks price data
 
 ### Pending Todos
 
