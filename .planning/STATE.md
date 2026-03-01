@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 8 — Multi-Tenant Database Migration
-Plan: 03 of 05 complete
-Status: In progress — Plans 08-01, 08-02, 08-03 complete; ready for Plan 08-04 (JWT hook registration)
-Last activity: 2026-03-01 — Plan 08-03 complete (BLOCK 12 RLS policy replacement appended to 009_multi_tenant.sql)
+Plan: 05 of 05 complete
+Status: In progress — Plans 08-01, 08-02, 08-03, 08-05 complete; 08-04 is manual Dashboard step (JWT hook registration)
+Last activity: 2026-03-01 — Plan 08-05 complete (TypeScript types updated for post-migration schema)
 
-Progress: [███░░░░░░░] 3% — Phase 8 of 12 (3/5 plans complete in phase)
+Progress: [████░░░░░░] 4% — Phase 8 of 12 (5/5 plans executed in phase, 08-04 pending Dashboard action)
 
 ## Milestones
 
@@ -62,6 +62,9 @@ Progress: [███░░░░░░░] 3% — Phase 8 of 12 (3/5 plans compl
 - 9 direct-assign tables get single-column (company_id) indexes (no dealer_id present)
 - users.company_id indexed for JWT hook lookup and admin RLS performance
 
+### Phase 8 Decisions (from Plan 08-05)
+- Insert types use company_id?: string (optional) — preserves existing server action compilation; DB enforces NOT NULL at runtime; Phase 9 will inject company_id from JWT context
+
 ### Phase 8 Decisions (from Plan 08-03)
 - DROP POLICY IF EXISTS uses both old actual names (from migrations 001-008) AND plan's expected names — migrations had different names (e.g., "Anyone can read categories" vs "Authenticated users can read categories")
 - dealer_favorites: 3 old granular policies (view/add/remove) collapsed into single FOR ALL policy with company_id scope
@@ -101,7 +104,7 @@ Progress: [███░░░░░░░] 3% — Phase 8 of 12 (3/5 plans compl
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 08-03-PLAN.md — BLOCK 12 RLS policy replacement appended to 009_multi_tenant.sql; ready for Dashboard execution of BLOCK 12 then Plan 08-04 (JWT hook registration)
+Stopped at: Completed 08-05-PLAN.md — TypeScript types updated for post-migration schema; companies table type, superadmin role, and company_id on all 19 tenant-scoped tables; Phase 8 code plans done, awaiting 08-04 Dashboard manual step (JWT hook registration)
 Resume file: None
 
 ---
