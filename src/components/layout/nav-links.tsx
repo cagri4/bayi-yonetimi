@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Zap, Package, ClipboardList, ShoppingCart, Heart, Wallet, Megaphone, Bell } from 'lucide-react'
+import { Zap, Package, ClipboardList, ShoppingCart, Heart, Wallet, Megaphone, Bell, LayoutDashboard } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/catalog', label: 'Urunler', icon: Package },
   { href: '/favorites', label: 'Favorilerim', icon: Heart },
   { href: '/campaigns', label: 'Kampanyalar', icon: Megaphone },
