@@ -45,7 +45,7 @@
 - [x] **SR-04**: Satis temsilcisi kampanya bilgisi verir (get_campaigns tool)
 - [x] **SR-05**: Satis temsilcisi stok kontrolu yapar (check_stock tool)
 - [x] **SR-06**: Satis temsilcisi bayi profil bilgisi sorgular (get_dealer_profile tool)
-- [ ] **SR-07**: Satis temsilcisi Telegram uzerinden siparis akisini yonetir
+- [x] **SR-07**: Satis temsilcisi Telegram uzerinden siparis akisini yonetir
 
 ### Muhasebeci (Accountant Agent)
 
@@ -181,7 +181,7 @@
 | SR-04 | Phase 10 | Complete |
 | SR-05 | Phase 10 | Complete |
 | SR-06 | Phase 10 | Complete |
-| SR-07 | Phase 10 | Pending |
+| SR-07 | Phase 10 | Complete |
 | MH-01 | Phase 11 | Pending |
 | MH-02 | Phase 11 | Pending |
 | MH-03 | Phase 11 | Pending |

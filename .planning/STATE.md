@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 10 — First Agent Group: Trainer + Sales Representative
-Plan: 02 of 05 complete
-Status: IN PROGRESS — Plans 01-02 executed; Egitimci + Satis Temsilcisi tools implemented
-Last activity: 2026-03-01 — Phase 10 Plan 02 complete (Satis Temsilcisi tools: 6 tools + create_order with stock validation + rollback)
+Plan: 03 of 05 complete
+Status: IN PROGRESS — Plans 01-03 executed; tools wired into dispatcher, dedicated webhook routes created, SQL seed prepared
+Last activity: 2026-03-01 — Phase 10 Plan 03 complete (ToolRegistry + dispatcher refactor, /api/telegram/egitimci + /api/telegram/satis routes, agent_definitions SQL seed)
 
-Progress: [████░░░░░░] 40% — Plan 02/05 complete
+Progress: [██████░░░░] 60% — Plan 03/05 complete
 
 ## Milestones
 
@@ -135,6 +135,15 @@ Progress: [████░░░░░░] 40% — Plan 02/05 complete
 - Dealer group min_order_amount defaults to 0 if no group — always passes minimum check (safe fallback for dealers without group)
 - Campaigns query uses .lte('start_date', now).gte('end_date', now) — exact mirror of getActiveCampaigns action
 
+### Phase 10 Decisions (from Plan 10-03)
+- TOOL_REGISTRY.egitimci = egitimciTools and TOOL_REGISTRY.satis_temsilcisi = satisTools — real tools replace placeholderTools at registry level
+- sendTelegramMessage token parameter replaces process.env.TELEGRAM_BOT_TOKEN — each route passes its own token for multi-bot support
+- parse_mode: 'Markdown' removed from sendTelegramMessage — prevents Telegram 400 errors from Claude's unbalanced markdown output (Pitfall 6)
+- agent_definitions query now filters by .eq('role', role) — retrieves system prompt for the specific role rather than first-active for company
+- forcedRole skips role detection; if forcedRole set, role field from agent_definitions is NOT overwritten (only systemPrompt is taken)
+- SQL seed creates UNIQUE INDEX on (company_id, role) before INSERT — makes ON CONFLICT safe even if index was absent
+- Dedicated webhook per bot: /api/telegram/{role}/route.ts uses TELEGRAM_BOT_TOKEN_{ROLE} and passes forcedRole to dispatcher
+
 ### v3.0 Phase Dependencies (strict)
 - Phase 8 (Multi-Tenant) → blocks Phase 9
 - Phase 9 (Agent Infrastructure) → blocks Phase 10
@@ -154,8 +163,8 @@ Progress: [████░░░░░░] 40% — Plan 02/05 complete
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 10 Plan 02 COMPLETE — Satis Temsilcisi agent tools (satis-tools.ts): 6 tool definitions + createSatisHandlers factory with create_order (stock validation, RPC order number, orders+order_items+history inserts, rollback) + 5 read-only handlers. TypeScript compiles cleanly.
+Stopped at: Phase 10 Plan 03 — CHECKPOINT:HUMAN-ACTION (Task 3: Seed agent_definitions in Supabase Dashboard SQL Editor). Tasks 1-2 complete and committed. Resume with "seeded" after SQL execution.
 Resume file: None
 
 ---
-*Last updated: 2026-03-01 (Plan 10-02 complete — Satis Temsilcisi tools done)*
+*Last updated: 2026-03-01 (Plan 10-03 — Tasks 1-2 complete; awaiting SQL seed at Task 3 checkpoint)*
