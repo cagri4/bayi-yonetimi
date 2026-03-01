@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 10 — First Agent Group: Trainer + Sales Representative
-Plan: 01 of 05 complete
-Status: IN PROGRESS — Plan 01 executed; Egitimci tools implemented
-Last activity: 2026-03-01 — Phase 10 Plan 01 complete (Egitimci agent tools: get_product_info + get_faq handlers)
+Plan: 02 of 05 complete
+Status: IN PROGRESS — Plans 01-02 executed; Egitimci + Satis Temsilcisi tools implemented
+Last activity: 2026-03-01 — Phase 10 Plan 02 complete (Satis Temsilcisi tools: 6 tools + create_order with stock validation + rollback)
 
-Progress: [██░░░░░░░░] 20% — Plan 01/05 complete
+Progress: [████░░░░░░] 40% — Plan 02/05 complete
 
 ## Milestones
 
@@ -128,6 +128,13 @@ Progress: [██░░░░░░░░] 20% — Plan 01/05 complete
 - createEgitimciHandlers closes over supabase client — handlers do NOT receive supabase directly (matches Phase 9 dispatcher closure pattern)
 - HandlerFn factory pattern established: createXxxHandlers(supabase) returns Map<string, HandlerFn> — Phase 10+ tool files follow this shape
 
+### Phase 10 Decisions (from Plan 10-02)
+- create_order validates stock inline before any DB writes — prevents partial order states (stock check before generate_order_number, before INSERT)
+- order_status_history inserted without changed_by (null) — agent has no user UUID; notes field carries audit trail text
+- (supabase as any) type assertion on orders/order_items/order_status_history inserts — matches createOrder server action pattern; Insert types conflict with optional company_id
+- Dealer group min_order_amount defaults to 0 if no group — always passes minimum check (safe fallback for dealers without group)
+- Campaigns query uses .lte('start_date', now).gte('end_date', now) — exact mirror of getActiveCampaigns action
+
 ### v3.0 Phase Dependencies (strict)
 - Phase 8 (Multi-Tenant) → blocks Phase 9
 - Phase 9 (Agent Infrastructure) → blocks Phase 10
@@ -147,8 +154,8 @@ Progress: [██░░░░░░░░] 20% — Plan 01/05 complete
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 10 Plan 01 COMPLETE — Egitimci agent tools (egitimci-tools.ts): get_product_info with company-scoped product search + dealer pricing, get_faq with global faq_items lookup. HandlerFn factory pattern established for Phase 10+.
+Stopped at: Phase 10 Plan 02 COMPLETE — Satis Temsilcisi agent tools (satis-tools.ts): 6 tool definitions + createSatisHandlers factory with create_order (stock validation, RPC order number, orders+order_items+history inserts, rollback) + 5 read-only handlers. TypeScript compiles cleanly.
 Resume file: None
 
 ---
-*Last updated: 2026-03-01 (Plan 10-01 complete — Egitimci tools done)*
+*Last updated: 2026-03-01 (Plan 10-02 complete — Satis Temsilcisi tools done)*

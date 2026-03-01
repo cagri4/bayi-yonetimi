@@ -39,12 +39,12 @@
 
 ### Satis Temsilcisi (Sales Agent)
 
-- [ ] **SR-01**: Satis temsilcisi urun katalogu sorgular (get_catalog tool)
-- [ ] **SR-02**: Satis temsilcisi siparis olusturur (create_order tool)
-- [ ] **SR-03**: Satis temsilcisi siparis durumu sorgular (get_order_status tool)
-- [ ] **SR-04**: Satis temsilcisi kampanya bilgisi verir (get_campaigns tool)
-- [ ] **SR-05**: Satis temsilcisi stok kontrolu yapar (check_stock tool)
-- [ ] **SR-06**: Satis temsilcisi bayi profil bilgisi sorgular (get_dealer_profile tool)
+- [x] **SR-01**: Satis temsilcisi urun katalogu sorgular (get_catalog tool)
+- [x] **SR-02**: Satis temsilcisi siparis olusturur (create_order tool)
+- [x] **SR-03**: Satis temsilcisi siparis durumu sorgular (get_order_status tool)
+- [x] **SR-04**: Satis temsilcisi kampanya bilgisi verir (get_campaigns tool)
+- [x] **SR-05**: Satis temsilcisi stok kontrolu yapar (check_stock tool)
+- [x] **SR-06**: Satis temsilcisi bayi profil bilgisi sorgular (get_dealer_profile tool)
 - [ ] **SR-07**: Satis temsilcisi Telegram uzerinden siparis akisini yonetir
 
 ### Muhasebeci (Accountant Agent)
@@ -175,12 +175,12 @@
 | TR-02 | Phase 10 | Complete |
 | TR-03 | Phase 10 | Complete |
 | TR-04 | Phase 10 | Complete |
-| SR-01 | Phase 10 | Pending |
-| SR-02 | Phase 10 | Pending |
-| SR-03 | Phase 10 | Pending |
-| SR-04 | Phase 10 | Pending |
-| SR-05 | Phase 10 | Pending |
-| SR-06 | Phase 10 | Pending |
+| SR-01 | Phase 10 | Complete |
+| SR-02 | Phase 10 | Complete |
+| SR-03 | Phase 10 | Complete |
+| SR-04 | Phase 10 | Complete |
+| SR-05 | Phase 10 | Complete |
+| SR-06 | Phase 10 | Complete |
 | SR-07 | Phase 10 | Pending |
 | MH-01 | Phase 11 | Pending |
 | MH-02 | Phase 11 | Pending |
