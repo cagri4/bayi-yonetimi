@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Zap, Package, ClipboardList, ShoppingCart, Heart, Wallet, Megaphone, Bell, LayoutDashboard } from 'lucide-react'
+import { Zap, Package, ClipboardList, ShoppingCart, Heart, Wallet, Megaphone, Bell, LayoutDashboard, BarChart2, Headphones } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
@@ -11,7 +11,9 @@ const links = [
   { href: '/favorites', label: 'Favorilerim', icon: Heart },
   { href: '/campaigns', label: 'Kampanyalar', icon: Megaphone },
   { href: '/announcements', label: 'Duyurular', icon: Bell },
+  { href: '/support', label: 'Destek', icon: Headphones },
   { href: '/financials', label: 'Cari Hesap', icon: Wallet },
+  { href: '/reports', label: 'Raporlar', icon: BarChart2 },
   { href: '/quick-order', label: 'Hizli Siparis', icon: Zap },
   { href: '/orders', label: 'Siparislerim', icon: ClipboardList },
   { href: '/cart', label: 'Sepetim', icon: ShoppingCart },

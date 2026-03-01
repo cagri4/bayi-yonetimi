@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { logout, getCurrentUser, getUserRole } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
-import { BarChart3, Megaphone, Bell, ClipboardList } from 'lucide-react'
+import { BarChart3, Megaphone, Bell, ClipboardList, Headphones } from 'lucide-react'
 
 export default async function AdminLayout({
   children,
@@ -69,6 +69,13 @@ export default async function AdminLayout({
                 >
                   <Bell className="h-4 w-4" />
                   Duyurular
+                </Link>
+                <Link
+                  href="/admin/support"
+                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium gap-1"
+                >
+                  <Headphones className="h-4 w-4" />
+                  Destek
                 </Link>
                 <Link
                   href="/admin/reports"
