@@ -111,6 +111,7 @@ export interface Database {
           phone: string | null
           address: string | null
           dealer_group_id: string | null
+          telegram_chat_id: number | null
           is_active: boolean
           created_at: string
           updated_at: string
@@ -124,6 +125,7 @@ export interface Database {
           phone?: string | null
           address?: string | null
           dealer_group_id?: string | null
+          telegram_chat_id?: number | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -137,6 +139,7 @@ export interface Database {
           phone?: string | null
           address?: string | null
           dealer_group_id?: string | null
+          telegram_chat_id?: number | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -1043,6 +1046,186 @@ export interface Database {
           }
         ]
       }
+      agent_definitions: {
+        Row: {
+          id: string
+          company_id: string
+          role: string
+          name: string
+          description: string | null
+          model: string
+          system_prompt: string
+          is_active: boolean
+          settings: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          role: string
+          name: string
+          description?: string | null
+          model?: string
+          system_prompt?: string
+          is_active?: boolean
+          settings?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          role?: string
+          name?: string
+          description?: string | null
+          model?: string
+          system_prompt?: string
+          is_active?: boolean
+          settings?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      agent_conversations: {
+        Row: {
+          id: string
+          company_id: string
+          dealer_id: string
+          agent_role: string
+          telegram_chat_id: number | null
+          status: 'active' | 'closed' | 'error'
+          summary: string | null
+          metadata: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          dealer_id: string
+          agent_role: string
+          telegram_chat_id?: number | null
+          status?: 'active' | 'closed' | 'error'
+          summary?: string | null
+          metadata?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          dealer_id?: string
+          agent_role?: string
+          telegram_chat_id?: number | null
+          status?: 'active' | 'closed' | 'error'
+          summary?: string | null
+          metadata?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      agent_messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          role: 'user' | 'assistant' | 'system'
+          content: string
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          role: 'user' | 'assistant' | 'system'
+          content: string
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          role?: 'user' | 'assistant' | 'system'
+          content?: string
+          metadata?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
+      agent_calls: {
+        Row: {
+          id: string
+          company_id: string
+          conversation_id: string | null
+          caller_role: string
+          callee_role: string
+          depth: number
+          success: boolean
+          error_message: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          conversation_id?: string | null
+          caller_role: string
+          callee_role: string
+          depth?: number
+          success?: boolean
+          error_message?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          conversation_id?: string | null
+          caller_role?: string
+          callee_role?: string
+          depth?: number
+          success?: boolean
+          error_message?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      processed_telegram_updates: {
+        Row: {
+          update_id: number
+          processed_at: string
+        }
+        Insert: {
+          update_id: number
+          processed_at?: string
+        }
+        Update: {
+          update_id?: number
+          processed_at?: string
+        }
+        Relationships: []
+      }
+      daily_token_usage: {
+        Row: {
+          dealer_id: string
+          date: string
+          tokens_used: number
+          updated_at: string
+        }
+        Insert: {
+          dealer_id: string
+          date: string
+          tokens_used?: number
+          updated_at?: string
+        }
+        Update: {
+          dealer_id?: string
+          date?: string
+          tokens_used?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       dealer_spending_summary: {
@@ -1098,6 +1281,14 @@ export interface Database {
           order_count: number
         }[]
       }
+      increment_daily_token_usage: {
+        Args: {
+          p_dealer_id: string
+          p_date: string
+          p_tokens: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {}
   }
@@ -1136,3 +1327,27 @@ export type FaqCategoryWithItems = FaqCategory & {
 export type SupportMessageWithDealer = SupportMessage & {
   dealers: { company_name: string }
 }
+
+// ============================================
+// Convenience type aliases for Phase 9 agent tables
+// ============================================
+
+export type AgentDefinition = Database['public']['Tables']['agent_definitions']['Row']
+export type AgentDefinitionInsert = Database['public']['Tables']['agent_definitions']['Insert']
+export type AgentDefinitionUpdate = Database['public']['Tables']['agent_definitions']['Update']
+
+export type AgentConversation = Database['public']['Tables']['agent_conversations']['Row']
+export type AgentConversationInsert = Database['public']['Tables']['agent_conversations']['Insert']
+export type AgentConversationUpdate = Database['public']['Tables']['agent_conversations']['Update']
+
+export type AgentMessage = Database['public']['Tables']['agent_messages']['Row']
+export type AgentMessageInsert = Database['public']['Tables']['agent_messages']['Insert']
+export type AgentMessageUpdate = Database['public']['Tables']['agent_messages']['Update']
+
+export type AgentCall = Database['public']['Tables']['agent_calls']['Row']
+export type AgentCallInsert = Database['public']['Tables']['agent_calls']['Insert']
+export type AgentCallUpdate = Database['public']['Tables']['agent_calls']['Update']
+
+export type DailyTokenUsage = Database['public']['Tables']['daily_token_usage']['Row']
+export type DailyTokenUsageInsert = Database['public']['Tables']['daily_token_usage']['Insert']
+export type DailyTokenUsageUpdate = Database['public']['Tables']['daily_token_usage']['Update']
