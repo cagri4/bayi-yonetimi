@@ -5,6 +5,7 @@ import { tr } from 'date-fns/locale'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getValidNextStatuses } from '@/lib/actions/admin-orders'
+import { getOrderDocuments, getCargoInfo } from '@/lib/actions/order-docs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -18,6 +19,8 @@ import {
 import { OrderStatusBadge } from '@/components/orders/order-status-badge'
 import { OrderStatusTimeline } from '@/components/orders/order-status-timeline'
 import { OrderStatusSelect, CancelOrderButton } from '@/components/admin/order-status-select'
+import { DocumentUpload } from '@/components/admin/orders/document-upload'
+import { CargoForm } from '@/components/admin/orders/cargo-form'
 
 interface OrderItem {
   id: string
@@ -176,9 +179,11 @@ export default async function AdminOrderDetailPage({
 }) {
   const { id } = await params
 
-  const [order, validStatuses] = await Promise.all([
+  const [order, validStatuses, documents, cargoInfo] = await Promise.all([
     getOrderDetails(id),
     getValidNextStatuses(id),
+    getOrderDocuments(id),
+    getCargoInfo(id),
   ])
 
   if (!order) {
@@ -288,6 +293,12 @@ export default async function AdminOrderDetailPage({
               />
             </CardContent>
           </Card>
+
+          {/* Document Upload */}
+          <DocumentUpload orderId={order.id} initialDocuments={documents} />
+
+          {/* Cargo Form */}
+          <CargoForm orderId={order.id} initialCargoInfo={cargoInfo} />
 
           {/* Order Notes */}
           {order.notes && (
