@@ -779,6 +779,178 @@ export interface Database {
         }
         Relationships: []
       }
+      support_messages: {
+        Row: {
+          id: string
+          dealer_id: string
+          subject: string
+          category: 'siparis' | 'urun' | 'odeme' | 'teknik' | 'diger'
+          body: string
+          status: 'pending' | 'answered'
+          reply_body: string | null
+          replied_at: string | null
+          replied_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          dealer_id: string
+          subject: string
+          category: 'siparis' | 'urun' | 'odeme' | 'teknik' | 'diger'
+          body: string
+          status?: 'pending' | 'answered'
+          reply_body?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          dealer_id?: string
+          subject?: string
+          category?: 'siparis' | 'urun' | 'odeme' | 'teknik' | 'diger'
+          body?: string
+          status?: 'pending' | 'answered'
+          reply_body?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      faq_categories: {
+        Row: {
+          id: string
+          name: string
+          display_order: number
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      faq_items: {
+        Row: {
+          id: string
+          category_id: string
+          question: string
+          answer: string
+          display_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          category_id: string
+          question: string
+          answer: string
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          category_id?: string
+          question?: string
+          answer?: string
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faq_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "faq_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      product_requests: {
+        Row: {
+          id: string
+          dealer_id: string
+          product_id: string | null
+          product_name: string
+          product_code: string | null
+          requested_quantity: number
+          notes: string | null
+          status: 'open' | 'in_review' | 'fulfilled' | 'rejected'
+          admin_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          dealer_id: string
+          product_id?: string | null
+          product_name: string
+          product_code?: string | null
+          requested_quantity?: number
+          notes?: string | null
+          status?: 'open' | 'in_review' | 'fulfilled' | 'rejected'
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          dealer_id?: string
+          product_id?: string | null
+          product_name?: string
+          product_code?: string | null
+          requested_quantity?: number
+          notes?: string | null
+          status?: 'open' | 'in_review' | 'fulfilled' | 'rejected'
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_requests_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       dealer_spending_summary: {
@@ -837,4 +1009,38 @@ export interface Database {
     }
     Enums: {}
   }
+}
+
+// ============================================
+// Convenience type aliases for Phase 7 tables
+// ============================================
+
+export type SupportMessage = Database['public']['Tables']['support_messages']['Row']
+export type SupportMessageInsert = Database['public']['Tables']['support_messages']['Insert']
+export type SupportMessageUpdate = Database['public']['Tables']['support_messages']['Update']
+
+export type FaqCategory = Database['public']['Tables']['faq_categories']['Row']
+export type FaqCategoryInsert = Database['public']['Tables']['faq_categories']['Insert']
+export type FaqCategoryUpdate = Database['public']['Tables']['faq_categories']['Update']
+
+export type FaqItem = Database['public']['Tables']['faq_items']['Row']
+export type FaqItemInsert = Database['public']['Tables']['faq_items']['Insert']
+export type FaqItemUpdate = Database['public']['Tables']['faq_items']['Update']
+
+export type ProductRequest = Database['public']['Tables']['product_requests']['Row']
+export type ProductRequestInsert = Database['public']['Tables']['product_requests']['Insert']
+export type ProductRequestUpdate = Database['public']['Tables']['product_requests']['Update']
+
+// ============================================
+// Composite types for common query patterns
+// ============================================
+
+// FAQ categories with nested items (used in dealer FAQ page)
+export type FaqCategoryWithItems = FaqCategory & {
+  faq_items: FaqItem[]
+}
+
+// Support message with dealer info (used in admin inbox)
+export type SupportMessageWithDealer = SupportMessage & {
+  dealers: { company_name: string }
 }
