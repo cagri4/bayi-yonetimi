@@ -71,6 +71,7 @@ export interface Database {
       dealer_groups: {
         Row: {
           id: string
+          company_id: string
           name: string
           discount_percent: number
           min_order_amount: number
@@ -80,6 +81,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           name: string
           discount_percent?: number
           min_order_amount?: number
@@ -89,6 +91,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           name?: string
           discount_percent?: number
           min_order_amount?: number
@@ -101,6 +104,7 @@ export interface Database {
       dealers: {
         Row: {
           id: string
+          company_id: string
           user_id: string | null
           company_name: string
           email: string
@@ -113,6 +117,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           user_id?: string | null
           company_name: string
           email: string
@@ -125,6 +130,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           user_id?: string | null
           company_name?: string
           email?: string
@@ -148,6 +154,7 @@ export interface Database {
       categories: {
         Row: {
           id: string
+          company_id: string
           name: string
           slug: string
           parent_id: string | null
@@ -156,6 +163,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           name: string
           slug: string
           parent_id?: string | null
@@ -164,6 +172,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           name?: string
           slug?: string
           parent_id?: string | null
@@ -175,6 +184,7 @@ export interface Database {
       brands: {
         Row: {
           id: string
+          company_id: string
           name: string
           slug: string
           is_active: boolean
@@ -182,6 +192,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           name: string
           slug: string
           is_active?: boolean
@@ -189,6 +200,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           name?: string
           slug?: string
           is_active?: boolean
@@ -199,6 +211,7 @@ export interface Database {
       products: {
         Row: {
           id: string
+          company_id: string
           code: string
           name: string
           description: string | null
@@ -214,6 +227,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           code: string
           name: string
           description?: string | null
@@ -229,6 +243,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           code?: string
           name?: string
           description?: string | null
@@ -262,6 +277,7 @@ export interface Database {
       dealer_prices: {
         Row: {
           id: string
+          company_id: string
           dealer_id: string
           product_id: string
           custom_price: number
@@ -270,6 +286,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           dealer_id: string
           product_id: string
           custom_price: number
@@ -278,6 +295,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           dealer_id?: string
           product_id?: string
           custom_price?: number
@@ -331,6 +349,7 @@ export interface Database {
       orders: {
         Row: {
           id: string
+          company_id: string
           order_number: string
           dealer_id: string
           status_id: string
@@ -347,6 +366,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           order_number: string
           dealer_id: string
           status_id: string
@@ -363,6 +383,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           order_number?: string
           dealer_id?: string
           status_id?: string
@@ -397,6 +418,7 @@ export interface Database {
       order_items: {
         Row: {
           id: string
+          company_id: string
           order_id: string
           product_id: string
           product_code: string
@@ -408,6 +430,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           order_id: string
           product_id: string
           product_code: string
@@ -419,6 +442,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           order_id?: string
           product_id?: string
           product_code?: string
@@ -448,6 +472,7 @@ export interface Database {
       order_status_history: {
         Row: {
           id: string
+          company_id: string
           order_id: string
           status_id: string
           changed_by: string | null
@@ -456,6 +481,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           order_id: string
           status_id: string
           changed_by?: string | null
@@ -464,6 +490,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           order_id?: string
           status_id?: string
           changed_by?: string | null
@@ -523,18 +550,21 @@ export interface Database {
       dealer_favorites: {
         Row: {
           id: string
+          company_id: string
           dealer_id: string
           product_id: string
           created_at: string
         }
         Insert: {
           id?: string
+          company_id?: string
           dealer_id: string
           product_id: string
           created_at?: string
         }
         Update: {
           id?: string
+          company_id?: string
           dealer_id?: string
           product_id?: string
           created_at?: string
@@ -574,6 +604,7 @@ export interface Database {
       dealer_transactions: {
         Row: {
           id: string
+          company_id: string
           dealer_id: string
           transaction_type_id: string
           amount: number
@@ -589,6 +620,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           dealer_id: string
           transaction_type_id: string
           amount: number
@@ -604,6 +636,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           dealer_id?: string
           transaction_type_id?: string
           amount?: number
@@ -622,6 +655,7 @@ export interface Database {
       dealer_invoices: {
         Row: {
           id: string
+          company_id: string
           dealer_id: string
           transaction_id: string | null
           invoice_number: string
@@ -636,6 +670,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           dealer_id: string
           transaction_id?: string | null
           invoice_number: string
@@ -650,6 +685,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           dealer_id?: string
           transaction_id?: string | null
           invoice_number?: string
@@ -667,6 +703,7 @@ export interface Database {
       campaigns: {
         Row: {
           id: string
+          company_id: string
           title: string
           description: string | null
           image_url: string | null
@@ -678,6 +715,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           title: string
           description?: string | null
           image_url?: string | null
@@ -689,6 +727,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           title?: string
           description?: string | null
           image_url?: string | null
@@ -704,18 +743,21 @@ export interface Database {
         Row: {
           id: string
           campaign_id: string
+          company_id: string
           product_id: string
           discount_percent: number | null
         }
         Insert: {
           id?: string
           campaign_id: string
+          company_id?: string
           product_id: string
           discount_percent?: number | null
         }
         Update: {
           id?: string
           campaign_id?: string
+          company_id?: string
           product_id?: string
           discount_percent?: number | null
         }
@@ -724,6 +766,7 @@ export interface Database {
       announcements: {
         Row: {
           id: string
+          company_id: string
           title: string
           content: string
           priority: number
@@ -735,6 +778,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           title: string
           content: string
           priority?: number
@@ -746,6 +790,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           title?: string
           content?: string
           priority?: number
@@ -761,18 +806,21 @@ export interface Database {
         Row: {
           id: string
           announcement_id: string
+          company_id: string
           dealer_id: string
           read_at: string
         }
         Insert: {
           id?: string
           announcement_id: string
+          company_id?: string
           dealer_id: string
           read_at?: string
         }
         Update: {
           id?: string
           announcement_id?: string
+          company_id?: string
           dealer_id?: string
           read_at?: string
         }
@@ -781,6 +829,7 @@ export interface Database {
       order_documents: {
         Row: {
           id: string
+          company_id: string
           order_id: string
           document_type: 'invoice' | 'irsaliye'
           file_name: string
@@ -792,6 +841,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           order_id: string
           document_type: 'invoice' | 'irsaliye'
           file_name: string
@@ -803,6 +853,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           order_id?: string
           document_type?: 'invoice' | 'irsaliye'
           file_name?: string
@@ -817,6 +868,7 @@ export interface Database {
       support_messages: {
         Row: {
           id: string
+          company_id: string
           dealer_id: string
           subject: string
           category: 'siparis' | 'urun' | 'odeme' | 'teknik' | 'diger'
@@ -830,6 +882,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           dealer_id: string
           subject: string
           category: 'siparis' | 'urun' | 'odeme' | 'teknik' | 'diger'
@@ -843,6 +896,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           dealer_id?: string
           subject?: string
           category?: 'siparis' | 'urun' | 'odeme' | 'teknik' | 'diger'
@@ -932,6 +986,7 @@ export interface Database {
       product_requests: {
         Row: {
           id: string
+          company_id: string
           dealer_id: string
           product_id: string | null
           product_name: string
@@ -945,6 +1000,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          company_id?: string
           dealer_id: string
           product_id?: string | null
           product_name: string
@@ -958,6 +1014,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          company_id?: string
           dealer_id?: string
           product_id?: string | null
           product_name?: string
