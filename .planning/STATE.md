@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 8 — Multi-Tenant Database Migration
-Plan: 02 of 05 (checkpoint: awaiting human action on Task 2)
-Status: In progress — Plan 08-02 Task 1 complete; BLOCK 11 documented; awaiting Dashboard index execution
-Last activity: 2026-03-01 — Plan 08-02 Task 1 complete (BLOCK 11 appended to 009_multi_tenant.sql)
+Plan: 03 of 05 complete
+Status: In progress — Plans 08-01, 08-02, 08-03 complete; ready for Plan 08-04 (JWT hook registration)
+Last activity: 2026-03-01 — Plan 08-03 complete (BLOCK 12 RLS policy replacement appended to 009_multi_tenant.sql)
 
-Progress: [█░░░░░░░░░] 2% — Phase 8 of 12 (2/5 plans in progress in phase)
+Progress: [███░░░░░░░] 3% — Phase 8 of 12 (3/5 plans complete in phase)
 
 ## Milestones
 
@@ -62,6 +62,13 @@ Progress: [█░░░░░░░░░] 2% — Phase 8 of 12 (2/5 plans in pr
 - 9 direct-assign tables get single-column (company_id) indexes (no dealer_id present)
 - users.company_id indexed for JWT hook lookup and admin RLS performance
 
+### Phase 8 Decisions (from Plan 08-03)
+- DROP POLICY IF EXISTS uses both old actual names (from migrations 001-008) AND plan's expected names — migrations had different names (e.g., "Anyone can read categories" vs "Authenticated users can read categories")
+- dealer_favorites: 3 old granular policies (view/add/remove) collapsed into single FOR ALL policy with company_id scope
+- support_messages + product_requests: 4 old policies each collapsed into 2 company-scoped policies (dealer ALL + admin ALL)
+- announcement_reads: old separate SELECT/INSERT policies replaced by FOR ALL with company_id + dealer_id check
+- BLOCK 12 can be pasted as single block (no CONCURRENTLY); application in locked-out state between BLOCK 12 execution and JWT hook registration
+
 ### v3.0 Architecture Decisions
 - Multi-tenancy: shared-schema with company_id on all 20+ tables (NOT schema-per-tenant)
 - RLS anchor: current_company_id() SECURITY DEFINER function via JWT claim injection
@@ -94,7 +101,7 @@ Progress: [█░░░░░░░░░] 2% — Phase 8 of 12 (2/5 plans in pr
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Checkpoint 08-02 Task 2 — BLOCK 11 documented, awaiting human execution of 20 CONCURRENTLY indexes in Supabase Dashboard. Resume after typing "indexes created".
+Stopped at: Completed 08-03-PLAN.md — BLOCK 12 RLS policy replacement appended to 009_multi_tenant.sql; ready for Dashboard execution of BLOCK 12 then Plan 08-04 (JWT hook registration)
 Resume file: None
 
 ---
