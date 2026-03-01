@@ -118,10 +118,13 @@ Plans:
   7. Dealer can view spending analysis with monthly trend charts
   8. Dealer can compare spending periods (this month vs last month, this year vs last year)
   9. Dealer can export spending report as Excel
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 07-01: TBD
+- [ ] 07-01-PLAN.md — Database schema (support_messages, faq_categories, faq_items, product_requests, realtime setup)
+- [ ] 07-02-PLAN.md — Support messaging system (dealer compose/history, FAQ, product requests, admin inbox, FAQ management)
+- [ ] 07-03-PLAN.md — Spending reports and analytics (trend chart, period comparison, Excel export via Route Handler)
+- [ ] 07-04-PLAN.md — Integration verification (automated checks across all Phase 7 artifacts)
 
 ## Progress
 
@@ -135,8 +138,8 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | 3. Insights & Mobile | v1 | 5/5 | Complete | 2026-02-03 |
 | 4. Favorites Quick Win | v2.0 | 3/3 | Complete | 2026-02-09 |
 | 5. Financial Backbone | v2.0 | 3/3 | Complete | 2026-02-09 |
-| 6. Dashboard, Campaigns & Order Documents | 4/5 | In Progress|  | - |
-| 7. Support & Reports | v2.0 | 0/TBD | Not started | - |
+| 6. Dashboard, Campaigns & Order Documents | v2.0 | 4/5 | In Progress | - |
+| 7. Support & Reports | v2.0 | 0/4 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-08*
