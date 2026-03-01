@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1 MVP** - Phases 1-3 (shipped 2026-02-03)
-- 🚧 **v2.0 Bayi Deneyimi ve Finansal Takip** - Phases 4-7 (in progress)
+- ✅ **v2.0 Bayi Deneyimi ve Finansal Takip** - Phases 4-7 (shipped 2026-03-01)
 
 ## Phases
 
@@ -44,7 +44,7 @@ Plans:
 
 </details>
 
-### 🚧 v2.0 Bayi Deneyimi ve Finansal Takip (In Progress)
+### ✅ v2.0 Bayi Deneyimi ve Finansal Takip (SHIPPED 2026-03-01)
 
 **Milestone Goal:** Transform from transactional ordering tool to comprehensive dealer relationship platform with financial transparency, personalization, and self-service capabilities.
 
@@ -98,11 +98,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Database schema (campaigns, announcements, order_documents, materialized views)
-- [ ] 06-02-PLAN.md — Dealer dashboard (spending summary, orders, quick actions, top products)
-- [ ] 06-03-PLAN.md — Campaigns and announcements (dealer browsing, admin CRUD, read receipts)
-- [ ] 06-04-PLAN.md — Order documents and cargo (admin upload, dealer download, cargo tracking)
-- [ ] 06-05-PLAN.md — New products filter and integration verification
+- [x] 06-01-PLAN.md — Database schema (campaigns, announcements, order_documents, materialized views)
+- [x] 06-02-PLAN.md — Dealer dashboard (spending summary, orders, quick actions, top products)
+- [x] 06-03-PLAN.md — Campaigns and announcements (dealer browsing, admin CRUD, read receipts)
+- [x] 06-04-PLAN.md — Order documents and cargo (admin upload, dealer download, cargo tracking)
+- [x] 06-05-PLAN.md — New products filter and integration verification
 
 #### Phase 7: Support & Reports
 **Goal**: Async dealer-admin messaging and self-service spending analytics
@@ -121,10 +121,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Database schema (support_messages, faq_categories, faq_items, product_requests, realtime setup)
-- [ ] 07-02-PLAN.md — Support messaging system (dealer compose/history, FAQ, product requests, admin inbox, FAQ management)
-- [ ] 07-03-PLAN.md — Spending reports and analytics (trend chart, period comparison, Excel export via Route Handler)
-- [x] 07-04-PLAN.md — Integration verification (automated checks across all Phase 7 artifacts) (completed 2026-03-01)
+- [x] 07-01-PLAN.md — Database schema (support_messages, faq_categories, faq_items, product_requests, realtime setup)
+- [x] 07-02-PLAN.md — Support messaging system (dealer compose/history, FAQ, product requests, admin inbox, FAQ management)
+- [x] 07-03-PLAN.md — Spending reports and analytics (trend chart, period comparison, Excel export via Route Handler)
+- [x] 07-04-PLAN.md — Integration verification (automated checks across all Phase 7 artifacts)
 
 ## Progress
 
@@ -138,9 +138,9 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | 3. Insights & Mobile | v1 | 5/5 | Complete | 2026-02-03 |
 | 4. Favorites Quick Win | v2.0 | 3/3 | Complete | 2026-02-09 |
 | 5. Financial Backbone | v2.0 | 3/3 | Complete | 2026-02-09 |
-| 6. Dashboard, Campaigns & Order Documents | v2.0 | 4/5 | In Progress | - |
-| 7. Support & Reports | 4/4 | Complete   | 2026-03-01 | - |
+| 6. Dashboard, Campaigns & Order Documents | v2.0 | 5/5 | Complete | 2026-03-01 |
+| 7. Support & Reports | v2.0 | 4/4 | Complete | 2026-03-01 |
 
 ---
 *Roadmap created: 2026-02-08*
-*v1 shipped: 2026-02-03 | v2.0 in progress*
+*v1 shipped: 2026-02-03 | v2.0 shipped: 2026-03-01*
