@@ -3,8 +3,11 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { createClient } from '@/lib/supabase/server'
+import { getOrderDocuments, getCargoInfo } from '@/lib/actions/order-docs'
 import { OrderStatusBadge } from '@/components/orders/order-status-badge'
 import { OrderStatusTimeline } from '@/components/orders/order-status-timeline'
+import { OrderDocuments } from '@/components/orders/order-documents'
+import { CargoInfo } from '@/components/orders/cargo-info'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -105,7 +108,12 @@ async function getOrderDetail(orderId: string): Promise<OrderDetail | null> {
 
 export default async function OrderDetailPage({ params }: PageProps) {
   const { id } = await params
-  const order = await getOrderDetail(id)
+
+  const [order, documents, cargoInfo] = await Promise.all([
+    getOrderDetail(id),
+    getOrderDocuments(id),
+    getCargoInfo(id),
+  ])
 
   if (!order) {
     notFound()
@@ -232,6 +240,12 @@ export default async function OrderDetailPage({ params }: PageProps) {
               </CardContent>
             </Card>
           )}
+
+          {/* Order Documents */}
+          <OrderDocuments documents={documents} />
+
+          {/* Cargo Info */}
+          <CargoInfo cargoInfo={cargoInfo} />
         </div>
 
         {/* Status Timeline - Right Column (1/3) */}
