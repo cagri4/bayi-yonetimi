@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 ## Current Position
 
 Phase: 7 of 7 (Support & Reports)
-Plan: 2 of 4 in phase 7 complete
+Plan: 3 of 4 in phase 7 complete
 Status: Phase 7 in progress
-Last activity: 2026-03-01 — Completed 07-02-PLAN.md
+Last activity: 2026-03-01 — Completed 07-03-PLAN.md
 
-Progress: [████████████████████] 85% (17/20 total plans complete)
+Progress: [████████████████████] 90% (18/20 total plans complete)
 Overall: v1 shipped (14 plans), v2.0 in progress (phases 04-06 complete, phase 07 started)
 
 ## Milestones
@@ -54,9 +54,10 @@ Overall: v1 shipped (14 plans), v2.0 in progress (phases 04-06 complete, phase 0
 | Phase 07-support-reports P07-01 | 3min | 2 tasks | 2 files |
 
 **Current Phase (07-support-reports):**
-- Plans completed: 1 of 4
-- Duration so far: 3min
-| Phase 07-support-reports P02 | 720 | 2 tasks | 18 files |
+- Plans completed: 3 of 4
+- Duration so far: ~25min
+| Phase 07-support-reports P07-02 | ~12min | 2 tasks | 18 files |
+| Phase 07-support-reports P07-03 | 11min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,8 @@ Recent decisions from PROJECT.md affecting v2.0:
 - [Phase 07-01]: Realtime publication uses idempotent DO block pattern from migration 002
 - [Phase 07-support-reports]: replyToMessage uses atomic single UPDATE (reply_body + status=answered) — avoids race condition
 - [Phase 07-support-reports]: useSupportRealtime subscribes to INSERT only on support_messages for admin new-message notifications
+- [Phase 07-03]: xlsx-server-only: Import xlsx only in route.ts to prevent ~500KB client bundle addition
+- [Phase 07-03]: direct-type-imports: Import types from @/types/database.types directly — Turbopack cannot process export type {} from 'use server' files
 
 ### Pending Todos
 
@@ -117,9 +120,9 @@ None. Research flagged critical pitfalls but all have known prevention patterns.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 07-01-PLAN.md (Phase 7 database schema and TypeScript types)
+Stopped at: Completed 07-03-PLAN.md (Spending reports, charts, Excel export)
 Resume file: None
 
 ---
 *Last updated: 2026-03-01*
-*Next: 07-02-PLAN.md (Support messaging UI)*
+*Next: 07-04-PLAN.md (Final plan — phase 7 completion)*

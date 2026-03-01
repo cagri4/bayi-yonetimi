@@ -61,9 +61,9 @@ v2.0 milestone için gereksinimler. Her biri roadmap fazlarına eşlenecek.
 
 ### Bayi Raporları
 
-- [ ] **REP-01**: Bayi kendi harcama analizini görür (aylık trend grafiği)
-- [ ] **REP-02**: Bayi dönemsel karşılaştırma yapar (bu ay vs geçen ay, bu yıl vs geçen yıl)
-- [ ] **REP-03**: Bayi harcama raporunu Excel olarak indirir
+- [x] **REP-01**: Bayi kendi harcama analizini görür (aylık trend grafiği)
+- [x] **REP-02**: Bayi dönemsel karşılaştırma yapar (bu ay vs geçen ay, bu yıl vs geçen yıl)
+- [x] **REP-03**: Bayi harcama raporunu Excel olarak indirir
 
 ## Future Requirements (v3+)
 
@@ -138,9 +138,9 @@ Hangi fazlar hangi gereksinimleri kapsıyor.
 | SUP-04 | Phase 7 | Complete |
 | SUP-05 | Phase 7 | Complete |
 | SUP-06 | Phase 7 | Complete |
-| REP-01 | Phase 7 | Pending |
-| REP-02 | Phase 7 | Pending |
-| REP-03 | Phase 7 | Pending |
+| REP-01 | Phase 7 | Complete |
+| REP-02 | Phase 7 | Complete |
+| REP-03 | Phase 7 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 36 total
