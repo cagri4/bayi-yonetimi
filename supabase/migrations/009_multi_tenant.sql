@@ -520,3 +520,695 @@ CREATE INDEX CONCURRENTLY idx_order_documents_company_id
 -- users (company_id for admin lookup in hook + admin RLS)
 CREATE INDEX CONCURRENTLY idx_users_company_id
   ON users(company_id);
+
+
+-- ============================================
+-- BLOCK 12: Replace all RLS policies with company-scoped versions
+-- Can be pasted as a single block in Supabase Dashboard SQL Editor
+-- Must run AFTER Block 2 (functions must exist)
+-- ============================================
+
+-- ============================================
+-- 12a: users table
+-- ============================================
+DROP POLICY IF EXISTS "Users can read own record" ON users;
+DROP POLICY IF EXISTS "Admins can manage users" ON users;
+
+CREATE POLICY "Users can read own record"
+  ON users FOR SELECT
+  TO authenticated
+  USING ((SELECT auth.uid()) = id);
+
+CREATE POLICY "Company admins can manage own company users"
+  ON users FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all users"
+  ON users FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12b: companies table
+-- (policies already created in Block 5 — drop and recreate to be idempotent)
+-- ============================================
+DROP POLICY IF EXISTS "Superadmin can manage all companies" ON companies;
+DROP POLICY IF EXISTS "Company admins can read own company" ON companies;
+
+CREATE POLICY "Superadmin can manage all companies"
+  ON companies FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+CREATE POLICY "Company admins can read own company"
+  ON companies FOR SELECT
+  TO authenticated
+  USING (id = current_company_id());
+
+-- ============================================
+-- 12c: dealer_groups table
+-- ============================================
+DROP POLICY IF EXISTS "Authenticated users can read dealer groups" ON dealer_groups;
+DROP POLICY IF EXISTS "Admins can manage dealer groups" ON dealer_groups;
+
+CREATE POLICY "Company members can read own company dealer groups"
+  ON dealer_groups FOR SELECT
+  TO authenticated
+  USING (company_id = current_company_id());
+
+CREATE POLICY "Company admins can manage dealer groups"
+  ON dealer_groups FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all dealer groups"
+  ON dealer_groups FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12d: dealers table
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own record" ON dealers;
+DROP POLICY IF EXISTS "Admins can manage dealers" ON dealers;
+
+CREATE POLICY "Dealers can read own record"
+  ON dealers FOR SELECT
+  TO authenticated
+  USING (
+    user_id = (SELECT auth.uid())
+    AND company_id = current_company_id()
+  );
+
+CREATE POLICY "Company admins can manage own company dealers"
+  ON dealers FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all dealers"
+  ON dealers FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12e: categories table
+-- (old policies: "Anyone can read categories", "Admins can manage categories")
+-- ============================================
+DROP POLICY IF EXISTS "Anyone can read categories" ON categories;
+DROP POLICY IF EXISTS "Authenticated users can read categories" ON categories;
+DROP POLICY IF EXISTS "Admins can manage categories" ON categories;
+
+CREATE POLICY "Company members can read own company categories"
+  ON categories FOR SELECT
+  TO authenticated
+  USING (company_id = current_company_id());
+
+CREATE POLICY "Company admins can manage categories"
+  ON categories FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all categories"
+  ON categories FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12f: brands table
+-- (old policies: "Anyone can read brands", "Admins can manage brands")
+-- ============================================
+DROP POLICY IF EXISTS "Anyone can read brands" ON brands;
+DROP POLICY IF EXISTS "Authenticated users can read brands" ON brands;
+DROP POLICY IF EXISTS "Admins can manage brands" ON brands;
+
+CREATE POLICY "Company members can read own company brands"
+  ON brands FOR SELECT
+  TO authenticated
+  USING (company_id = current_company_id());
+
+CREATE POLICY "Company admins can manage brands"
+  ON brands FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all brands"
+  ON brands FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12g: products table
+-- (old policies: "Authenticated can read active products", "Admins can manage products")
+-- ============================================
+DROP POLICY IF EXISTS "Authenticated can read active products" ON products;
+DROP POLICY IF EXISTS "Authenticated users can read active products" ON products;
+DROP POLICY IF EXISTS "Admins can manage products" ON products;
+
+CREATE POLICY "Company members can read own company products"
+  ON products FOR SELECT
+  TO authenticated
+  USING (company_id = current_company_id());
+
+CREATE POLICY "Company admins can manage products"
+  ON products FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all products"
+  ON products FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12h: dealer_prices table
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own prices" ON dealer_prices;
+DROP POLICY IF EXISTS "Admins can manage dealer prices" ON dealer_prices;
+
+CREATE POLICY "Dealers can read own prices"
+  ON dealer_prices FOR SELECT
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers
+      WHERE user_id = (SELECT auth.uid())
+        AND company_id = current_company_id()
+    )
+  );
+
+CREATE POLICY "Company admins can manage dealer prices"
+  ON dealer_prices FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all dealer prices"
+  ON dealer_prices FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12i: orders table
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own orders" ON orders;
+DROP POLICY IF EXISTS "Dealers can create orders" ON orders;
+DROP POLICY IF EXISTS "Admins can manage orders" ON orders;
+
+CREATE POLICY "Dealers can read own orders"
+  ON orders FOR SELECT
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers
+      WHERE user_id = (SELECT auth.uid())
+        AND company_id = current_company_id()
+    )
+  );
+
+CREATE POLICY "Dealers can create orders"
+  ON orders FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    dealer_id IN (
+      SELECT id FROM dealers
+      WHERE user_id = (SELECT auth.uid())
+        AND company_id = current_company_id()
+    )
+  );
+
+CREATE POLICY "Company admins can manage orders"
+  ON orders FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all orders"
+  ON orders FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12j: order_items table
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own order items" ON order_items;
+DROP POLICY IF EXISTS "Dealers can create order items" ON order_items;
+DROP POLICY IF EXISTS "Admins can manage order items" ON order_items;
+
+CREATE POLICY "Dealers can read own order items"
+  ON order_items FOR SELECT
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND order_id IN (
+      SELECT id FROM orders
+      WHERE dealer_id IN (
+        SELECT id FROM dealers WHERE user_id = (SELECT auth.uid())
+      )
+    )
+  );
+
+CREATE POLICY "Dealers can create order items"
+  ON order_items FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    company_id = current_company_id()
+    AND order_id IN (
+      SELECT id FROM orders
+      WHERE dealer_id IN (
+        SELECT id FROM dealers WHERE user_id = (SELECT auth.uid())
+      )
+    )
+  );
+
+CREATE POLICY "Company admins can manage order items"
+  ON order_items FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all order items"
+  ON order_items FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12k: order_status_history table
+-- (old policies: "Dealers can read own order history", "Admins can manage order history")
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own order history" ON order_status_history;
+DROP POLICY IF EXISTS "Dealers can read own order status history" ON order_status_history;
+DROP POLICY IF EXISTS "Admins can manage order history" ON order_status_history;
+DROP POLICY IF EXISTS "Admins can manage order status history" ON order_status_history;
+
+CREATE POLICY "Dealers can read own order status history"
+  ON order_status_history FOR SELECT
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND order_id IN (
+      SELECT id FROM orders
+      WHERE dealer_id IN (
+        SELECT id FROM dealers WHERE user_id = (SELECT auth.uid())
+      )
+    )
+  );
+
+CREATE POLICY "Company admins can manage order status history"
+  ON order_status_history FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all order status history"
+  ON order_status_history FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12l: Global lookup tables (no company_id — same for all companies)
+-- order_statuses, order_status_transitions, transaction_types
+-- (old policy names differ from plan: "Authenticated can read ..." not "Authenticated users can read ...")
+-- ============================================
+DROP POLICY IF EXISTS "Authenticated can read order statuses" ON order_statuses;
+DROP POLICY IF EXISTS "Authenticated users can read order statuses" ON order_statuses;
+DROP POLICY IF EXISTS "Admins can manage order statuses" ON order_statuses;
+DROP POLICY IF EXISTS "Authenticated can read transitions" ON order_status_transitions;
+DROP POLICY IF EXISTS "Authenticated users can read transitions" ON order_status_transitions;
+DROP POLICY IF EXISTS "Admins can manage transitions" ON order_status_transitions;
+DROP POLICY IF EXISTS "Authenticated can read transaction types" ON transaction_types;
+DROP POLICY IF EXISTS "Authenticated users can read transaction types" ON transaction_types;
+DROP POLICY IF EXISTS "Admins can manage transaction types" ON transaction_types;
+
+CREATE POLICY "Authenticated users can read order statuses"
+  ON order_statuses FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Superadmin can manage order statuses"
+  ON order_statuses FOR ALL TO authenticated USING ((SELECT is_superadmin()));
+
+CREATE POLICY "Authenticated users can read transitions"
+  ON order_status_transitions FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Superadmin can manage transitions"
+  ON order_status_transitions FOR ALL TO authenticated USING ((SELECT is_superadmin()));
+
+CREATE POLICY "Authenticated users can read transaction types"
+  ON transaction_types FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Superadmin can manage transaction types"
+  ON transaction_types FOR ALL TO authenticated USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12m: dealer_transactions table
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own transactions" ON dealer_transactions;
+DROP POLICY IF EXISTS "Admins can manage dealer transactions" ON dealer_transactions;
+
+CREATE POLICY "Dealers can read own transactions"
+  ON dealer_transactions FOR SELECT
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers
+      WHERE user_id = (SELECT auth.uid())
+        AND company_id = current_company_id()
+    )
+  );
+
+CREATE POLICY "Company admins can manage dealer transactions"
+  ON dealer_transactions FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all dealer transactions"
+  ON dealer_transactions FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12n: dealer_invoices table
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own invoices" ON dealer_invoices;
+DROP POLICY IF EXISTS "Admins can manage dealer invoices" ON dealer_invoices;
+
+CREATE POLICY "Dealers can read own invoices"
+  ON dealer_invoices FOR SELECT
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers
+      WHERE user_id = (SELECT auth.uid())
+        AND company_id = current_company_id()
+    )
+  );
+
+CREATE POLICY "Company admins can manage dealer invoices"
+  ON dealer_invoices FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all dealer invoices"
+  ON dealer_invoices FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12o: dealer_favorites table
+-- (old policies: "Dealers can view own favorites", "Dealers can add favorites",
+--  "Dealers can remove favorites", "Admins can manage favorites")
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can view own favorites" ON dealer_favorites;
+DROP POLICY IF EXISTS "Dealers can add favorites" ON dealer_favorites;
+DROP POLICY IF EXISTS "Dealers can remove favorites" ON dealer_favorites;
+DROP POLICY IF EXISTS "Admins can manage favorites" ON dealer_favorites;
+DROP POLICY IF EXISTS "Dealers can manage own favorites" ON dealer_favorites;
+DROP POLICY IF EXISTS "Admins can read dealer favorites" ON dealer_favorites;
+
+CREATE POLICY "Dealers can manage own favorites"
+  ON dealer_favorites FOR ALL
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers
+      WHERE user_id = (SELECT auth.uid())
+        AND company_id = current_company_id()
+    )
+  );
+
+CREATE POLICY "Company admins can read dealer favorites"
+  ON dealer_favorites FOR SELECT
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all dealer favorites"
+  ON dealer_favorites FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12p: campaigns + campaign_products tables
+-- (old policies: "Authenticated can read active campaigns", "Admins can manage campaigns",
+--  "Authenticated can read campaign products", "Admins can manage campaign products")
+-- ============================================
+DROP POLICY IF EXISTS "Authenticated can read active campaigns" ON campaigns;
+DROP POLICY IF EXISTS "Authenticated users can read active campaigns" ON campaigns;
+DROP POLICY IF EXISTS "Admins can manage campaigns" ON campaigns;
+DROP POLICY IF EXISTS "Authenticated can read campaign products" ON campaign_products;
+DROP POLICY IF EXISTS "Authenticated users can read campaign products" ON campaign_products;
+DROP POLICY IF EXISTS "Admins can manage campaign products" ON campaign_products;
+
+CREATE POLICY "Company members can read own company campaigns"
+  ON campaigns FOR SELECT
+  TO authenticated
+  USING (company_id = current_company_id());
+
+CREATE POLICY "Company admins can manage campaigns"
+  ON campaigns FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all campaigns"
+  ON campaigns FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+CREATE POLICY "Company members can read own company campaign products"
+  ON campaign_products FOR SELECT
+  TO authenticated
+  USING (company_id = current_company_id());
+
+CREATE POLICY "Company admins can manage campaign products"
+  ON campaign_products FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all campaign products"
+  ON campaign_products FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12q: announcements + announcement_reads tables
+-- (old policies: "Authenticated can read active announcements", "Admins can manage announcements",
+--  "Dealers can read own announcement reads", "Dealers can insert own announcement reads")
+-- ============================================
+DROP POLICY IF EXISTS "Authenticated can read active announcements" ON announcements;
+DROP POLICY IF EXISTS "Authenticated users can read active announcements" ON announcements;
+DROP POLICY IF EXISTS "Admins can manage announcements" ON announcements;
+DROP POLICY IF EXISTS "Dealers can read own announcement reads" ON announcement_reads;
+DROP POLICY IF EXISTS "Dealers can insert own announcement reads" ON announcement_reads;
+DROP POLICY IF EXISTS "Dealers can manage own announcement reads" ON announcement_reads;
+DROP POLICY IF EXISTS "Admins can read announcement reads" ON announcement_reads;
+
+CREATE POLICY "Company members can read own company announcements"
+  ON announcements FOR SELECT
+  TO authenticated
+  USING (company_id = current_company_id());
+
+CREATE POLICY "Company admins can manage announcements"
+  ON announcements FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all announcements"
+  ON announcements FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+CREATE POLICY "Dealers can manage own announcement reads"
+  ON announcement_reads FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND dealer_id IN (
+      SELECT id FROM dealers WHERE user_id = (SELECT auth.uid())
+    )
+  );
+
+CREATE POLICY "Company admins can read announcement reads"
+  ON announcement_reads FOR SELECT
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all announcement reads"
+  ON announcement_reads FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12r: order_documents table
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own order documents" ON order_documents;
+DROP POLICY IF EXISTS "Admins can manage order documents" ON order_documents;
+
+CREATE POLICY "Dealers can read own order documents"
+  ON order_documents FOR SELECT
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND order_id IN (
+      SELECT id FROM orders
+      WHERE dealer_id IN (
+        SELECT id FROM dealers WHERE user_id = (SELECT auth.uid())
+      )
+    )
+  );
+
+CREATE POLICY "Company admins can manage order documents"
+  ON order_documents FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all order documents"
+  ON order_documents FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12s: support_messages table
+-- (old policies: "Dealers can read own support messages", "Dealers can insert own support messages",
+--  "Admins can read all support messages", "Admins can update support messages")
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own support messages" ON support_messages;
+DROP POLICY IF EXISTS "Dealers can insert own support messages" ON support_messages;
+DROP POLICY IF EXISTS "Admins can read all support messages" ON support_messages;
+DROP POLICY IF EXISTS "Admins can update support messages" ON support_messages;
+DROP POLICY IF EXISTS "Dealers can manage own support messages" ON support_messages;
+DROP POLICY IF EXISTS "Admins can manage support messages" ON support_messages;
+
+CREATE POLICY "Dealers can manage own support messages"
+  ON support_messages FOR ALL
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers
+      WHERE user_id = (SELECT auth.uid())
+        AND company_id = current_company_id()
+    )
+  );
+
+CREATE POLICY "Company admins can manage support messages"
+  ON support_messages FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all support messages"
+  ON support_messages FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12t: product_requests table
+-- (old policies: "Dealers can read own product requests", "Dealers can insert own product requests",
+--  "Admins can read all product requests", "Admins can update product requests")
+-- ============================================
+DROP POLICY IF EXISTS "Dealers can read own product requests" ON product_requests;
+DROP POLICY IF EXISTS "Dealers can insert own product requests" ON product_requests;
+DROP POLICY IF EXISTS "Admins can read all product requests" ON product_requests;
+DROP POLICY IF EXISTS "Admins can update product requests" ON product_requests;
+DROP POLICY IF EXISTS "Dealers can manage own product requests" ON product_requests;
+DROP POLICY IF EXISTS "Admins can manage product requests" ON product_requests;
+
+CREATE POLICY "Dealers can manage own product requests"
+  ON product_requests FOR ALL
+  TO authenticated
+  USING (
+    dealer_id IN (
+      SELECT id FROM dealers
+      WHERE user_id = (SELECT auth.uid())
+        AND company_id = current_company_id()
+    )
+  );
+
+CREATE POLICY "Company admins can manage product requests"
+  ON product_requests FOR ALL
+  TO authenticated
+  USING (
+    company_id = current_company_id()
+    AND (SELECT is_company_admin())
+  );
+
+CREATE POLICY "Superadmin can manage all product requests"
+  ON product_requests FOR ALL
+  TO authenticated
+  USING ((SELECT is_superadmin()));
+
+-- ============================================
+-- 12u: FAQ tables (global content — readable by all authenticated)
+-- faq_categories, faq_items are platform-level, not company-scoped
+-- (old policies: "Authenticated can read active faq categories", "Admins can manage faq categories",
+--  "Authenticated can read active faq items", "Admins can manage faq items")
+-- ============================================
+DROP POLICY IF EXISTS "Authenticated can read active faq categories" ON faq_categories;
+DROP POLICY IF EXISTS "Authenticated users can read faq categories" ON faq_categories;
+DROP POLICY IF EXISTS "Admins can manage faq categories" ON faq_categories;
+DROP POLICY IF EXISTS "Authenticated can read active faq items" ON faq_items;
+DROP POLICY IF EXISTS "Authenticated users can read faq items" ON faq_items;
+DROP POLICY IF EXISTS "Admins can manage faq items" ON faq_items;
+
+CREATE POLICY "Authenticated users can read faq categories"
+  ON faq_categories FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Superadmin can manage faq categories"
+  ON faq_categories FOR ALL TO authenticated USING ((SELECT is_superadmin()));
+-- Company admins can also manage FAQ for their company UX
+CREATE POLICY "Company admins can manage faq categories"
+  ON faq_categories FOR ALL TO authenticated
+  USING ((SELECT is_company_admin()));
+
+CREATE POLICY "Authenticated users can read faq items"
+  ON faq_items FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Superadmin can manage faq items"
+  ON faq_items FOR ALL TO authenticated USING ((SELECT is_superadmin()));
+CREATE POLICY "Company admins can manage faq items"
+  ON faq_items FOR ALL TO authenticated
+  USING ((SELECT is_company_admin()));
