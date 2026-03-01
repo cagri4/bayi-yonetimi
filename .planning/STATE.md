@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 9 — Agent Infrastructure Foundation
-Plan: 02 of 05 complete
-Status: IN PROGRESS — Plan 02 executed (agent types, tool registry, token budget)
-Last activity: 2026-03-01 — Phase 9 Plan 02 complete (AgentRole taxonomy, ToolRegistry, TokenBudget, applyPromptCaching)
+Plan: 04 of 05 complete
+Status: IN PROGRESS — Plan 04 executed (AgentBridge, deadlock detection, cross-agent call logging)
+Last activity: 2026-03-01 — Phase 9 Plan 04 complete (AgentBridge: checkDeadlock, logAgentCall, callAgent placeholder, direct DB query helpers)
 
-Progress: [███████░░░] 33% — Phase 9 Plan 02 complete, Plan 03 next
+Progress: [█████████░] 80% — Phase 9 Plan 04 complete, Plan 05 next
 
 ## Milestones
 
@@ -99,6 +99,12 @@ Progress: [███████░░░] 33% — Phase 9 Plan 02 complete, Pla
 - ToolRegistry exposes getToolsWithCaching convenience method — AgentRunner should use this instead of calling applyPromptCaching manually
 - @anthropic-ai/sdk installed at ^0.78.0 per v3.0 architecture decision (raw SDK, not Vercel AI SDK)
 
+### Phase 9 Decisions (from Plan 09-04)
+- checkDeadlock() is synchronous — no DB access needed, only inspects in-memory callStack (fast guard before async operations)
+- callAgent() is a Phase 9 placeholder returning stub result; Phase 10 will replace stub with AgentRunner invocation using extended callStack and depth+1
+- getDealerInfo/getRecentOrders/getProductInfo use direct DB queries (not Claude) per AI-06 cross-agent data pattern
+- orders.status_id used (not status) — TypeScript Supabase query builder caught column name mismatch at compile time
+
 ### v3.0 Phase Dependencies (strict)
 - Phase 8 (Multi-Tenant) → blocks Phase 9
 - Phase 9 (Agent Infrastructure) → blocks Phase 10
@@ -118,8 +124,8 @@ Progress: [███████░░░] 33% — Phase 9 Plan 02 complete, Pla
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 9 Plan 02 COMPLETE — AgentRole (12 roles), AGENT_MODELS, AgentContext, TokenBudget, ToolRegistry, applyPromptCaching, placeholder tools. Ready for Plan 09-03.
+Stopped at: Phase 9 Plan 04 COMPLETE — AgentBridge (checkDeadlock, logAgentCall, callAgent placeholder, getDealerInfo/getRecentOrders/getProductInfo). Ready for Plan 09-05.
 Resume file: None
 
 ---
-*Last updated: 2026-03-01 (Plan 09-02 complete)*
+*Last updated: 2026-03-01 (Plan 09-04 complete)*

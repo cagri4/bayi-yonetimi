@@ -23,9 +23,9 @@
 - [ ] **AI-03**: ConversationManager DB-backed mesaj gecmisi tutar (rolling window 50 mesaj + otomatik ozet)
 - [ ] **AI-04**: Telegram webhook route immediate 200 response + after() ile background processing yapar
 - [ ] **AI-05**: update_id idempotency ile duplicate mesaj isleme engellenir
-- [ ] **AI-06**: AgentBridge cross-agent tool call yapar (direkt DB sorgusu, Claude invocation olmadan)
+- [x] **AI-06**: AgentBridge cross-agent tool call yapar (direkt DB sorgusu, Claude invocation olmadan)
 - [x] **AI-07**: Per-dealer gunluk token budget tracking (50K soft / 100K hard limit) calisir
-- [ ] **AI-08**: Agent-to-agent deadlock korumasi (depth limit 5, cycle detection, 10 tool call cap)
+- [x] **AI-08**: Agent-to-agent deadlock korumasi (depth limit 5, cycle detection, 10 tool call cap)
 - [x] **AI-09**: agent_definitions, agent_conversations, agent_messages, agent_calls tablolari olusturulur
 - [x] **AI-10**: Prompt caching konfigurasyonu (system prompt + tool definition uzerine cache_control)
 - [x] **AI-11**: Service role client (createServiceClient) sadece agent layer icin olusturulur
@@ -165,9 +165,9 @@
 | AI-03 | Phase 9 | Pending |
 | AI-04 | Phase 9 | Pending |
 | AI-05 | Phase 9 | Pending |
-| AI-06 | Phase 9 | Pending |
+| AI-06 | Phase 9 | Complete |
 | AI-07 | Phase 9 | Complete |
-| AI-08 | Phase 9 | Pending |
+| AI-08 | Phase 9 | Complete |
 | AI-09 | Phase 9 | Complete |
 | AI-10 | Phase 9 | Complete |
 | AI-11 | Phase 9 | Complete |
