@@ -7,14 +7,14 @@ import { cn } from '@/lib/utils'
 
 const links = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/catalog', label: 'Urunler', icon: Package },
+  { href: '/catalog', label: 'Katalog', icon: Package },
   { href: '/favorites', label: 'Favorilerim', icon: Heart },
   { href: '/campaigns', label: 'Kampanyalar', icon: Megaphone },
   { href: '/announcements', label: 'Duyurular', icon: Bell },
   { href: '/financials', label: 'Cari Hesap', icon: Wallet },
   { href: '/quick-order', label: 'Hizli Siparis', icon: Zap },
   { href: '/orders', label: 'Siparislerim', icon: ClipboardList },
-  { href: '/cart', label: 'Sepet', icon: ShoppingCart },
+  { href: '/cart', label: 'Sepetim', icon: ShoppingCart },
 ]
 
 export function NavLinks() {

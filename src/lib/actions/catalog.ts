@@ -12,6 +12,7 @@ export interface CatalogProduct {
   stock_quantity: number
   low_stock_threshold: number
   image_url: string | null
+  created_at?: string
   category: { id: string; name: string; slug: string } | null
   brand: { id: string; name: string; slug: string } | null
 }
@@ -31,6 +32,7 @@ export interface CatalogFilters {
   search?: string
   category_id?: string
   brand_id?: string
+  is_new?: boolean
 }
 
 export async function getDealerInfo(): Promise<DealerInfo | null> {
@@ -71,6 +73,7 @@ interface ProductFromDB {
   stock_quantity: number
   low_stock_threshold: number
   image_url: string | null
+  created_at: string
   category: { id: string; name: string; slug: string } | null
   brand: { id: string; name: string; slug: string } | null
 }
@@ -115,6 +118,7 @@ export async function getCatalogProducts(
       stock_quantity,
       low_stock_threshold,
       image_url,
+      created_at,
       category:categories(id, name, slug),
       brand:brands(id, name, slug)
     `)
@@ -132,6 +136,12 @@ export async function getCatalogProducts(
 
   if (filters?.search) {
     query = query.or(`name.ilike.%${filters.search}%,code.ilike.%${filters.search}%`)
+  }
+
+  if (filters?.is_new) {
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    query = query.gte('created_at', thirtyDaysAgo.toISOString())
   }
 
   const { data: productsData, error } = await query
@@ -167,6 +177,7 @@ export async function getCatalogProducts(
     return {
       ...product,
       dealer_price: Math.round(dealerPrice * 100) / 100, // Round to 2 decimals
+      created_at: product.created_at,
     }
   })
 }

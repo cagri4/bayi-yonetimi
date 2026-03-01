@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { ProductGrid } from '@/components/catalog/product-grid'
 import { ProductFilters } from '@/components/catalog/product-filters'
 import { ProductSearch } from '@/components/catalog/product-search'
+import { CatalogFilterTabs } from '@/components/catalog/catalog-filter-tabs'
 import { getCategories, getBrands } from '@/lib/actions/catalog'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -10,6 +11,7 @@ interface CatalogPageProps {
     search?: string
     category?: string
     brand?: string
+    filter?: string
   }>
 }
 
@@ -35,6 +37,10 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     getBrands(),
   ])
 
+  const activeFilter = params.filter || 'all'
+  const isNewFilter = activeFilter === 'new'
+  const isFavoritesFilter = activeFilter === 'favorites'
+
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -42,16 +48,23 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         <p className="text-gray-500 mt-1">Tum urunlerimizi goruntuleyebilir ve siparis verebilirsiniz.</p>
       </div>
 
-      <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <ProductSearch />
-        <ProductFilters categories={categories} brands={brands} />
+      <div className="bg-white rounded-xl p-4 shadow-sm space-y-4">
+        <CatalogFilterTabs activeFilter={activeFilter} />
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center border-t pt-4">
+          <ProductSearch />
+          {!isFavoritesFilter && (
+            <ProductFilters categories={categories} brands={brands} />
+          )}
+        </div>
       </div>
 
       <Suspense fallback={<ProductGridSkeleton />}>
         <ProductGrid
           search={params.search}
-          categoryId={params.category}
-          brandId={params.brand}
+          categoryId={isFavoritesFilter ? undefined : params.category}
+          brandId={isFavoritesFilter ? undefined : params.brand}
+          isNew={isNewFilter}
+          favoritesOnly={isFavoritesFilter}
         />
       </Suspense>
     </div>

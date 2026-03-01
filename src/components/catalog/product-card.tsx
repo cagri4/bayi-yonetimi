@@ -12,9 +12,10 @@ import type { CatalogProduct } from '@/lib/actions/catalog'
 interface ProductCardProps {
   product: CatalogProduct
   isFavorited?: boolean
+  showNewBadge?: boolean
 }
 
-export function ProductCard({ product, isFavorited }: ProductCardProps) {
+export function ProductCard({ product, isFavorited, showNewBadge }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
   const { toast } = useToast()
 
@@ -89,11 +90,18 @@ export function ProductCard({ product, isFavorited }: ProductCardProps) {
             initialFavorited={isFavorited ?? false}
           />
         </div>
-        {hasDiscount && (
-          <Badge className="absolute top-2 right-2 bg-rose-500 text-white font-semibold shadow-md">
-            %{discountPercent} indirim
-          </Badge>
-        )}
+        <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+          {showNewBadge && (
+            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded font-semibold shadow-sm">
+              Yeni
+            </span>
+          )}
+          {hasDiscount && (
+            <Badge className="bg-rose-500 text-white font-semibold shadow-md">
+              %{discountPercent} indirim
+            </Badge>
+          )}
+        </div>
       </div>
 
       <CardContent className="flex-grow pt-4 space-y-3">

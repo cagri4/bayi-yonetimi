@@ -13,6 +13,7 @@ export interface FavoriteProduct {
   stock_quantity: number
   low_stock_threshold: number
   image_url: string | null
+  created_at: string
   category: { id: string; name: string; slug: string } | null
   brand: { id: string; name: string; slug: string } | null
 }
@@ -31,6 +32,7 @@ interface ProductFromDB {
   stock_quantity: number
   low_stock_threshold: number
   image_url: string | null
+  created_at: string
   category: { id: string; name: string; slug: string } | null
   brand: { id: string; name: string; slug: string } | null
 }
@@ -152,6 +154,7 @@ export async function getFavoriteProducts(): Promise<FavoriteProduct[]> {
         stock_quantity,
         low_stock_threshold,
         image_url,
+        created_at,
         category:categories(id, name, slug),
         brand:brands(id, name, slug)
       )
@@ -193,6 +196,7 @@ export async function getFavoriteProducts(): Promise<FavoriteProduct[]> {
     return {
       ...product,
       dealer_price: Math.round(dealerPrice * 100) / 100, // Round to 2 decimals
+      created_at: product.created_at,
     }
   })
 }
