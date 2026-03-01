@@ -11,23 +11,30 @@ Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis ve
 ## Current State
 
 **v1 MVP shipped: 2026-02-03**
+**v2.0 shipped: 2026-03-01**
 
-- Web portal: Next.js 14 App Router + Supabase
-- Mobile app: Expo/React Native
-- 13,200 LOC TypeScript/TSX
-- 215 files across 3 phases, 14 plans
+- Web portal: Next.js 16 App Router + Supabase
+- 38 routes deployed on Vercel
+- Supabase: neqcuhejmornybmbclwt (Frankfurt)
 
-**Deployed capabilities:**
+**Deployed capabilities (v1 + v2.0):**
 - Dealer auth with session persistence
 - Product catalog with group pricing (Altin/Gumus/Bronz)
 - Shopping cart with minimum order validation
-- Order creation with status tracking
+- Order creation with status tracking + cargo tracking
 - Realtime order updates via Supabase Realtime
 - Quick order form with SKU search
 - Reorder from history
 - Admin product/dealer/order management
-- Sales reporting with CSV export
-- Mobile app with push notifications
+- Sales reporting with CSV/Excel export
+- Dealer dashboard (spending summary, top products, recent orders)
+- Financial backbone (cari hesap, transactions, invoices)
+- Campaigns and announcements with read receipts
+- Order documents (invoice/irsaliye PDF upload)
+- Support messaging (dealer-admin async)
+- FAQ system
+- Product requests
+- Spending reports with Excel export
 
 ## Requirements
 
@@ -55,50 +62,45 @@ Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis ve
 
 ### Active
 
-**Current Milestone: v2.0 — Bayi Deneyimi ve Finansal Takip**
+**Current Milestone: v3.0 — Multi-Tenant SaaS + AI Agent Ecosystem**
 
-**Goal:** Bayilerin kendi finansal durumlarini takip edebilmesi, favori urunleri yonetebilmesi, kampanyalardan haberdar olabilmesi ve admin ile iletisim kurabilmesi.
+**Goal:** Mevcut SaaS'i multi-tenant yapiya donustur, 12 AI dijital calisani Telegram uzerinden Claude API ile insa et. Birden fazla firmaya satilabilir urun haline getir.
 
-**Bayi Dashboard:**
-- [ ] Toplam harcama ozeti (bu ay/yil)
-- [ ] Son siparisler widget'i
-- [ ] En cok aldigi urunler
-- [ ] Bekleyen siparis sayisi
+**Multi-Tenant Mimari:**
+- [ ] companies tablosu ve firma yonetimi
+- [ ] Tum tablolara company_id ekleme
+- [ ] RLS policy'leri company-aware guncelleme
+- [ ] Firma bazli login ve routing
 
-**Finansal Bilgiler (ERP-ready):**
-- [ ] Cari hesap bakiyesi (borc/alacak) — admin manuel girer, ERP-ready sema
-- [ ] Odeme gecmisi
-- [ ] Fatura goruntuleme / PDF indirme
+**Agent Altyapisi:**
+- [ ] Claude API entegrasyonu (tool calling framework)
+- [ ] Telegram Bot entegrasyonu
+- [ ] Agent konusma hafizasi ve state yonetimi
+- [ ] Agent-to-agent iletisim protokolu
+- [ ] Agent tool sarmalama (mevcut server actions -> tools)
 
-**Favori Urunler:**
-- [ ] Favorilere ekle butonu
-- [ ] Favori listesi sayfasi
-
-**Kampanyalar / Duyurular:**
-- [ ] Aktif kampanyalar sayfasi
-- [ ] Admin'den gelen duyurular
-- [ ] Indirimli urunler filtresi
-
-**Destek / Iletisim:**
-- [ ] Admin'e mesaj gonderme
-- [ ] SSS sayfasi
-- [ ] Urun talebi (stokta yoksa)
-
-**Siparis Detaylari (gelistirme):**
-- [ ] Fatura/irsaliye PDF (admin yukler)
-- [ ] Kargo takip bilgisi (kendi araclar icin)
-
-**Bayi Raporlari:**
-- [ ] Kendi harcama analizi
-- [ ] Donemsel karsilastirma
+**12 AI Dijital Calisan:**
+- [ ] Satis Temsilcisi (bayi siparisi, urun onerme, fiyat verme)
+- [ ] Muhasebeci (cari hesap, fatura, tahsilat takibi)
+- [ ] Depo Sorumlusu (stok yonetimi, siparis hazirlama)
+- [ ] Saha Satis Sorumlusu (rut planlama, bayi ziyaret)
+- [ ] Dagitim Koordinatoru (rut optimizasyonu, teslimat takibi)
+- [ ] Tahsilat Uzmani (vadesi gecen alacak, odeme hatirlatma)
+- [ ] Satin Alma Sorumlusu (tedarikci siparisi, stok yenileme)
+- [ ] Pazarlamaci (kampanya yonetimi, bayi segmentasyonu)
+- [ ] Urun Yoneticisi (katalog yonetimi, fiyat stratejisi)
+- [ ] Egitimci (bayi onboarding, urun egitimi)
+- [ ] Iade/Kalite Sorumlusu (iade sureci, sikayet takibi)
+- [ ] Genel Mudur Danismani (KPI, stratejik analiz, trend tespiti)
 
 ### Out of Scope
 
-- ERP entegrasyonu (Logo/Netsis) — Finansal veriler ERP-ready sema ile hazir, API baglantisi sonraki milestone
+- ERP entegrasyonu (Logo/Netsis) — API baglantisi v4.0'da
 - Odeme sistemi entegrasyonu — Mevcut odeme surecleri devam edecek
-- Canli chat (realtime) — v2'de mesajlasma var ama async, canli chat yok
+- WhatsApp Business API — Telegram oncelikli, WhatsApp v4.0'da
+- Sesli asistan — Text-based oncelikli
+- Mobil uygulama agent entegrasyonu — Web + Telegram oncelikli
 - Coklu dil destegi — Sadece Turkce
-- Offline mobil calisma — Internet baglantisi gerekli
 
 ## Context
 
@@ -122,10 +124,12 @@ Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis ve
 
 ## Constraints
 
-- **Platform**: Web portal (Next.js) + Mobil uygulama (Expo/React Native)
+- **Platform**: Web portal (Next.js 16) + Telegram Bot
 - **Backend**: Next.js API Routes + Supabase (Auth, Database, Realtime, Storage)
-- **Deployment**: Vercel (web), Expo EAS (mobile)
-- **Data**: Demo data ile baslandi, ERP entegrasyonu v2'de
+- **AI**: Claude API (Anthropic) — tool calling for agent capabilities
+- **Messaging**: Telegram Bot API — primary agent channel
+- **Deployment**: Vercel (web + API)
+- **Multi-tenant**: Single deployment, company_id isolation
 - **Dil**: Sadece Turkce
 
 ## Key Decisions
@@ -141,5 +145,10 @@ Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis ve
 | Supabase Realtime for orders | WebSocket yerine Supabase postgres_changes | Good — Minimum setup ile realtime calisiyor |
 | Edge Function for push | Client-side push yerine server-triggered | Good — Guvenli ve olceklenebilir |
 
+| Multi-tenant architecture | Scale to multiple companies from single deployment | — Pending |
+| Claude API for agents | Best tool-calling capability, Turkish language support | — Pending |
+| Telegram as primary channel | B2B users prefer Telegram for business bots, rich API | — Pending |
+| Agent-per-role design | Each business role = separate agent with own tools/authority | — Pending |
+
 ---
-*Last updated: 2026-02-08 after v2.0 milestone start*
+*Last updated: 2026-03-01 after v3.0 milestone start*
