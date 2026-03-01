@@ -1,158 +1,234 @@
-# Requirements: Bayi Yönetimi v2.0
+# Requirements: Bayi Yonetimi v3.0
 
-**Defined:** 2026-02-08
-**Core Value:** Bayilerin finansal durumlarını takip edebilmesi, kişiselleştirilmiş deneyim ve admin ile iletişim — "cari hesabım ne durumda?" sorusuna son.
+**Defined:** 2026-03-01
+**Core Value:** Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis verebilmesi — AI agent'lar ile 7/24 otonom is surecleri.
 
-## v2.0 Requirements
+## v3.0 Requirements
 
-v2.0 milestone için gereksinimler. Her biri roadmap fazlarına eşlenecek.
+### Multi-Tenant Altyapi
 
-### Bayi Dashboard
+- [ ] **MT-01**: Sistem birden fazla firmayi tek deployment uzerinden bagimsiz olarak destekler (company_id izolasyonu)
+- [ ] **MT-02**: Her firma kendi bayilerini, urunlerini ve siparislerini yalnizca kendisi gorebilir (RLS ile izolasyon)
+- [ ] **MT-03**: Mevcut 20+ tabloya company_id eklenir ve tum veriler backfill edilir (zero downtime)
+- [ ] **MT-04**: Admin kullanicisi yalnizca kendi firmasinin verilerini yonetebilir (is_company_admin)
+- [ ] **MT-05**: Platform operatoru (superadmin) tum firmalari gorebilir ve yonetebilir
+- [ ] **MT-06**: JWT claim injection ile tenant izolasyonu saglanan current_company_id() fonksiyonu calisir
+- [ ] **MT-07**: Materialized view (dealer_spending_summary) company_id ile yeniden olusturulur ve RPC ile sarmalanir
+- [ ] **MT-08**: Composite index'ler (company_id, dealer_id) tum tenant-scoped tablolara eklenir
 
-- [ ] **DASH-01**: Bayi giriş yaptığında dashboard sayfasını görür (ana sayfa)
-- [ ] **DASH-02**: Bayi toplam harcama özetini görür (bu ay ve bu yıl)
-- [ ] **DASH-03**: Bayi son 5 siparişini widget olarak görür
-- [ ] **DASH-04**: Bayi bekleyen sipariş sayısını görür (Beklemede/Onaylandı/Hazırlanıyor)
-- [ ] **DASH-05**: Bayi hızlı aksiyonlara tek tıkla erişir (Yeni Sipariş, Siparişlerim, Faturalar)
-- [ ] **DASH-06**: Bayi en çok aldığı 5 ürünü görür ve sepete ekleyebilir
+### Ajan Altyapisi
 
-### Finansal Bilgiler
+- [ ] **AI-01**: AgentRunner sinifi Claude API tool-calling loop ile calisir (max 10 iterasyon, model secimi per rol)
+- [ ] **AI-02**: ToolRegistry her ajan rolu icin 4-7 tool yukler (tum tool'lar degil, sadece ilgili olanlar)
+- [ ] **AI-03**: ConversationManager DB-backed mesaj gecmisi tutar (rolling window 50 mesaj + otomatik ozet)
+- [ ] **AI-04**: Telegram webhook route immediate 200 response + after() ile background processing yapar
+- [ ] **AI-05**: update_id idempotency ile duplicate mesaj isleme engellenir
+- [ ] **AI-06**: AgentBridge cross-agent tool call yapar (direkt DB sorgusu, Claude invocation olmadan)
+- [ ] **AI-07**: Per-dealer gunluk token budget tracking (50K soft / 100K hard limit) calisir
+- [ ] **AI-08**: Agent-to-agent deadlock korumasi (depth limit 5, cycle detection, 10 tool call cap)
+- [ ] **AI-09**: agent_definitions, agent_conversations, agent_messages, agent_calls tablolari olusturulur
+- [ ] **AI-10**: Prompt caching konfigurasyonu (system prompt + tool definition uzerine cache_control)
+- [ ] **AI-11**: Service role client (createServiceClient) sadece agent layer icin olusturulur
 
-- [ ] **FIN-01**: Bayi cari hesap bakiyesini görür (toplam borç, alacak, net bakiye)
-- [ ] **FIN-02**: Bayi cari hesap hareketlerini listeler (fatura, ödeme, düzeltme)
-- [ ] **FIN-03**: Bayi faturalarını listeler ve PDF olarak indirir
-- [ ] **FIN-04**: Bayi ödeme geçmişini görür (tarih, tutar, yöntem)
-- [ ] **FIN-05**: Admin bayi için cari hareket girebilir (borç/alacak/ödeme)
-- [ ] **FIN-06**: Admin bayiye fatura PDF'i yükleyebilir
+### Egitimci (Trainer Agent)
 
-### Favori Ürünler
+- [ ] **TR-01**: Egitimci ajani urun bilgisi sorgusuna yanitlar verir (get_product_info tool)
+- [ ] **TR-02**: Egitimci ajani FAQ sorularina yanitlar verir (get_faq tool)
+- [ ] **TR-03**: Egitimci ajani Telegram uzerinden bayilerle Turkce konusur
+- [ ] **TR-04**: Egitimci ajani read-only calisir, hicbir veriyi degistirmez
 
-- [ ] **FAV-01**: Bayi ürün kartından favorilere ekleyebilir/çıkarabilir
-- [ ] **FAV-02**: Bayi favori ürünlerini ayrı sayfada listeler
-- [ ] **FAV-03**: Bayi favori listesinden ürünleri sepete ekleyebilir
-- [ ] **FAV-04**: Bayi favorilerdeki stokta olmayan ürünler için bildirim alır (opsiyonel)
+### Satis Temsilcisi (Sales Agent)
 
-### Kampanyalar ve Duyurular
+- [ ] **SR-01**: Satis temsilcisi urun katalogu sorgular (get_catalog tool)
+- [ ] **SR-02**: Satis temsilcisi siparis olusturur (create_order tool)
+- [ ] **SR-03**: Satis temsilcisi siparis durumu sorgular (get_order_status tool)
+- [ ] **SR-04**: Satis temsilcisi kampanya bilgisi verir (get_campaigns tool)
+- [ ] **SR-05**: Satis temsilcisi stok kontrolu yapar (check_stock tool)
+- [ ] **SR-06**: Satis temsilcisi bayi profil bilgisi sorgular (get_dealer_profile tool)
+- [ ] **SR-07**: Satis temsilcisi Telegram uzerinden siparis akisini yonetir
 
-- [ ] **CAMP-01**: Bayi aktif kampanyaları listeler
-- [ ] **CAMP-02**: Bayi kampanya detayını görür (açıklama, tarihler, ürünler)
-- [ ] **CAMP-03**: Bayi duyuruları görür ve okundu olarak işaretler
-- [ ] **CAMP-04**: Bayi katalogda "yeni ürünler" filtresini kullanabilir
-- [ ] **CAMP-05**: Admin kampanya oluşturur/düzenler/siler
-- [ ] **CAMP-06**: Admin duyuru oluşturur/düzenler/siler
-- [ ] **CAMP-07**: Bayi yeni kampanya için push notification alır (opsiyonel)
+### Muhasebeci (Accountant Agent)
 
-### Destek ve İletişim
+- [ ] **MH-01**: Muhasebeci cari hesap bilgisi sorgular (get_financials tool)
+- [ ] **MH-02**: Muhasebeci odeme gecmisi sorgular (get_payment_history tool)
+- [ ] **MH-03**: Muhasebeci fatura bilgisi sorgular (get_invoices tool)
+- [ ] **MH-04**: Muhasebeci bayi bakiyesi sorgular (get_dealer_balance tool)
+- [ ] **MH-05**: Muhasebeci finansal rapor export eder (export_report tool)
+- [ ] **MH-06**: Muhasebeci tool olmadan asla finansal rakam soylemez (hallucination prevention)
 
-- [x] **SUP-01**: Bayi admin'e mesaj gönderebilir (konu, içerik)
-- [x] **SUP-02**: Bayi mesaj geçmişini görür (bekleyen/cevaplanan)
-- [x] **SUP-03**: Admin bayi mesajlarını görür ve cevaplar
-- [x] **SUP-04**: Bayi SSS sayfasını görür (kategorilere ayrılmış)
-- [x] **SUP-05**: Admin SSS içeriğini yönetir
-- [x] **SUP-06**: Bayi ürün talebi gönderebilir (stokta olmayan ürün için)
+### Depo Sorumlusu (Warehouse Agent)
 
-### Sipariş Detayları Geliştirme
+- [ ] **DS-01**: Depo sorumlusu envanter durumu sorgular (get_inventory_status tool)
+- [ ] **DS-02**: Depo sorumlusu bekleyen siparisleri listeler (get_pending_orders tool)
+- [ ] **DS-03**: Depo sorumlusu stok gunceller (update_stock tool — write operation)
+- [ ] **DS-04**: Depo sorumlusu yeniden siparis seviyesi kontrol eder (check_reorder_level tool)
+- [ ] **DS-05**: Depo sorumlusu sevkiyat bilgisi sorgular (get_shipments tool)
 
-- [ ] **ORD-01**: Bayi sipariş detayında fatura PDF'ini indirir (varsa)
-- [ ] **ORD-02**: Bayi sipariş detayında irsaliye PDF'ini indirir (varsa)
-- [ ] **ORD-03**: Admin siparişe fatura/irsaliye PDF'i yükler
-- [ ] **ORD-04**: Bayi kargo takip bilgisini görür (araç plakası, sürücü bilgisi vb.)
-- [ ] **ORD-05**: Admin sipariş için kargo takip bilgisi girer
+### Genel Mudur Danismani (Executive Advisor Agent)
 
-### Bayi Raporları
+- [ ] **GM-01**: GM danismani tum ajanlarin read-only tool'larini kullanir (cross-domain sorgu)
+- [ ] **GM-02**: GM danismani dashboard ozeti sunar (get_dashboard_summary tool)
+- [ ] **GM-03**: GM danismani rapor export eder (export_report tool)
+- [ ] **GM-04**: GM danismani Sonnet 4.6 ile karmasik analiz yapar (complex reasoning)
+- [ ] **GM-05**: GM danismani KPI ve trend analizi sunar
 
-- [x] **REP-01**: Bayi kendi harcama analizini görür (aylık trend grafiği)
-- [x] **REP-02**: Bayi dönemsel karşılaştırma yapar (bu ay vs geçen ay, bu yıl vs geçen yıl)
-- [x] **REP-03**: Bayi harcama raporunu Excel olarak indirir
+### Tahsilat Uzmani (Collections Agent)
 
-## Future Requirements (v3+)
+- [ ] **TU-01**: Tahsilat uzmani vadesi gecen alacaklari listeler (get_overdue_payments tool)
+- [ ] **TU-02**: Tahsilat uzmani odeme hatirlatmasi gonderir (send_reminder tool)
+- [ ] **TU-03**: Tahsilat uzmani tahsilat aktivitesi kaydeder (log_collection_activity tool)
+- [ ] **TU-04**: Tahsilat uzmani icin collection_activities tablosu olusturulur
 
-Sonraki milestone'lara ertelenen gereksinimler.
+### Dagitim Koordinatoru (Distribution Agent)
 
-### Online Ödeme
-- **PAY-01**: Bayi portaldan online ödeme yapabilir (iyzico/PayTR)
-- **PAY-02**: Bayi fatura için "Şimdi Öde" butonu görür
+- [ ] **DK-01**: Dagitim koordinatoru teslimat durumu sorgular (get_delivery_status tool)
+- [ ] **DK-02**: Dagitim koordinatoru rut bilgisi yonetir (manage_routes tool)
+- [ ] **DK-03**: Dagitim koordinatoru kargo takibi yapar (track_shipment tool)
 
-### ERP Entegrasyonu
-- **ERP-01**: Cari hesap verileri ERP'den otomatik senkronize olur
-- **ERP-02**: Stok verileri ERP'den otomatik güncellenir
-- **ERP-03**: Siparişler ERP'ye otomatik aktarılır
+### Saha Satis Sorumlusu (Field Sales Agent)
 
-### Gelişmiş Özellikler
-- **ADV-01**: E-fatura entegrasyonu (GİB)
-- **ADV-02**: WhatsApp bildirim entegrasyonu
-- **ADV-03**: Bayi içi çoklu kullanıcı ve onay akışı
+- [ ] **SS-01**: Saha satis sorumlusu bayi ziyaret plani olusturur (plan_visit tool)
+- [ ] **SS-02**: Saha satis sorumlusu ziyaret kaydeder (log_visit tool)
+- [ ] **SS-03**: Saha satis sorumlusu icin dealer_visits ve sales_targets tablolari olusturulur
+
+### Pazarlamaci (Marketing Agent)
+
+- [ ] **PZ-01**: Pazarlamaci kampanya analizi yapar (analyze_campaigns tool)
+- [ ] **PZ-02**: Pazarlamaci bayi segmentasyonu olusturur (segment_dealers tool)
+- [ ] **PZ-03**: Pazarlamaci kampanya onerisi sunar (suggest_campaign tool)
+
+### Urun Yoneticisi (Product Manager Agent)
+
+- [ ] **UY-01**: Urun yoneticisi katalog analizi yapar (analyze_catalog tool)
+- [ ] **UY-02**: Urun yoneticisi fiyat stratejisi onerir (suggest_pricing tool)
+- [ ] **UY-03**: Urun yoneticisi urun talep analizi yapar (analyze_requests tool)
+
+### Satin Alma Sorumlusu (Procurement Agent)
+
+- [ ] **SA-01**: Satin alma sorumlusu tedarikci siparisi olusturur (create_purchase_order tool)
+- [ ] **SA-02**: Satin alma sorumlusu stok yenileme onerir (suggest_restock tool)
+- [ ] **SA-03**: Satin alma sorumlusu icin suppliers ve purchase_orders tablolari olusturulur
+
+### Iade Kalite Sorumlusu (Returns/Quality Agent)
+
+- [ ] **IK-01**: Iade sorumlusu iade talebi yonetir (manage_return tool)
+- [ ] **IK-02**: Iade sorumlusu sikayet takibi yapar (track_complaint tool)
+- [ ] **IK-03**: Iade sorumlusu icin return_requests ve quality_complaints tablolari olusturulur
+
+### Ajan Orkestrasyon
+
+- [ ] **AO-01**: Tum 12 ajanin Telegram bot'lari kayitli ve webhook'lari aktif
+- [ ] **AO-02**: Agent-to-agent handoff workflow'lari calisir (Sales -> Warehouse stok kontrolu vb.)
+- [ ] **AO-03**: Proaktif bildirim sistemi calisir (gunluk brifing per ajan)
+
+## v3.1 Requirements (Deferred)
+
+### Gelismis Ozellikler
+
+- **ADV-01**: WhatsApp Business API entegrasyonu
+- **ADV-02**: ERP real-time sync (Logo/Netsis)
+- **ADV-03**: Sesli asistan (voice interface)
+- **ADV-04**: Predictive ML modelleri (talep tahmini)
+- **ADV-05**: Web chat interface (Telegram'a ek olarak)
+- **ADV-06**: Per-company agent customization admin UI
+- **ADV-07**: pgvector semantic product search
 
 ## Out of Scope
 
-Kapsam dışı özellikler ve nedenleri.
-
 | Feature | Reason |
 |---------|--------|
-| Canlı chat (realtime) | Async mesajlaşma yeterli, WebSocket karmaşıklığı gereksiz |
-| Online ödeme | Mevcut ödeme süreçleri devam edecek, v3'e ertelendi |
-| ERP real-time sync | v2'de ERP-ready şema, gerçek entegrasyon sonraki milestone |
-| Çoklu favori listesi | B2C özelliği, B2B için tek liste yeterli |
-| Dealer self-service finansal düzeltme | Güvenlik riski, admin onayı gerekli |
-| Karmaşık kampanya otomasyonu | Basit kampanya yönetimi yeterli |
-| Public API | Bayilerin teknik kapasitesi yok |
-| Predictive analytics / AI | Overengineering, basit raporlama yeterli |
+| WhatsApp Business API | Telegram oncelikli, WhatsApp v4.0'da |
+| ERP entegrasyonu (Logo/Netsis) | API baglantisi v4.0'da |
+| Sesli asistan | Text-based oncelikli |
+| Mobil uygulama agent | Web + Telegram oncelikli |
+| Coklu dil destegi | Sadece Turkce |
+| Schema-per-tenant | Overkill for <50 tenants |
+| Redis/separate queue | after() + prompt caching yeterli |
+| LangChain/LangGraph | Over-engineered for 12 fixed roles |
+| A2A cross-vendor protocol | Internal tool calls yeterli |
+| Odeme sistemi entegrasyonu | Mevcut odeme surecleri devam |
 
 ## Traceability
 
-Hangi fazlar hangi gereksinimleri kapsıyor.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FAV-01 | Phase 4 | Pending |
-| FAV-02 | Phase 4 | Pending |
-| FAV-03 | Phase 4 | Pending |
-| FAV-04 | Phase 4 | Pending |
-| FIN-01 | Phase 5 | Pending |
-| FIN-02 | Phase 5 | Pending |
-| FIN-03 | Phase 5 | Pending |
-| FIN-04 | Phase 5 | Pending |
-| FIN-05 | Phase 5 | Pending |
-| FIN-06 | Phase 5 | Pending |
-| DASH-01 | Phase 6 | Pending |
-| DASH-02 | Phase 6 | Pending |
-| DASH-03 | Phase 6 | Pending |
-| DASH-04 | Phase 6 | Pending |
-| DASH-05 | Phase 6 | Pending |
-| DASH-06 | Phase 6 | Pending |
-| CAMP-01 | Phase 6 | Pending |
-| CAMP-02 | Phase 6 | Pending |
-| CAMP-03 | Phase 6 | Pending |
-| CAMP-04 | Phase 6 | Pending |
-| CAMP-05 | Phase 6 | Pending |
-| CAMP-06 | Phase 6 | Pending |
-| CAMP-07 | Phase 6 | Pending |
-| ORD-01 | Phase 6 | Pending |
-| ORD-02 | Phase 6 | Pending |
-| ORD-03 | Phase 6 | Pending |
-| ORD-04 | Phase 6 | Pending |
-| ORD-05 | Phase 6 | Pending |
-| SUP-01 | Phase 7 | Complete |
-| SUP-02 | Phase 7 | Complete |
-| SUP-03 | Phase 7 | Complete |
-| SUP-04 | Phase 7 | Complete |
-| SUP-05 | Phase 7 | Complete |
-| SUP-06 | Phase 7 | Complete |
-| REP-01 | Phase 7 | Complete |
-| REP-02 | Phase 7 | Complete |
-| REP-03 | Phase 7 | Complete |
+| MT-01 | — | Pending |
+| MT-02 | — | Pending |
+| MT-03 | — | Pending |
+| MT-04 | — | Pending |
+| MT-05 | — | Pending |
+| MT-06 | — | Pending |
+| MT-07 | — | Pending |
+| MT-08 | — | Pending |
+| AI-01 | — | Pending |
+| AI-02 | — | Pending |
+| AI-03 | — | Pending |
+| AI-04 | — | Pending |
+| AI-05 | — | Pending |
+| AI-06 | — | Pending |
+| AI-07 | — | Pending |
+| AI-08 | — | Pending |
+| AI-09 | — | Pending |
+| AI-10 | — | Pending |
+| AI-11 | — | Pending |
+| TR-01 | — | Pending |
+| TR-02 | — | Pending |
+| TR-03 | — | Pending |
+| TR-04 | — | Pending |
+| SR-01 | — | Pending |
+| SR-02 | — | Pending |
+| SR-03 | — | Pending |
+| SR-04 | — | Pending |
+| SR-05 | — | Pending |
+| SR-06 | — | Pending |
+| SR-07 | — | Pending |
+| MH-01 | — | Pending |
+| MH-02 | — | Pending |
+| MH-03 | — | Pending |
+| MH-04 | — | Pending |
+| MH-05 | — | Pending |
+| MH-06 | — | Pending |
+| DS-01 | — | Pending |
+| DS-02 | — | Pending |
+| DS-03 | — | Pending |
+| DS-04 | — | Pending |
+| DS-05 | — | Pending |
+| GM-01 | — | Pending |
+| GM-02 | — | Pending |
+| GM-03 | — | Pending |
+| GM-04 | — | Pending |
+| GM-05 | — | Pending |
+| TU-01 | — | Pending |
+| TU-02 | — | Pending |
+| TU-03 | — | Pending |
+| TU-04 | — | Pending |
+| DK-01 | — | Pending |
+| DK-02 | — | Pending |
+| DK-03 | — | Pending |
+| SS-01 | — | Pending |
+| SS-02 | — | Pending |
+| SS-03 | — | Pending |
+| PZ-01 | — | Pending |
+| PZ-02 | — | Pending |
+| PZ-03 | — | Pending |
+| UY-01 | — | Pending |
+| UY-02 | — | Pending |
+| UY-03 | — | Pending |
+| SA-01 | — | Pending |
+| SA-02 | — | Pending |
+| SA-03 | — | Pending |
+| IK-01 | — | Pending |
+| IK-02 | — | Pending |
+| IK-03 | — | Pending |
+| AO-01 | — | Pending |
+| AO-02 | — | Pending |
+| AO-03 | — | Pending |
 
 **Coverage:**
-- v2.0 requirements: 36 total
-- Mapped to phases: 36 ✓
-- Unmapped: 0 ✓
-
-**Phase Distribution:**
-- Phase 4 (Favorites Quick Win): 4 requirements
-- Phase 5 (Financial Backbone): 6 requirements
-- Phase 6 (Dashboard, Campaigns & Order Documents): 18 requirements
-- Phase 7 (Support & Reports): 9 requirements
+- v3.0 requirements: 68 total
+- Mapped to phases: 0 (awaiting roadmap)
+- Unmapped: 68
 
 ---
-*Requirements defined: 2026-02-08*
-*Last updated: 2026-02-08 after roadmap creation*
+*Requirements defined: 2026-03-01*
+*Last updated: 2026-03-01 after research synthesis*
