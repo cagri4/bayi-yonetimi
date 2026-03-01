@@ -169,7 +169,14 @@ Plans:
   3. A dealer who sends 100K tokens of messages in one day receives a hard-limit refusal message on the next attempt rather than triggering additional Claude API calls
   4. An agent-to-agent call chain that would create a cycle (A calls B calls A) is interrupted with a depth or cycle error logged to `agent_calls` — no infinite loop occurs
   5. The `agent_definitions`, `agent_conversations`, `agent_messages`, and `agent_calls` tables exist and are correctly populated after a test conversation
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — Database schema (agent tables, RLS, indexes, RPC) + service role client
+- [ ] 09-02-PLAN.md — Agent types, tool registry, token budget tracker
+- [ ] 09-03-PLAN.md — AgentRunner (tool-use loop) + ConversationManager (DB history, auto-summarization)
+- [ ] 09-04-PLAN.md — AgentBridge (cross-agent calls, deadlock protection)
+- [ ] 09-05-PLAN.md — Telegram webhook route + agent dispatcher
 
 ### Phase 10: First Agent Group — Trainer + Sales
 **Goal**: Dealers can place orders and ask product questions via Telegram in Turkish — the Egitimci and Satis Temsilcisi agents are live in production
