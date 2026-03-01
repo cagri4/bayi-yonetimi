@@ -6,17 +6,20 @@
 import type { Tool } from '@anthropic-ai/sdk/resources/messages'
 import { AgentRole, AGENT_MODELS } from './types'
 import { placeholderTools } from './tools/index'
+import { egitimciTools } from './tools/egitimci-tools'
+import { satisTools } from './tools/satis-tools'
 
 // ─── Tool Registry Map ─────────────────────────────────────────────────────
 
 /**
  * Maps each agent role to its available tools.
  * Phase 9: all roles use placeholder tools.
- * Phase 10+: populate role-specific tool arrays.
+ * Phase 10: egitimci and satis_temsilcisi use real tool implementations.
+ * Phase 10+: populate role-specific tool arrays for remaining roles.
  */
 export const TOOL_REGISTRY: Record<AgentRole, Tool[]> = {
-  egitimci: placeholderTools,
-  satis_temsilcisi: placeholderTools,
+  egitimci: egitimciTools,
+  satis_temsilcisi: satisTools,
   muhasebeci: placeholderTools,
   depo_sorumlusu: placeholderTools,
   destek: placeholderTools,

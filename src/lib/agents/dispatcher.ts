@@ -7,14 +7,14 @@
  * Responsibilities:
  * 1. Extract the incoming message from the Telegram Update
  * 2. Resolve dealer identity via telegram_chat_id
- * 3. Determine agent role from company's agent_definitions
+ * 3. Determine agent role (from forcedRole or agent_definitions query)
  * 4. Check token budget before running agent
  * 5. Load conversation history via ConversationManager
- * 6. Build and run AgentRunner with tool handlers
+ * 6. Build and run AgentRunner with role-specific tool handlers
  * 7. Save agent reply and send it back to Telegram
  *
  * Error handling: all errors are caught; a Turkish fallback is sent to the user.
- * Uses process.env.TELEGRAM_BOT_TOKEN for Telegram API calls.
+ * Each webhook route passes its own bot token so replies go through the correct bot.
  */
 import type { Update } from 'grammy/types'
 import { createServiceClient } from '@/lib/supabase/service-client'
@@ -22,19 +22,23 @@ import { AgentRunner } from './agent-runner'
 import { ConversationManager } from './conversation-manager'
 import { TokenBudget } from './token-budget'
 import { ToolRegistry } from './tool-registry'
+import { createEgitimciHandlers } from './tools/egitimci-tools'
+import { createSatisHandlers } from './tools/satis-tools'
 import type { AgentContext, AgentRole } from './types'
 
 // ─── Telegram Helper ─────────────────────────────────────────────────────────
 
 /**
  * Sends a text message to a Telegram chat via the Bot API.
- * Uses process.env.TELEGRAM_BOT_TOKEN.
+ * Accepts a token parameter so each bot uses its own bot token.
  * Logs errors but never throws — the caller continues regardless.
+ *
+ * Note: parse_mode is intentionally omitted to avoid Telegram 400 errors
+ * caused by Claude's unbalanced markdown output (Pitfall 6).
  */
-async function sendTelegramMessage(chatId: number, text: string): Promise<void> {
-  const token = process.env.TELEGRAM_BOT_TOKEN
+async function sendTelegramMessage(chatId: number, text: string, token: string): Promise<void> {
   if (!token) {
-    console.error('[dispatcher] TELEGRAM_BOT_TOKEN is not set — cannot send message')
+    console.error('[dispatcher] No bot token provided — cannot send message')
     return
   }
 
@@ -47,7 +51,6 @@ async function sendTelegramMessage(chatId: number, text: string): Promise<void> 
         body: JSON.stringify({
           chat_id: chatId,
           text,
-          parse_mode: 'Markdown',
         }),
       }
     )
@@ -68,8 +71,21 @@ async function sendTelegramMessage(chatId: number, text: string): Promise<void> 
  *
  * Called from the webhook route's after() callback. Has up to 300 seconds
  * on Vercel Fluid Compute to complete.
+ *
+ * @param update - The Telegram Update object parsed from the webhook request body
+ * @param forcedRole - When set, skips role detection from agent_definitions and
+ *   uses this role directly. Each dedicated webhook route passes its role here.
+ *   When absent, the original behavior is preserved: first active agent_definition
+ *   for the company determines the role (Phase 9 fallback).
+ * @param botToken - The bot token used to send replies back via Telegram API.
+ *   Each dedicated webhook route passes its own token. Falls back to
+ *   process.env.TELEGRAM_BOT_TOKEN if not provided (backward compatibility).
  */
-export async function dispatchAgentUpdate(update: Update): Promise<void> {
+export async function dispatchAgentUpdate(
+  update: Update,
+  forcedRole?: AgentRole,
+  botToken?: string
+): Promise<void> {
   // Extract message — ignore non-text updates (edits, callbacks, media, etc.)
   const message = update.message
   if (!message || !message.text) {
@@ -79,6 +95,13 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
   const chatId = message.chat.id
   const text = message.text
   const telegramUserId = message.from?.id
+
+  // Resolve the bot token: prefer the passed-in token, fall back to env var
+  const token = botToken || process.env.TELEGRAM_BOT_TOKEN || ''
+  if (!token) {
+    console.error('[dispatcher] No bot token provided — cannot send replies')
+    return
+  }
 
   // Log for observability
   console.log(
@@ -105,7 +128,8 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
       // Unregistered chat — prompt the user to link their account
       await sendTelegramMessage(
         chatId,
-        'Bu bot\'u kullanmak icin hesabinizi baglayiniz. Bayi panelinizden Telegram entegrasyonunu tamamlayin.'
+        'Bu bot\'u kullanmak icin hesabinizi baglayiniz. Bayi panelinizden Telegram entegrasyonunu tamamlayin.',
+        token
       )
       return
     }
@@ -114,17 +138,17 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
     const companyId = dealer.company_id
 
     // ── Step 2: Determine agent role ──────────────────────────────────────────
-    // Look up active agent_definitions for this company.
-    // Phase 9: single-bot setup — use the first active definition's role, or 'destek' fallback.
-    // Phase 10+: each bot will map to a specific role via bot token or webhook URL.
+    // If forcedRole is provided (dedicated webhook routes), use it directly.
+    // Otherwise query agent_definitions for role detection (Phase 9 single-bot behavior).
 
-    let role: AgentRole = 'destek' // fallback
+    let role: AgentRole = forcedRole || 'destek'
 
     const { data: agentDefs, error: agentDefsError } = await supabase
       .from('agent_definitions')
       .select('role, system_prompt, model')
       .eq('company_id', companyId)
       .eq('is_active', true)
+      .eq('role', role)
       .limit(1)
 
     if (agentDefsError) {
@@ -136,7 +160,7 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
 
     if (agentDefs && agentDefs.length > 0) {
       const def = agentDefs[0]
-      role = def.role as AgentRole
+      if (!forcedRole) role = def.role as AgentRole
       systemPrompt = def.system_prompt
     }
 
@@ -146,7 +170,7 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
     const budgetCheck = await tokenBudget.checkBudget(dealerId)
 
     if (!budgetCheck.allowed) {
-      await sendTelegramMessage(chatId, budgetCheck.reason ?? 'Gunluk limitinize ulastiniz.')
+      await sendTelegramMessage(chatId, budgetCheck.reason ?? 'Gunluk limitinize ulastiniz.', token)
       return
     }
 
@@ -167,57 +191,38 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
     // Load message history (rolling 50, excludes system summaries)
     const messages = await conversationManager.getMessages(conversationId)
 
-    // ── Step 5: Build tool handlers ───────────────────────────────────────────
-    // Phase 9: placeholder tools wired to simple handlers.
-    // Phase 10+: real tool implementations per role.
+    // ── Step 5: Build tool handlers per role ───────────────────────────────────
+    // Phase 10: egitimci and satis_temsilcisi use factory-built handler maps.
+    // Other roles use inline placeholder handlers until their tools are implemented.
 
     const toolRegistry = new ToolRegistry()
     const tools = toolRegistry.getToolsWithCaching(role)
 
-    const toolHandlers = new Map<
-      string,
-      (input: Record<string, unknown>, context: AgentContext) => Promise<string>
-    >([
-      // echo: returns the input message back
-      [
-        'echo',
-        async (input: Record<string, unknown>) => {
-          return String(input.message ?? '[Bos mesaj]')
-        },
-      ],
+    let toolHandlers: Map<string, (input: Record<string, unknown>, context: AgentContext) => Promise<string>>
 
-      // get_current_time: returns the current server time in ISO format
-      [
-        'get_current_time',
-        async () => {
-          return new Date().toISOString()
-        },
-      ],
-
-      // lookup_dealer: queries dealer info scoped to this company
-      [
-        'lookup_dealer',
-        async (input: Record<string, unknown>, context: AgentContext) => {
+    if (role === 'egitimci') {
+      toolHandlers = createEgitimciHandlers(supabase)
+    } else if (role === 'satis_temsilcisi') {
+      toolHandlers = createSatisHandlers(supabase)
+    } else {
+      // Fallback: placeholder handlers for unimplemented roles
+      toolHandlers = new Map([
+        ['echo', async (input: Record<string, unknown>) => String(input.message ?? '[Bos mesaj]')],
+        ['get_current_time', async () => new Date().toISOString()],
+        ['lookup_dealer', async (input: Record<string, unknown>, ctx: AgentContext) => {
           const targetDealerId = String(input.dealer_id ?? '')
-          if (!targetDealerId) {
-            return '[Hata: dealer_id gerekli]'
-          }
-
+          if (!targetDealerId) return '[Hata: dealer_id gerekli]'
           const { data, error } = await supabase
             .from('dealers')
             .select('id, company_name, email, phone, is_active')
             .eq('id', targetDealerId)
-            .eq('company_id', context.companyId)
+            .eq('company_id', ctx.companyId)
             .single()
-
-          if (error || !data) {
-            return `[Bayi bulunamadi: ${targetDealerId}]`
-          }
-
+          if (error || !data) return `[Bayi bulunamadi: ${targetDealerId}]`
           return JSON.stringify(data)
-        },
-      ],
-    ])
+        }],
+      ])
+    }
 
     // ── Step 6: Build AgentContext and run AgentRunner ────────────────────────
 
@@ -231,7 +236,7 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
       depth: 0,
     }
 
-    // Retrieve the model from agent_definitions if available; ToolRegistry model is the fallback
+    // Retrieve the model from ToolRegistry (AGENT_MODELS map)
     const model = toolRegistry.getModel(role)
 
     const runner = new AgentRunner(model, tools, toolHandlers)
@@ -241,7 +246,7 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
 
     await conversationManager.saveMessage(conversationId, 'assistant', reply)
 
-    await sendTelegramMessage(chatId, reply)
+    await sendTelegramMessage(chatId, reply, token)
 
     console.log(
       `[dispatcher] completed: dealerId=${dealerId} role=${role} conversationId=${conversationId}`
@@ -251,7 +256,7 @@ export async function dispatchAgentUpdate(update: Update): Promise<void> {
 
     // Best-effort error notification to user — do not propagate throws
     try {
-      await sendTelegramMessage(chatId, 'Bir hata olustu. Lutfen tekrar deneyin.')
+      await sendTelegramMessage(chatId, 'Bir hata olustu. Lutfen tekrar deneyin.', token)
     } catch (notifyErr) {
       console.error('[dispatcher] failed to send error notification:', notifyErr)
     }
