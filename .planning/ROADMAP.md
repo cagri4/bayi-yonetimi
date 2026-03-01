@@ -150,7 +150,14 @@ Plans:
   3. The platform superadmin can view and manage all companies from a dedicated interface unavailable to company-level admins
   4. The existing `dealer_spending_summary` materialized view returns only the requesting company's data — no cross-company financial aggregates are accessible via the API
   5. All 20+ existing tables have a NOT NULL `company_id` foreign key with composite indexes on `(company_id, dealer_id)` confirming zero-NULL backfill completed
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Foundation SQL: companies table, security functions, users extensions, backfill all 19 tables, materialized view rebuild
+- [ ] 08-02-PLAN.md — Composite indexes: CREATE INDEX CONCURRENTLY on all tenant-scoped tables (manual Dashboard execution, one at a time)
+- [ ] 08-03-PLAN.md — RLS policy replacement: drop old admin policies, create company-scoped + superadmin bypass policies on all tables
+- [ ] 08-04-PLAN.md — Hook registration and end-to-end isolation verification (manual Supabase Dashboard step)
+- [ ] 08-05-PLAN.md — TypeScript types update: companies table type, company_id on 19 tables, superadmin role
 
 ### Phase 9: Agent Infrastructure Foundation
 **Goal**: A shared agent execution layer exists that any of the 12 agent roles can use — with cost controls, security boundaries, and deadlock guards built in from the start
@@ -214,7 +221,7 @@ Phases execute in strict dependency order: 8 → 9 → 10 → 11 → 12
 | 5. Financial Backbone | v2.0 | 3/3 | Complete | 2026-02-09 |
 | 6. Dashboard, Campaigns & Order Documents | v2.0 | 5/5 | Complete | 2026-03-01 |
 | 7. Support & Reports | v2.0 | 4/4 | Complete | 2026-03-01 |
-| 8. Multi-Tenant Database Migration | v3.0 | 0/? | Pending | — |
+| 8. Multi-Tenant Database Migration | v3.0 | 0/5 | Pending | — |
 | 9. Agent Infrastructure Foundation | v3.0 | 0/? | Pending | — |
 | 10. First Agent Group — Trainer + Sales | v3.0 | 0/? | Pending | — |
 | 11. Financial and Operations Agents | v3.0 | 0/? | Pending | — |
