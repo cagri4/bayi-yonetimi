@@ -66,11 +66,11 @@
 
 ### Genel Mudur Danismani (Executive Advisor Agent)
 
-- [ ] **GM-01**: GM danismani tum ajanlarin read-only tool'larini kullanir (cross-domain sorgu)
-- [ ] **GM-02**: GM danismani dashboard ozeti sunar (get_dashboard_summary tool)
-- [ ] **GM-03**: GM danismani rapor export eder (export_report tool)
-- [ ] **GM-04**: GM danismani Sonnet 4.6 ile karmasik analiz yapar (complex reasoning)
-- [ ] **GM-05**: GM danismani KPI ve trend analizi sunar
+- [x] **GM-01**: GM danismani tum ajanlarin read-only tool'larini kullanir (cross-domain sorgu)
+- [x] **GM-02**: GM danismani dashboard ozeti sunar (get_dashboard_summary tool)
+- [x] **GM-03**: GM danismani rapor export eder (export_report tool)
+- [x] **GM-04**: GM danismani Sonnet 4.6 ile karmasik analiz yapar (complex reasoning)
+- [x] **GM-05**: GM danismani KPI ve trend analizi sunar
 
 ### Tahsilat Uzmani (Collections Agent)
 
@@ -193,11 +193,11 @@
 | DS-03 | Phase 11 | Complete |
 | DS-04 | Phase 11 | Complete |
 | DS-05 | Phase 11 | Complete |
-| GM-01 | Phase 11 | Pending |
-| GM-02 | Phase 11 | Pending |
-| GM-03 | Phase 11 | Pending |
-| GM-04 | Phase 11 | Pending |
-| GM-05 | Phase 11 | Pending |
+| GM-01 | Phase 11 | Complete |
+| GM-02 | Phase 11 | Complete |
+| GM-03 | Phase 11 | Complete |
+| GM-04 | Phase 11 | Complete |
+| GM-05 | Phase 11 | Complete |
 | TU-01 | Phase 12 | Pending |
 | TU-02 | Phase 12 | Pending |
 | TU-03 | Phase 12 | Pending |

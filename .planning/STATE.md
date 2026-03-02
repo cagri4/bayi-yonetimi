@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 11 — Financial and Operations Agents
-Plan: 02 of 04 complete
-Status: IN PROGRESS — Plans 01-02 executed; muhasebeci-tools.ts + depo-sorumlusu-tools.ts created; Plans 03 (genel-mudur-tools) and 04 (dispatcher wiring) pending
-Last activity: 2026-03-02 — Phase 11 Plan 02 complete (Depo Sorumlusu: 5 warehouse tools, update_stock write op with two-turn confirmation, createDepoSorumlusuHandlers factory)
+Plan: 03 of 04 complete
+Status: IN PROGRESS — Plans 01-03 executed; muhasebeci-tools.ts + depo-sorumlusu-tools.ts + genel-mudur-tools.ts created; Plan 04 (dispatcher wiring) pending
+Last activity: 2026-03-02 — Phase 11 Plan 03 complete (Genel Mudur Danismani: 10-tool composite read-only agent, cross-domain handler factory, company-wide KPI dashboard and export)
 
-Progress: [████░░░░░░] 50% — Plan 02/04 complete
+Progress: [██████░░░░] 75% — Plan 03/04 complete
 
 ## Milestones
 
@@ -152,6 +152,14 @@ Progress: [████░░░░░░] 50% — Plan 02/04 complete
 - void input in handleGetDealerBalance — no input needed, context.dealerId provides all required data; TS unused var suppressed
 - MH-06 hallucination prevention enforced via tool description text only — system prompt remains authoritative
 
+### Phase 11 Decisions (from Plan 11-03)
+- GM handler factory cherry-picks handlers from createMuhasebeciHandlers and createSatisHandlers by key — does not inherit full handler maps (avoids leaking write tools like create_order)
+- get_any_dealer_balance verifies target dealer belongs to context.companyId before RPC call — tenant isolation enforced at handler level
+- get_dashboard_summary uses direct from('orders') + from('order_items').in('order_id', ...) queries — avoids get_top_products and get_dealer_performance RPCs which lack company_id scope
+- export_report in GM file is company-wide scope (all dealers); Muhasebeci export_report is dealer-scoped — same tool name, different implementation per agent
+- GM-04 satisfied by existing AGENT_MODELS['genel_mudur_danismani'] = SONNET_MODEL in types.ts — no new code needed
+- muhasebeci-tools.ts TS2352 fix: as unknown as TransactionRow[] cast pattern for Supabase SelectQueryError on unregistered FK join (dealer_transactions → transaction_types)
+
 ### Phase 11 Decisions (from Plan 11-02)
 - check_reorder_level uses client-side filter (fetch 200 products, filter JS: stock_quantity <= low_stock_threshold) — Supabase JS client does not support column-to-column WHERE comparisons
 - update_stock description contains Turkish confirmation instruction: "BU ARACI CAGIRMADAN ONCE bayiye guncelleme detaylarini goster ve onay al. Onay alinmadan bu araci ASLA cagirma." — enforces two-turn pattern without code logic
@@ -178,8 +186,8 @@ Progress: [████░░░░░░] 50% — Plan 02/04 complete
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed Phase 11 Plan 02 — depo-sorumlusu-tools.ts created and committed (994cc4b). Ready to execute Plan 03 (Genel Mudur tools) or Plan 04 (dispatcher wiring).
+Stopped at: Completed Phase 11 Plan 03 — genel-mudur-tools.ts created and committed (7bc727c). Ready to execute Plan 04 (dispatcher wiring for all agents).
 Resume file: None
 
 ---
-*Last updated: 2026-03-02 (Plan 11-02 — depo-sorumlusu-tools.ts created; 5 warehouse tools + createDepoSorumlusuHandlers factory)*
+*Last updated: 2026-03-02 (Plan 11-03 — genel-mudur-tools.ts created; 10-tool composite agent, cross-domain handler factory, company KPI dashboard + export)*
