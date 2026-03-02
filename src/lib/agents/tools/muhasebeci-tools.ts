@@ -249,7 +249,7 @@ async function handleGetFinancials(
     return '[Kayit bulunamadi]'
   }
 
-  return JSON.stringify(transactions as TransactionRow[])
+  return JSON.stringify(transactions as unknown as TransactionRow[])
 }
 
 /**
@@ -294,7 +294,7 @@ async function handleGetPaymentHistory(
 
   // Filter to payment and credit_note types only, then apply limit
   const paymentTypes = new Set(['payment', 'credit_note'])
-  const filtered = (transactions as TransactionRow[])
+  const filtered = (transactions as unknown as TransactionRow[])
     .filter((t) => t.transaction_type && paymentTypes.has(t.transaction_type.code))
     .slice(0, limit)
 
@@ -416,7 +416,7 @@ async function handleExportReport(
     .limit(20)
 
   const balance = balanceData as BalanceResult | null
-  const txList = (transactions as TransactionRow[] | null) ?? []
+  const txList = (transactions as unknown as TransactionRow[] | null) ?? []
 
   // Build plain-text report
   const lines: string[] = []
