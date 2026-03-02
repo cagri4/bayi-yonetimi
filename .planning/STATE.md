@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 11 — Financial and Operations Agents
-Plan: 01 of 04 complete
-Status: IN PROGRESS — Plan 01 executed; muhasebeci-tools.ts with 5 financial tools + handler factory created
-Last activity: 2026-03-02 — Phase 11 Plan 01 complete (Muhasebeci agent: get_financials, get_payment_history, get_invoices, get_dealer_balance, export_report tools)
+Plan: 02 of 04 complete
+Status: IN PROGRESS — Plans 01-02 executed; muhasebeci-tools.ts + depo-sorumlusu-tools.ts created; Plans 03 (genel-mudur-tools) and 04 (dispatcher wiring) pending
+Last activity: 2026-03-02 — Phase 11 Plan 02 complete (Depo Sorumlusu: 5 warehouse tools, update_stock write op with two-turn confirmation, createDepoSorumlusuHandlers factory)
 
-Progress: [██░░░░░░░░] 25% — Plan 01/04 complete
+Progress: [████░░░░░░] 50% — Plan 02/04 complete
 
 ## Milestones
 
@@ -152,6 +152,13 @@ Progress: [██░░░░░░░░] 25% — Plan 01/04 complete
 - void input in handleGetDealerBalance — no input needed, context.dealerId provides all required data; TS unused var suppressed
 - MH-06 hallucination prevention enforced via tool description text only — system prompt remains authoritative
 
+### Phase 11 Decisions (from Plan 11-02)
+- check_reorder_level uses client-side filter (fetch 200 products, filter JS: stock_quantity <= low_stock_threshold) — Supabase JS client does not support column-to-column WHERE comparisons
+- update_stock description contains Turkish confirmation instruction: "BU ARACI CAGIRMADAN ONCE bayiye guncelleme detaylarini goster ve onay al. Onay alinmadan bu araci ASLA cagirma." — enforces two-turn pattern without code logic
+- get_pending_orders scoped by company_id only (NOT dealer_id) — warehouse manager sees all company orders, not just one dealer's
+- (supabase as any) on .update() call in update_stock — same pattern as satis-tools create_order; Update types conflict with optional fields
+- update_stock: double company_id scope on both product lookup (.eq('company_id', context.companyId) on SELECT) and UPDATE (.eq('company_id', context.companyId) on UPDATE) — defense in depth
+
 ### v3.0 Phase Dependencies (strict)
 - Phase 8 (Multi-Tenant) → blocks Phase 9
 - Phase 9 (Agent Infrastructure) → blocks Phase 10
@@ -171,8 +178,8 @@ Progress: [██░░░░░░░░] 25% — Plan 01/04 complete
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed Phase 11 Plan 01 — muhasebeci-tools.ts created and committed (29541bb). Ready to execute Plan 02 (Depo Sorumlusu).
+Stopped at: Completed Phase 11 Plan 02 — depo-sorumlusu-tools.ts created and committed (994cc4b). Ready to execute Plan 03 (Genel Mudur tools) or Plan 04 (dispatcher wiring).
 Resume file: None
 
 ---
-*Last updated: 2026-03-02 (Plan 11-01 — muhasebeci-tools.ts created; 5 financial tools + handler factory)*
+*Last updated: 2026-03-02 (Plan 11-02 — depo-sorumlusu-tools.ts created; 5 warehouse tools + createDepoSorumlusuHandlers factory)*

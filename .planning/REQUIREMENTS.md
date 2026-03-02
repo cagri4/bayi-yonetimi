@@ -58,11 +58,11 @@
 
 ### Depo Sorumlusu (Warehouse Agent)
 
-- [ ] **DS-01**: Depo sorumlusu envanter durumu sorgular (get_inventory_status tool)
-- [ ] **DS-02**: Depo sorumlusu bekleyen siparisleri listeler (get_pending_orders tool)
-- [ ] **DS-03**: Depo sorumlusu stok gunceller (update_stock tool — write operation)
-- [ ] **DS-04**: Depo sorumlusu yeniden siparis seviyesi kontrol eder (check_reorder_level tool)
-- [ ] **DS-05**: Depo sorumlusu sevkiyat bilgisi sorgular (get_shipments tool)
+- [x] **DS-01**: Depo sorumlusu envanter durumu sorgular (get_inventory_status tool)
+- [x] **DS-02**: Depo sorumlusu bekleyen siparisleri listeler (get_pending_orders tool)
+- [x] **DS-03**: Depo sorumlusu stok gunceller (update_stock tool — write operation)
+- [x] **DS-04**: Depo sorumlusu yeniden siparis seviyesi kontrol eder (check_reorder_level tool)
+- [x] **DS-05**: Depo sorumlusu sevkiyat bilgisi sorgular (get_shipments tool)
 
 ### Genel Mudur Danismani (Executive Advisor Agent)
 
@@ -188,11 +188,11 @@
 | MH-04 | Phase 11 | Complete |
 | MH-05 | Phase 11 | Complete |
 | MH-06 | Phase 11 | Complete |
-| DS-01 | Phase 11 | Pending |
-| DS-02 | Phase 11 | Pending |
-| DS-03 | Phase 11 | Pending |
-| DS-04 | Phase 11 | Pending |
-| DS-05 | Phase 11 | Pending |
+| DS-01 | Phase 11 | Complete |
+| DS-02 | Phase 11 | Complete |
+| DS-03 | Phase 11 | Complete |
+| DS-04 | Phase 11 | Complete |
+| DS-05 | Phase 11 | Complete |
 | GM-01 | Phase 11 | Pending |
 | GM-02 | Phase 11 | Pending |
 | GM-03 | Phase 11 | Pending |
