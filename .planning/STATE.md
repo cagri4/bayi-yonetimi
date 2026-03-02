@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 10 — First Agent Group: Trainer + Sales Representative
-Plan: 03 of 05 complete
-Status: IN PROGRESS — Plans 01-03 executed; tools wired into dispatcher, dedicated webhook routes created, SQL seed prepared
-Last activity: 2026-03-01 — Phase 10 Plan 03 complete (ToolRegistry + dispatcher refactor, /api/telegram/egitimci + /api/telegram/satis routes, agent_definitions SQL seed)
+Phase: 11 — Financial and Operations Agents
+Plan: 01 of 04 complete
+Status: IN PROGRESS — Plan 01 executed; muhasebeci-tools.ts with 5 financial tools + handler factory created
+Last activity: 2026-03-02 — Phase 11 Plan 01 complete (Muhasebeci agent: get_financials, get_payment_history, get_invoices, get_dealer_balance, export_report tools)
 
-Progress: [██████░░░░] 60% — Plan 03/05 complete
+Progress: [██░░░░░░░░] 25% — Plan 01/04 complete
 
 ## Milestones
 
@@ -144,6 +144,14 @@ Progress: [██████░░░░] 60% — Plan 03/05 complete
 - SQL seed creates UNIQUE INDEX on (company_id, role) before INSERT — makes ON CONFLICT safe even if index was absent
 - Dedicated webhook per bot: /api/telegram/{role}/route.ts uses TELEGRAM_BOT_TOKEN_{ROLE} and passes forcedRole to dispatcher
 
+### Phase 11 Decisions (from Plan 11-01)
+- dealer_transactions has NO company_id column — all transaction queries scope by dealer_id only (Pitfall 1 in research)
+- get_payment_history filters payment/credit_note via JS post-query (not SQL IN clause) to avoid join-filter complexity
+- export_report returns lines.join('\n') plain text — NOT CSV/JSON — Telegram text-only constraint
+- (supabase as any).rpc() type assertion for get_dealer_balance_breakdown — not in auto-generated Database RPC types
+- void input in handleGetDealerBalance — no input needed, context.dealerId provides all required data; TS unused var suppressed
+- MH-06 hallucination prevention enforced via tool description text only — system prompt remains authoritative
+
 ### v3.0 Phase Dependencies (strict)
 - Phase 8 (Multi-Tenant) → blocks Phase 9
 - Phase 9 (Agent Infrastructure) → blocks Phase 10
@@ -162,9 +170,9 @@ Progress: [██████░░░░] 60% — Plan 03/05 complete
 
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: Phase 10 Plan 03 — CHECKPOINT:HUMAN-ACTION (Task 3: Seed agent_definitions in Supabase Dashboard SQL Editor). Tasks 1-2 complete and committed. Resume with "seeded" after SQL execution.
+Last session: 2026-03-02
+Stopped at: Completed Phase 11 Plan 01 — muhasebeci-tools.ts created and committed (29541bb). Ready to execute Plan 02 (Depo Sorumlusu).
 Resume file: None
 
 ---
-*Last updated: 2026-03-01 (Plan 10-03 — Tasks 1-2 complete; awaiting SQL seed at Task 3 checkpoint)*
+*Last updated: 2026-03-02 (Plan 11-01 — muhasebeci-tools.ts created; 5 financial tools + handler factory)*

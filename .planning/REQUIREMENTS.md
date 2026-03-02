@@ -49,12 +49,12 @@
 
 ### Muhasebeci (Accountant Agent)
 
-- [ ] **MH-01**: Muhasebeci cari hesap bilgisi sorgular (get_financials tool)
-- [ ] **MH-02**: Muhasebeci odeme gecmisi sorgular (get_payment_history tool)
-- [ ] **MH-03**: Muhasebeci fatura bilgisi sorgular (get_invoices tool)
-- [ ] **MH-04**: Muhasebeci bayi bakiyesi sorgular (get_dealer_balance tool)
-- [ ] **MH-05**: Muhasebeci finansal rapor export eder (export_report tool)
-- [ ] **MH-06**: Muhasebeci tool olmadan asla finansal rakam soylemez (hallucination prevention)
+- [x] **MH-01**: Muhasebeci cari hesap bilgisi sorgular (get_financials tool)
+- [x] **MH-02**: Muhasebeci odeme gecmisi sorgular (get_payment_history tool)
+- [x] **MH-03**: Muhasebeci fatura bilgisi sorgular (get_invoices tool)
+- [x] **MH-04**: Muhasebeci bayi bakiyesi sorgular (get_dealer_balance tool)
+- [x] **MH-05**: Muhasebeci finansal rapor export eder (export_report tool)
+- [x] **MH-06**: Muhasebeci tool olmadan asla finansal rakam soylemez (hallucination prevention)
 
 ### Depo Sorumlusu (Warehouse Agent)
 
@@ -182,12 +182,12 @@
 | SR-05 | Phase 10 | Complete |
 | SR-06 | Phase 10 | Complete |
 | SR-07 | Phase 10 | Complete |
-| MH-01 | Phase 11 | Pending |
-| MH-02 | Phase 11 | Pending |
-| MH-03 | Phase 11 | Pending |
-| MH-04 | Phase 11 | Pending |
-| MH-05 | Phase 11 | Pending |
-| MH-06 | Phase 11 | Pending |
+| MH-01 | Phase 11 | Complete |
+| MH-02 | Phase 11 | Complete |
+| MH-03 | Phase 11 | Complete |
+| MH-04 | Phase 11 | Complete |
+| MH-05 | Phase 11 | Complete |
+| MH-06 | Phase 11 | Complete |
 | DS-01 | Phase 11 | Pending |
 | DS-02 | Phase 11 | Pending |
 | DS-03 | Phase 11 | Pending |
