@@ -24,6 +24,9 @@ import { TokenBudget } from './token-budget'
 import { ToolRegistry } from './tool-registry'
 import { createEgitimciHandlers } from './tools/egitimci-tools'
 import { createSatisHandlers } from './tools/satis-tools'
+import { createMuhasebeciHandlers } from './tools/muhasebeci-tools'
+import { createDepoSorumlusuHandlers } from './tools/depo-sorumlusu-tools'
+import { createGenelMudurHandlers } from './tools/genel-mudur-tools'
 import type { AgentContext, AgentRole } from './types'
 
 // ─── Telegram Helper ─────────────────────────────────────────────────────────
@@ -204,6 +207,12 @@ export async function dispatchAgentUpdate(
       toolHandlers = createEgitimciHandlers(supabase)
     } else if (role === 'satis_temsilcisi') {
       toolHandlers = createSatisHandlers(supabase)
+    } else if (role === 'muhasebeci') {
+      toolHandlers = createMuhasebeciHandlers(supabase)
+    } else if (role === 'depo_sorumlusu') {
+      toolHandlers = createDepoSorumlusuHandlers(supabase)
+    } else if (role === 'genel_mudur_danismani') {
+      toolHandlers = createGenelMudurHandlers(supabase)
     } else {
       // Fallback: placeholder handlers for unimplemented roles
       toolHandlers = new Map([

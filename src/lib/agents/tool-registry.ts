@@ -8,6 +8,9 @@ import { AgentRole, AGENT_MODELS } from './types'
 import { placeholderTools } from './tools/index'
 import { egitimciTools } from './tools/egitimci-tools'
 import { satisTools } from './tools/satis-tools'
+import { muhasebeciTools } from './tools/muhasebeci-tools'
+import { depoSorumlusuTools } from './tools/depo-sorumlusu-tools'
+import { genelMudurTools } from './tools/genel-mudur-tools'
 
 // ─── Tool Registry Map ─────────────────────────────────────────────────────
 
@@ -20,10 +23,10 @@ import { satisTools } from './tools/satis-tools'
 export const TOOL_REGISTRY: Record<AgentRole, Tool[]> = {
   egitimci: egitimciTools,
   satis_temsilcisi: satisTools,
-  muhasebeci: placeholderTools,
-  depo_sorumlusu: placeholderTools,
+  muhasebeci: muhasebeciTools,
+  depo_sorumlusu: depoSorumlusuTools,
   destek: placeholderTools,
-  genel_mudur_danismani: placeholderTools,
+  genel_mudur_danismani: genelMudurTools,
   tahsilat_uzmani: placeholderTools,
   dagitim_koordinatoru: placeholderTools,
   saha_satis: placeholderTools,
