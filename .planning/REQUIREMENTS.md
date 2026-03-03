@@ -87,15 +87,15 @@
 
 ### Saha Satis Sorumlusu (Field Sales Agent)
 
-- [ ] **SS-01**: Saha satis sorumlusu bayi ziyaret plani olusturur (plan_visit tool)
-- [ ] **SS-02**: Saha satis sorumlusu ziyaret kaydeder (log_visit tool)
+- [x] **SS-01**: Saha satis sorumlusu bayi ziyaret plani olusturur (plan_visit tool)
+- [x] **SS-02**: Saha satis sorumlusu ziyaret kaydeder (log_visit tool)
 - [ ] **SS-03**: Saha satis sorumlusu icin dealer_visits ve sales_targets tablolari olusturulur
 
 ### Pazarlamaci (Marketing Agent)
 
-- [ ] **PZ-01**: Pazarlamaci kampanya analizi yapar (analyze_campaigns tool)
-- [ ] **PZ-02**: Pazarlamaci bayi segmentasyonu olusturur (segment_dealers tool)
-- [ ] **PZ-03**: Pazarlamaci kampanya onerisi sunar (suggest_campaign tool)
+- [x] **PZ-01**: Pazarlamaci kampanya analizi yapar (analyze_campaigns tool)
+- [x] **PZ-02**: Pazarlamaci bayi segmentasyonu olusturur (segment_dealers tool)
+- [x] **PZ-03**: Pazarlamaci kampanya onerisi sunar (suggest_campaign tool)
 
 ### Urun Yoneticisi (Product Manager Agent)
 
@@ -205,12 +205,12 @@
 | DK-01 | Phase 12 | Complete |
 | DK-02 | Phase 12 | Complete |
 | DK-03 | Phase 12 | Complete |
-| SS-01 | Phase 12 | Pending |
-| SS-02 | Phase 12 | Pending |
+| SS-01 | Phase 12 | Complete |
+| SS-02 | Phase 12 | Complete |
 | SS-03 | Phase 12 | Pending |
-| PZ-01 | Phase 12 | Pending |
-| PZ-02 | Phase 12 | Pending |
-| PZ-03 | Phase 12 | Pending |
+| PZ-01 | Phase 12 | Complete |
+| PZ-02 | Phase 12 | Complete |
+| PZ-03 | Phase 12 | Complete |
 | UY-01 | Phase 12 | Complete |
 | UY-02 | Phase 12 | Complete |
 | UY-03 | Phase 12 | Complete |

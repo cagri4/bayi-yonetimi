@@ -171,6 +171,13 @@ Progress: [████░░░░░░] 57% — Phase 12 Plan 04 of 07 comple
 - get_overdue_payments MUST scope via dealer join (dealers.company_id) before querying dealer_transactions — that table has no company_id column (same constraint as Phase 11 muhasebeci)
 - dealers table has no city column — manage_routes uses first word of address field as region key for route grouping
 
+### Phase 12 Decisions (from Plan 12-03)
+- suggest_campaign (PZ-03) is advisory-only — NO DB reads or writes; handler returns formatted Turkish string based on inputs only; no supabase calls in handler body
+- (supabase as any) on dealer_visits INSERT — table not in auto-generated Database types, same pattern as orders/order_items from Phase 10
+- log_visit sets planned_date = actual_date — visit already happened, planned_date column is required by dealer_visits schema
+- as unknown as CampaignRow[] cast for analyze_campaigns — campaigns.name not surfaced in Supabase TS types, consistent with Phase 11 muhasebeci-tools TS2352 fix
+- segment_dealers uses client-side grouping in JavaScript Map — Supabase JS client does not support GROUP BY, consistent with Phase 11 check_reorder_level pattern
+
 ### Phase 12 Decisions (from Plan 12-04)
 - analyze_catalog uses two-step query (orders by company_id, then order_items IN orderIds) and JS-side aggregation — avoids Supabase JS join filter complexity with company_id scope
 - suggest_pricing corrected to use base_price (not price) from products and custom_price (not price) from dealer_prices — plan spec had wrong column names; TypeScript compile errors caught this at Task 1
@@ -203,9 +210,9 @@ Progress: [████░░░░░░] 57% — Phase 12 Plan 04 of 07 comple
 
 ## Session Continuity
 
-Last session: 2026-03-03 (Phase 12 Plan 04 complete)
-Stopped at: Completed 12-02-PLAN.md (iade_kalite typed, tahsilat-uzmani-tools.ts, dagitim-koordinatoru-tools.ts created)
+Last session: 2026-03-03 (Phase 12 Plan 03 complete)
+Stopped at: Completed 12-03-PLAN.md (saha-satis-tools.ts and pazarlamaci-tools.ts created)
 Resume file: None
 
 ---
-*Last updated: 2026-03-03 (Phase 12 Plan 02 complete — iade_kalite role typed, TU and DK tool files created)*
+*Last updated: 2026-03-03 (Phase 12 Plan 03 complete — saha-satis and pazarlamaci tool files created)*
