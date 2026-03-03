@@ -22,6 +22,7 @@ export type AgentRole =
   | 'pazarlamaci'           // Marketing
   | 'urun_yoneticisi'       // Product Manager
   | 'satin_alma'            // Procurement
+  | 'iade_kalite'            // Returns/Quality
 
 // ─── Model Constants ───────────────────────────────────────────────────────
 
@@ -49,6 +50,7 @@ export const AGENT_MODELS: Record<AgentRole, string> = {
   saha_satis: HAIKU_MODEL,
   urun_yoneticisi: HAIKU_MODEL,
   satin_alma: HAIKU_MODEL,
+  iade_kalite: HAIKU_MODEL,
 }
 
 // ─── Runtime Context ───────────────────────────────────────────────────────
