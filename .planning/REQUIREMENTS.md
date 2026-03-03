@@ -74,16 +74,16 @@
 
 ### Tahsilat Uzmani (Collections Agent)
 
-- [ ] **TU-01**: Tahsilat uzmani vadesi gecen alacaklari listeler (get_overdue_payments tool)
-- [ ] **TU-02**: Tahsilat uzmani odeme hatirlatmasi gonderir (send_reminder tool)
-- [ ] **TU-03**: Tahsilat uzmani tahsilat aktivitesi kaydeder (log_collection_activity tool)
+- [x] **TU-01**: Tahsilat uzmani vadesi gecen alacaklari listeler (get_overdue_payments tool)
+- [x] **TU-02**: Tahsilat uzmani odeme hatirlatmasi gonderir (send_reminder tool)
+- [x] **TU-03**: Tahsilat uzmani tahsilat aktivitesi kaydeder (log_collection_activity tool)
 - [ ] **TU-04**: Tahsilat uzmani icin collection_activities tablosu olusturulur
 
 ### Dagitim Koordinatoru (Distribution Agent)
 
-- [ ] **DK-01**: Dagitim koordinatoru teslimat durumu sorgular (get_delivery_status tool)
-- [ ] **DK-02**: Dagitim koordinatoru rut bilgisi yonetir (manage_routes tool)
-- [ ] **DK-03**: Dagitim koordinatoru kargo takibi yapar (track_shipment tool)
+- [x] **DK-01**: Dagitim koordinatoru teslimat durumu sorgular (get_delivery_status tool)
+- [x] **DK-02**: Dagitim koordinatoru rut bilgisi yonetir (manage_routes tool)
+- [x] **DK-03**: Dagitim koordinatoru kargo takibi yapar (track_shipment tool)
 
 ### Saha Satis Sorumlusu (Field Sales Agent)
 
@@ -198,13 +198,13 @@
 | GM-03 | Phase 11 | Complete |
 | GM-04 | Phase 11 | Complete |
 | GM-05 | Phase 11 | Complete |
-| TU-01 | Phase 12 | Pending |
-| TU-02 | Phase 12 | Pending |
-| TU-03 | Phase 12 | Pending |
+| TU-01 | Phase 12 | Complete |
+| TU-02 | Phase 12 | Complete |
+| TU-03 | Phase 12 | Complete |
 | TU-04 | Phase 12 | Pending |
-| DK-01 | Phase 12 | Pending |
-| DK-02 | Phase 12 | Pending |
-| DK-03 | Phase 12 | Pending |
+| DK-01 | Phase 12 | Complete |
+| DK-02 | Phase 12 | Complete |
+| DK-03 | Phase 12 | Complete |
 | SS-01 | Phase 12 | Pending |
 | SS-02 | Phase 12 | Pending |
 | SS-03 | Phase 12 | Pending |

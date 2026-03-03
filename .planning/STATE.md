@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 11 — Financial and Operations Agents — COMPLETE
-Plan: 04 of 04 complete (all tasks done, checkpoint resolved)
-Status: COMPLETE — All 4 plans executed, SQL seed applied, 3 Telegram bots registered
-Last activity: 2026-03-03 — Phase 11 complete (SQL seed executed, bot tokens added to Vercel, webhooks registered)
+Phase: 12 — Extended Agent Ecosystem — IN PROGRESS
+Plan: 02 of 07 complete
+Status: IN PROGRESS — Plan 02 executed (types.ts updated, tahsilat-uzmani-tools.ts, dagitim-koordinatoru-tools.ts created)
+Last activity: 2026-03-03 — Phase 12 Plan 02 complete (iade_kalite typed, TU + DK tool files created)
 
-Progress: [██████████] 100% — Phase 11 complete
+Progress: [██░░░░░░░░] 29% — Phase 12 Plan 02 of 07 complete
 
 ## Milestones
 
@@ -165,6 +165,12 @@ Progress: [██████████] 100% — Phase 11 complete
 - SQL seed contains KRITIK KURAL in Muhasebeci prompt and ONEMLI KURAL in Depo Sorumlusu prompt — system prompt enforcement, not code logic (MH-06, DS-03)
 - Genel Mudur URL shortened to genel-mudur while role enum remains full genel_mudur_danismani — URL brevity vs code clarity tradeoff
 
+### Phase 12 Decisions (from Plan 12-02)
+- iade_kalite added to AgentRole after satin_alma; TOOL_REGISTRY update deferred to plan 05 (expected TS2741 until then — by design)
+- manage_routes is advisory-only: no DB writes, no new tables; groups active dealers by address in JavaScript, returns formatted plain text route suggestion
+- get_overdue_payments MUST scope via dealer join (dealers.company_id) before querying dealer_transactions — that table has no company_id column (same constraint as Phase 11 muhasebeci)
+- dealers table has no city column — manage_routes uses first word of address field as region key for route grouping
+
 ### Phase 11 Decisions (from Plan 11-02)
 - check_reorder_level uses client-side filter (fetch 200 products, filter JS: stock_quantity <= low_stock_threshold) — Supabase JS client does not support column-to-column WHERE comparisons
 - update_stock description contains Turkish confirmation instruction: "BU ARACI CAGIRMADAN ONCE bayiye guncelleme detaylarini goster ve onay al. Onay alinmadan bu araci ASLA cagirma." — enforces two-turn pattern without code logic
@@ -191,8 +197,8 @@ Progress: [██████████] 100% — Phase 11 complete
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Phase 11 fully complete. Ready for Phase 12.
+Stopped at: Completed 12-02-PLAN.md (iade_kalite typed, tahsilat-uzmani-tools.ts, dagitim-koordinatoru-tools.ts created)
 Resume file: None
 
 ---
-*Last updated: 2026-03-03 (Phase 11 complete — all 4 plans executed, SQL seed applied, 3 Telegram bots live)*
+*Last updated: 2026-03-03 (Phase 12 Plan 02 complete — iade_kalite role typed, TU and DK tool files created)*
