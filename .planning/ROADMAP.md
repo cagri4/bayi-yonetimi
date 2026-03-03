@@ -208,10 +208,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 11-01-PLAN.md — Muhasebeci (Accountant) tool definitions and handlers (get_financials, get_payment_history, get_invoices, get_dealer_balance, export_report)
-- [ ] 11-02-PLAN.md — Depo Sorumlusu (Warehouse) tool definitions and handlers (get_inventory_status, get_pending_orders, update_stock, check_reorder_level, get_shipments)
-- [ ] 11-03-PLAN.md — Genel Mudur Danismani (Executive Advisor) composite tool set (cross-domain read-only + dashboard summary + company-wide export)
-- [ ] 11-04-PLAN.md — Dispatcher integration, webhook routes, ToolRegistry update, and agent_definitions SQL seed
+- [x] 11-01-PLAN.md — Muhasebeci (Accountant) tool definitions and handlers (get_financials, get_payment_history, get_invoices, get_dealer_balance, export_report)
+- [x] 11-02-PLAN.md — Depo Sorumlusu (Warehouse) tool definitions and handlers (get_inventory_status, get_pending_orders, update_stock, check_reorder_level, get_shipments)
+- [x] 11-03-PLAN.md — Genel Mudur Danismani (Executive Advisor) composite tool set (cross-domain read-only + dashboard summary + company-wide export)
+- [x] 11-04-PLAN.md — Dispatcher integration, webhook routes, ToolRegistry update, and agent_definitions SQL seed
 
 ### Phase 12: Extended Agent Ecosystem
 **Goal**: All 12 AI agents are operational with agent-to-agent handoffs, proactive daily briefings, and new domain-specific database tables for Collections, Field Sales, Procurement, and Returns
@@ -240,9 +240,9 @@ Phases execute in strict dependency order: 8 → 9 → 10 → 11 → 12
 | 6. Dashboard, Campaigns & Order Documents | v2.0 | 5/5 | Complete | 2026-03-01 |
 | 7. Support & Reports | v2.0 | 4/4 | Complete | 2026-03-01 |
 | 8. Multi-Tenant Database Migration | v3.0 | 5/5 | Complete | 2026-03-01 |
-| 9. Agent Infrastructure Foundation | 5/5 | Complete   | 2026-03-01 | — |
-| 10. First Agent Group — Trainer + Sales | 3/3 | Complete    | 2026-03-02 | — |
-| 11. Financial and Operations Agents | 4/4 | Complete   | 2026-03-02 | — |
+| 9. Agent Infrastructure Foundation | v3.0 | 5/5 | Complete | 2026-03-01 |
+| 10. First Agent Group — Trainer + Sales | v3.0 | 3/3 | Complete | 2026-03-02 |
+| 11. Financial and Operations Agents | v3.0 | 4/4 | Complete | 2026-03-03 |
 | 12. Extended Agent Ecosystem | v3.0 | 0/? | Pending | — |
 
 ---
