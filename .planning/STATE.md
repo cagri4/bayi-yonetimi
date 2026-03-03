@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 12 — Extended Agent Ecosystem — IN PROGRESS
-Plan: 02 of 07 complete
-Status: IN PROGRESS — Plan 02 executed (types.ts updated, tahsilat-uzmani-tools.ts, dagitim-koordinatoru-tools.ts created)
-Last activity: 2026-03-03 — Phase 12 Plan 02 complete (iade_kalite typed, TU + DK tool files created)
+Plan: 04 of 07 complete
+Status: IN PROGRESS — Plans 01-04 executed (domain tables SQL, types, 5 tool files, tool-registry wired)
+Last activity: 2026-03-03 — Phase 12 Plan 04 complete (urun-yoneticisi, satin-alma, iade-kalite tools created)
 
-Progress: [██░░░░░░░░] 29% — Phase 12 Plan 02 of 07 complete
+Progress: [████░░░░░░] 57% — Phase 12 Plan 04 of 07 complete
 
 ## Milestones
 
@@ -171,6 +171,13 @@ Progress: [██░░░░░░░░] 29% — Phase 12 Plan 02 of 07 comple
 - get_overdue_payments MUST scope via dealer join (dealers.company_id) before querying dealer_transactions — that table has no company_id column (same constraint as Phase 11 muhasebeci)
 - dealers table has no city column — manage_routes uses first word of address field as region key for route grouping
 
+### Phase 12 Decisions (from Plan 12-04)
+- analyze_catalog uses two-step query (orders by company_id, then order_items IN orderIds) and JS-side aggregation — avoids Supabase JS join filter complexity with company_id scope
+- suggest_pricing corrected to use base_price (not price) from products and custom_price (not price) from dealer_prices — plan spec had wrong column names; TypeScript compile errors caught this at Task 1
+- suggest_restock filters JS-side after fetching 200 products — same column-to-column comparison limitation as check_reorder_level in depo-sorumlusu-tools
+- track_complaint auto-detects list vs create mode from description field presence — no explicit action enum needed
+- tool-registry.ts lacked iade_kalite entry — TS2741 blocking error; Rule 3 auto-fix added all 3 new role registrations in Task 2 commit
+
 ### Phase 11 Decisions (from Plan 11-02)
 - check_reorder_level uses client-side filter (fetch 200 products, filter JS: stock_quantity <= low_stock_threshold) — Supabase JS client does not support column-to-column WHERE comparisons
 - update_stock description contains Turkish confirmation instruction: "BU ARACI CAGIRMADAN ONCE bayiye guncelleme detaylarini goster ve onay al. Onay alinmadan bu araci ASLA cagirma." — enforces two-turn pattern without code logic
@@ -196,7 +203,7 @@ Progress: [██░░░░░░░░] 29% — Phase 12 Plan 02 of 07 comple
 
 ## Session Continuity
 
-Last session: 2026-03-03
+Last session: 2026-03-03 (Phase 12 Plan 04 complete)
 Stopped at: Completed 12-02-PLAN.md (iade_kalite typed, tahsilat-uzmani-tools.ts, dagitim-koordinatoru-tools.ts created)
 Resume file: None
 

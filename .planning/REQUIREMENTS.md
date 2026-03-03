@@ -99,20 +99,20 @@
 
 ### Urun Yoneticisi (Product Manager Agent)
 
-- [ ] **UY-01**: Urun yoneticisi katalog analizi yapar (analyze_catalog tool)
-- [ ] **UY-02**: Urun yoneticisi fiyat stratejisi onerir (suggest_pricing tool)
-- [ ] **UY-03**: Urun yoneticisi urun talep analizi yapar (analyze_requests tool)
+- [x] **UY-01**: Urun yoneticisi katalog analizi yapar (analyze_catalog tool)
+- [x] **UY-02**: Urun yoneticisi fiyat stratejisi onerir (suggest_pricing tool)
+- [x] **UY-03**: Urun yoneticisi urun talep analizi yapar (analyze_requests tool)
 
 ### Satin Alma Sorumlusu (Procurement Agent)
 
-- [ ] **SA-01**: Satin alma sorumlusu tedarikci siparisi olusturur (create_purchase_order tool)
-- [ ] **SA-02**: Satin alma sorumlusu stok yenileme onerir (suggest_restock tool)
+- [x] **SA-01**: Satin alma sorumlusu tedarikci siparisi olusturur (create_purchase_order tool)
+- [x] **SA-02**: Satin alma sorumlusu stok yenileme onerir (suggest_restock tool)
 - [ ] **SA-03**: Satin alma sorumlusu icin suppliers ve purchase_orders tablolari olusturulur
 
 ### Iade Kalite Sorumlusu (Returns/Quality Agent)
 
-- [ ] **IK-01**: Iade sorumlusu iade talebi yonetir (manage_return tool)
-- [ ] **IK-02**: Iade sorumlusu sikayet takibi yapar (track_complaint tool)
+- [x] **IK-01**: Iade sorumlusu iade talebi yonetir (manage_return tool)
+- [x] **IK-02**: Iade sorumlusu sikayet takibi yapar (track_complaint tool)
 - [ ] **IK-03**: Iade sorumlusu icin return_requests ve quality_complaints tablolari olusturulur
 
 ### Ajan Orkestrasyon
@@ -211,14 +211,14 @@
 | PZ-01 | Phase 12 | Pending |
 | PZ-02 | Phase 12 | Pending |
 | PZ-03 | Phase 12 | Pending |
-| UY-01 | Phase 12 | Pending |
-| UY-02 | Phase 12 | Pending |
-| UY-03 | Phase 12 | Pending |
-| SA-01 | Phase 12 | Pending |
-| SA-02 | Phase 12 | Pending |
+| UY-01 | Phase 12 | Complete |
+| UY-02 | Phase 12 | Complete |
+| UY-03 | Phase 12 | Complete |
+| SA-01 | Phase 12 | Complete |
+| SA-02 | Phase 12 | Complete |
 | SA-03 | Phase 12 | Pending |
-| IK-01 | Phase 12 | Pending |
-| IK-02 | Phase 12 | Pending |
+| IK-01 | Phase 12 | Complete |
+| IK-02 | Phase 12 | Complete |
 | IK-03 | Phase 12 | Pending |
 | AO-01 | Phase 12 | Pending |
 | AO-02 | Phase 12 | Pending |
