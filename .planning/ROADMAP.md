@@ -223,7 +223,16 @@ Plans:
   3. The Tahsilat Uzmani bot lists overdue payments and sends a reminder to a test dealer — the `collection_activities` table records the action with timestamp and outcome
   4. The `dealer_visits`, `sales_targets`, `suppliers`, `purchase_orders`, `return_requests`, and `quality_complaints` tables exist and are correctly scoped by `company_id`
   5. A proactive daily briefing fires for at least one agent role and delivers a summary message to the configured Telegram chat without a dealer initiating the conversation
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — SQL migration for 7 new domain tables (collection_activities, dealer_visits, sales_targets, suppliers, purchase_orders, return_requests, quality_complaints)
+- [ ] 12-02-PLAN.md — iade_kalite type + Tahsilat Uzmani and Dagitim Koordinatoru tool files
+- [ ] 12-03-PLAN.md — Saha Satis and Pazarlamaci tool files
+- [ ] 12-04-PLAN.md — Urun Yoneticisi, Satin Alma, and Iade Kalite tool files
+- [ ] 12-05-PLAN.md — handler-factory.ts + TOOL_REGISTRY + dispatcher refactor + real AgentBridge.callAgent()
+- [ ] 12-06-PLAN.md — 7 Telegram webhook routes + agent_definitions SQL seed
+- [ ] 12-07-PLAN.md — Vercel cron + daily briefing route (proactive Tahsilat Uzmani briefing)
 
 ## Progress
 
