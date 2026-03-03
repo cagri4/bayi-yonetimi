@@ -11,6 +11,9 @@ import { satisTools } from './tools/satis-tools'
 import { muhasebeciTools } from './tools/muhasebeci-tools'
 import { depoSorumlusuTools } from './tools/depo-sorumlusu-tools'
 import { genelMudurTools } from './tools/genel-mudur-tools'
+import { urunYoneticisiTools } from './tools/urun-yoneticisi-tools'
+import { satinAlmaTools } from './tools/satin-alma-tools'
+import { iadeKaliteTools } from './tools/iade-kalite-tools'
 
 // ─── Tool Registry Map ─────────────────────────────────────────────────────
 
@@ -31,8 +34,9 @@ export const TOOL_REGISTRY: Record<AgentRole, Tool[]> = {
   dagitim_koordinatoru: placeholderTools,
   saha_satis: placeholderTools,
   pazarlamaci: placeholderTools,
-  urun_yoneticisi: placeholderTools,
-  satin_alma: placeholderTools,
+  urun_yoneticisi: urunYoneticisiTools,
+  satin_alma: satinAlmaTools,
+  iade_kalite: iadeKaliteTools,
 }
 
 // ─── Prompt Caching Helper ─────────────────────────────────────────────────
