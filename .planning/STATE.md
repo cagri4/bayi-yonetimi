@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 12 — Extended Agent Ecosystem — IN PROGRESS
-Plan: 04 of 07 complete
-Status: IN PROGRESS — Plans 01-04 executed (domain tables SQL, types, 5 tool files, tool-registry wired)
-Last activity: 2026-03-03 — Phase 12 Plan 04 complete (urun-yoneticisi, satin-alma, iade-kalite tools created)
+Plan: 06 of 07 complete
+Status: IN PROGRESS — Plans 01-06 executed (domain tables SQL, types, 5 tool files, tool-registry wired, 3 wave-2 tool files + 7 webhook routes + agent_definitions seed)
+Last activity: 2026-03-04 — Phase 12 Plan 06 complete (7 webhook routes created, SS/12-agent-definitions-seed.sql created — checkpoint pending verification)
 
-Progress: [████░░░░░░] 57% — Phase 12 Plan 04 of 07 complete
+Progress: [████████░░] 86% — Phase 12 Plan 06 of 07 complete
 
 ## Milestones
 
@@ -191,6 +191,12 @@ Progress: [████░░░░░░] 57% — Phase 12 Plan 04 of 07 comple
 - track_complaint auto-detects list vs create mode from description field presence — no explicit action enum needed
 - tool-registry.ts lacked iade_kalite entry — TS2741 blocking error; Rule 3 auto-fix added all 3 new role registrations in Task 2 commit
 
+### Phase 12 Decisions (from Plan 12-06)
+- pazarlamaci gets claude-sonnet-4-6 (reasoning-heavy campaign analysis); remaining 6 Phase 12 agents use claude-haiku-4-5
+- satin_alma and iade_kalite system prompts contain ONEMLI confirmation gate text — behavioral enforcement via prompt, not code (same pattern as depo_sorumlusu ONEMLI KURAL from Phase 11)
+- Webhook route env vars use TELEGRAM_BOT_TOKEN_{ROLE_UPPERCASE} convention — e.g., TELEGRAM_BOT_TOKEN_DAGITIM_KOORDINATORU
+- 7 routes are exact copies of egitimci/route.ts with 3 substitutions: env var name, role enum string, log prefix in console.error calls
+
 ### Phase 11 Decisions (from Plan 11-02)
 - check_reorder_level uses client-side filter (fetch 200 products, filter JS: stock_quantity <= low_stock_threshold) — Supabase JS client does not support column-to-column WHERE comparisons
 - update_stock description contains Turkish confirmation instruction: "BU ARACI CAGIRMADAN ONCE bayiye guncelleme detaylarini goster ve onay al. Onay alinmadan bu araci ASLA cagirma." — enforces two-turn pattern without code logic
@@ -216,9 +222,9 @@ Progress: [████░░░░░░] 57% — Phase 12 Plan 04 of 07 comple
 
 ## Session Continuity
 
-Last session: 2026-03-04 (Phase 12 Plan 01 SUMMARY created — checkpoint resolution)
-Stopped at: Completed 12-01-PLAN.md (domain tables SQL migration confirmed in Supabase)
+Last session: 2026-03-04 (Phase 12 Plan 06 complete — 7 webhook routes + agent_definitions seed SQL)
+Stopped at: Checkpoint in 12-06-PLAN.md — awaiting Supabase seed apply + Vercel deploy verification
 Resume file: None
 
 ---
-*Last updated: 2026-03-04 (Phase 12 Plan 01 SUMMARY created — 7 domain tables confirmed in Supabase)*
+*Last updated: 2026-03-04 (Phase 12 Plan 06 complete — 7 webhook routes + agent_definitions seed SQL created, checkpoint pending human verification)*
