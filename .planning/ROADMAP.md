@@ -136,7 +136,7 @@ Plans:
 - [x] **Phase 9: Agent Infrastructure Foundation** - Build the shared AgentRunner, ToolRegistry, and Telegram webhook framework all 12 agents depend on (completed 2026-03-01)
 - [x] **Phase 10: First Agent Group — Trainer + Sales** - Validate the full agent pipeline with two production agents before touching financial data (completed 2026-03-01)
 - [x] **Phase 11: Financial and Operations Agents** - Add Accountant, Warehouse, and Executive Advisor agents with cross-agent tool calls (completed 2026-03-02)
-- [ ] **Phase 12: Extended Agent Ecosystem** - Complete all remaining 7 agents, new database tables, agent orchestration, and proactive notifications
+- [x] **Phase 12: Extended Agent Ecosystem** - Complete all remaining 7 agents, new database tables, agent orchestration, and proactive notifications (completed 2026-03-04)
 
 ## Phase Details
 
@@ -252,7 +252,7 @@ Phases execute in strict dependency order: 8 → 9 → 10 → 11 → 12
 | 9. Agent Infrastructure Foundation | v3.0 | 5/5 | Complete | 2026-03-01 |
 | 10. First Agent Group — Trainer + Sales | v3.0 | 3/3 | Complete | 2026-03-02 |
 | 11. Financial and Operations Agents | v3.0 | 4/4 | Complete | 2026-03-03 |
-| 12. Extended Agent Ecosystem | 6/7 | In Progress|  | — |
+| 12. Extended Agent Ecosystem | 7/7 | Complete   | 2026-03-04 | — |
 
 ---
 *Roadmap created: 2026-02-08*

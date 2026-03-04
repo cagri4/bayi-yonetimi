@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 12 — Extended Agent Ecosystem — IN PROGRESS
-Plan: 06 of 07 complete
-Status: IN PROGRESS — Plans 01-06 executed (domain tables SQL, types, 5 tool files, tool-registry wired, 3 wave-2 tool files + 7 webhook routes + agent_definitions seed)
-Last activity: 2026-03-04 — Phase 12 Plan 06 complete (7 webhook routes created, SS/12-agent-definitions-seed.sql created — checkpoint pending verification)
+Phase: 12 — Extended Agent Ecosystem — COMPLETE
+Plan: 07 of 07 complete
+Status: COMPLETE — All 7 plans executed (domain tables SQL, types, 5 tool files, tool-registry wired, 3 wave-2 tool files + 7 webhook routes + agent_definitions seed + daily briefing cron)
+Last activity: 2026-03-04 — Phase 12 Plan 07 complete (vercel.json cron, daily-briefing route deployed, CRON_SECRET verified live)
 
-Progress: [████████░░] 86% — Phase 12 Plan 06 of 07 complete
+Progress: [██████████] 100% — Phase 12 Plan 07 of 07 complete
 
 ## Milestones
 
@@ -229,9 +229,15 @@ Progress: [████████░░] 86% — Phase 12 Plan 06 of 07 comple
 
 ## Session Continuity
 
-Last session: 2026-03-04 (Phase 12 Plan 06 fully complete — checkpoint resolved, 7 webhook routes deployed, agent_definitions seed applied)
-Stopped at: Completed 12-06-PLAN.md — ready to begin 12-07-PLAN.md
+Last session: 2026-03-04 (Phase 12 Plan 07 fully complete — all 7 plans done, daily briefing cron live, CRON_SECRET verified)
+Stopped at: Completed 12-07-PLAN.md — Phase 12 fully complete
 Resume file: None
 
 ---
-*Last updated: 2026-03-04 (Phase 12 Plan 06 fully complete — 7 webhook routes live on Vercel, 7 agent_definitions rows confirmed in Supabase)*
+### Phase 12 Decisions (from Plan 12-07)
+- CRON_SECRET header auth (not query param) — Vercel injects Authorization: Bearer header automatically when calling cron routes; avoids secret leakage in server logs
+- Overdue scope via dealer_id IN (...) join — dealer_transactions has no company_id column (consistent with Phase 11 muhasebeci-tools decision)
+- Middleware fix: /api/ routes excluded from auth redirect — cron route would 302-redirect without Bearer header otherwise (Rule 3 auto-fix)
+- briefingsSent counter in JSON response — enables manual test verification without Telegram bot configured
+
+*Last updated: 2026-03-04 (Phase 12 fully complete — all 7 plans done, proactive daily briefing cron live on Vercel)*
