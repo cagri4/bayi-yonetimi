@@ -13,7 +13,11 @@
  */
 
 import { createServiceClient } from '@/lib/supabase/service-client'
-import { MAX_AGENT_DEPTH, MAX_TOOL_CALLS, AgentContext } from './types'
+import { AgentRunner } from './agent-runner'
+import { ToolRegistry } from './tool-registry'
+import { buildHandlersForRole } from './handler-factory'
+import { MAX_AGENT_DEPTH, MAX_TOOL_CALLS, AgentContext, AgentRole } from './types'
+import type { MessageParam } from '@anthropic-ai/sdk/resources/messages'
 
 // ─── AgentCallContext ────────────────────────────────────────────────────────
 
@@ -131,14 +135,13 @@ export class AgentBridge {
   /**
    * Orchestrates a cross-agent call with deadlock protection and audit logging.
    *
-   * Phase 9: returns a placeholder result after validation + logging.
-   * Phase 10+: step 3 will be replaced with an actual AgentRunner invocation
-   *            using the extended callStack and depth + 1.
+   * Phase 12: real AgentRunner invocation with extended callStack and depth+1.
+   * Sub-agent context uses telegramChatId: 0 to prevent double Telegram messages.
    */
   async callAgent(
     targetRole: string,
     query: string,
-    context: AgentCallContext & { companyId: string; conversationId: string },
+    context: AgentCallContext & { companyId: string; conversationId: string; dealerId: string; agentRole: AgentRole; telegramChatId: number; callStack: string[]; depth: number },
   ): Promise<{ success: boolean; result?: string; error?: string }> {
     // 1. Deadlock check (synchronous — fast path)
     const guard = this.checkDeadlock(targetRole, context)
@@ -172,12 +175,46 @@ export class AgentBridge {
       success: true,
     })
 
-    // 3. Phase 9 placeholder — Phase 10+ will invoke AgentRunner here with:
-    //    callStack: [...context.callStack, targetRole]
-    //    depth: context.depth + 1
-    return {
-      success: true,
-      result: '[Cross-agent call placeholder - will be implemented in Phase 10]',
+    try {
+      // 3. Fetch target agent definition from DB
+      const { data: agentDef } = await this.supabase
+        .from('agent_definitions')
+        .select('role, system_prompt, model')
+        .eq('company_id', context.companyId)
+        .eq('role', targetRole)
+        .eq('is_active', true)
+        .maybeSingle()
+
+      if (!agentDef) {
+        return { success: false, error: `[Ajan tanimlamasi bulunamadi: ${targetRole}]` }
+      }
+
+      // 4. Build synthetic AgentContext for the target agent
+      // CRITICAL: telegramChatId = 0 prevents sub-agent from sending Telegram messages
+      const targetContext: AgentContext = {
+        companyId: context.companyId,
+        dealerId: context.dealerId,
+        conversationId: context.conversationId,
+        agentRole: targetRole as AgentRole,
+        telegramChatId: 0,
+        callStack: [...context.callStack, targetRole],
+        depth: context.depth + 1,
+      }
+
+      // 5. Get tools and handlers for the target role
+      const toolRegistry = new ToolRegistry()
+      const tools = toolRegistry.getToolsWithCaching(targetRole as AgentRole)
+      const targetHandlers = buildHandlersForRole(targetRole, this.supabase)
+
+      // 6. Run the target agent
+      const runner = new AgentRunner(agentDef.model, tools, targetHandlers)
+      const syntheticMessages: MessageParam[] = [{ role: 'user', content: query }]
+      const result = await runner.run(agentDef.system_prompt, syntheticMessages, targetContext)
+
+      return { success: true, result }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      return { success: false, error: message }
     }
   }
 

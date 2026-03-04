@@ -22,11 +22,7 @@ import { AgentRunner } from './agent-runner'
 import { ConversationManager } from './conversation-manager'
 import { TokenBudget } from './token-budget'
 import { ToolRegistry } from './tool-registry'
-import { createEgitimciHandlers } from './tools/egitimci-tools'
-import { createSatisHandlers } from './tools/satis-tools'
-import { createMuhasebeciHandlers } from './tools/muhasebeci-tools'
-import { createDepoSorumlusuHandlers } from './tools/depo-sorumlusu-tools'
-import { createGenelMudurHandlers } from './tools/genel-mudur-tools'
+import { buildHandlersForRole } from './handler-factory'
 import type { AgentContext, AgentRole } from './types'
 
 // ─── Telegram Helper ─────────────────────────────────────────────────────────
@@ -195,43 +191,12 @@ export async function dispatchAgentUpdate(
     const messages = await conversationManager.getMessages(conversationId)
 
     // ── Step 5: Build tool handlers per role ───────────────────────────────────
-    // Phase 10: egitimci and satis_temsilcisi use factory-built handler maps.
-    // Other roles use inline placeholder handlers until their tools are implemented.
+    // Phase 12: all roles use buildHandlersForRole from handler-factory (single source of truth).
 
     const toolRegistry = new ToolRegistry()
     const tools = toolRegistry.getToolsWithCaching(role)
 
-    let toolHandlers: Map<string, (input: Record<string, unknown>, context: AgentContext) => Promise<string>>
-
-    if (role === 'egitimci') {
-      toolHandlers = createEgitimciHandlers(supabase)
-    } else if (role === 'satis_temsilcisi') {
-      toolHandlers = createSatisHandlers(supabase)
-    } else if (role === 'muhasebeci') {
-      toolHandlers = createMuhasebeciHandlers(supabase)
-    } else if (role === 'depo_sorumlusu') {
-      toolHandlers = createDepoSorumlusuHandlers(supabase)
-    } else if (role === 'genel_mudur_danismani') {
-      toolHandlers = createGenelMudurHandlers(supabase)
-    } else {
-      // Fallback: placeholder handlers for unimplemented roles
-      toolHandlers = new Map([
-        ['echo', async (input: Record<string, unknown>) => String(input.message ?? '[Bos mesaj]')],
-        ['get_current_time', async () => new Date().toISOString()],
-        ['lookup_dealer', async (input: Record<string, unknown>, ctx: AgentContext) => {
-          const targetDealerId = String(input.dealer_id ?? '')
-          if (!targetDealerId) return '[Hata: dealer_id gerekli]'
-          const { data, error } = await supabase
-            .from('dealers')
-            .select('id, company_name, email, phone, is_active')
-            .eq('id', targetDealerId)
-            .eq('company_id', ctx.companyId)
-            .single()
-          if (error || !data) return `[Bayi bulunamadi: ${targetDealerId}]`
-          return JSON.stringify(data)
-        }],
-      ])
-    }
+    const toolHandlers = buildHandlersForRole(role, supabase)
 
     // ── Step 6: Build AgentContext and run AgentRunner ────────────────────────
 
