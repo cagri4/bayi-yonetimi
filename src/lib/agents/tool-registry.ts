@@ -11,6 +11,10 @@ import { satisTools } from './tools/satis-tools'
 import { muhasebeciTools } from './tools/muhasebeci-tools'
 import { depoSorumlusuTools } from './tools/depo-sorumlusu-tools'
 import { genelMudurTools } from './tools/genel-mudur-tools'
+import { tahsilatUzmaniTools } from './tools/tahsilat-uzmani-tools'
+import { dagitimKoordinatoruTools } from './tools/dagitim-koordinatoru-tools'
+import { sahaSatisTools } from './tools/saha-satis-tools'
+import { pazarlamaciTools } from './tools/pazarlamaci-tools'
 import { urunYoneticisiTools } from './tools/urun-yoneticisi-tools'
 import { satinAlmaTools } from './tools/satin-alma-tools'
 import { iadeKaliteTools } from './tools/iade-kalite-tools'
@@ -30,10 +34,10 @@ export const TOOL_REGISTRY: Record<AgentRole, Tool[]> = {
   depo_sorumlusu: depoSorumlusuTools,
   destek: placeholderTools,
   genel_mudur_danismani: genelMudurTools,
-  tahsilat_uzmani: placeholderTools,
-  dagitim_koordinatoru: placeholderTools,
-  saha_satis: placeholderTools,
-  pazarlamaci: placeholderTools,
+  tahsilat_uzmani: tahsilatUzmaniTools,
+  dagitim_koordinatoru: dagitimKoordinatoruTools,
+  saha_satis: sahaSatisTools,
+  pazarlamaci: pazarlamaciTools,
   urun_yoneticisi: urunYoneticisiTools,
   satin_alma: satinAlmaTools,
   iade_kalite: iadeKaliteTools,
