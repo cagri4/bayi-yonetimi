@@ -165,6 +165,12 @@ Progress: [████░░░░░░] 57% — Phase 12 Plan 04 of 07 comple
 - SQL seed contains KRITIK KURAL in Muhasebeci prompt and ONEMLI KURAL in Depo Sorumlusu prompt — system prompt enforcement, not code logic (MH-06, DS-03)
 - Genel Mudur URL shortened to genel-mudur while role enum remains full genel_mudur_danismani — URL brevity vs code clarity tradeoff
 
+### Phase 12 Decisions (from Plan 12-01)
+- All 7 domain tables follow 010_agent_tables.sql pattern: UUID PK, company_id NOT NULL FK ON DELETE CASCADE, RLS enabled, compound index on (company_id, created_at DESC)
+- purchase_orders.supplier_id and return_requests.order_id use ON DELETE SET NULL — supplier/order deletion must not cascade-delete business records
+- JSONB used for items arrays on purchase_orders and return_requests — avoids separate line-item join tables
+- SQL executed via Supabase Dashboard (no CLI access to neqcuhejmornybmbclwt)
+
 ### Phase 12 Decisions (from Plan 12-02)
 - iade_kalite added to AgentRole after satin_alma; TOOL_REGISTRY update deferred to plan 05 (expected TS2741 until then — by design)
 - manage_routes is advisory-only: no DB writes, no new tables; groups active dealers by address in JavaScript, returns formatted plain text route suggestion
@@ -210,9 +216,9 @@ Progress: [████░░░░░░] 57% — Phase 12 Plan 04 of 07 comple
 
 ## Session Continuity
 
-Last session: 2026-03-03 (Phase 12 Plan 03 complete)
-Stopped at: Completed 12-03-PLAN.md (saha-satis-tools.ts and pazarlamaci-tools.ts created)
+Last session: 2026-03-04 (Phase 12 Plan 01 SUMMARY created — checkpoint resolution)
+Stopped at: Completed 12-01-PLAN.md (domain tables SQL migration confirmed in Supabase)
 Resume file: None
 
 ---
-*Last updated: 2026-03-03 (Phase 12 Plan 03 complete — saha-satis and pazarlamaci tool files created)*
+*Last updated: 2026-03-04 (Phase 12 Plan 01 SUMMARY created — 7 domain tables confirmed in Supabase)*

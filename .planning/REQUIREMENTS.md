@@ -77,7 +77,7 @@
 - [x] **TU-01**: Tahsilat uzmani vadesi gecen alacaklari listeler (get_overdue_payments tool)
 - [x] **TU-02**: Tahsilat uzmani odeme hatirlatmasi gonderir (send_reminder tool)
 - [x] **TU-03**: Tahsilat uzmani tahsilat aktivitesi kaydeder (log_collection_activity tool)
-- [ ] **TU-04**: Tahsilat uzmani icin collection_activities tablosu olusturulur
+- [x] **TU-04**: Tahsilat uzmani icin collection_activities tablosu olusturulur
 
 ### Dagitim Koordinatoru (Distribution Agent)
 
@@ -89,7 +89,7 @@
 
 - [x] **SS-01**: Saha satis sorumlusu bayi ziyaret plani olusturur (plan_visit tool)
 - [x] **SS-02**: Saha satis sorumlusu ziyaret kaydeder (log_visit tool)
-- [ ] **SS-03**: Saha satis sorumlusu icin dealer_visits ve sales_targets tablolari olusturulur
+- [x] **SS-03**: Saha satis sorumlusu icin dealer_visits ve sales_targets tablolari olusturulur
 
 ### Pazarlamaci (Marketing Agent)
 
@@ -107,13 +107,13 @@
 
 - [x] **SA-01**: Satin alma sorumlusu tedarikci siparisi olusturur (create_purchase_order tool)
 - [x] **SA-02**: Satin alma sorumlusu stok yenileme onerir (suggest_restock tool)
-- [ ] **SA-03**: Satin alma sorumlusu icin suppliers ve purchase_orders tablolari olusturulur
+- [x] **SA-03**: Satin alma sorumlusu icin suppliers ve purchase_orders tablolari olusturulur
 
 ### Iade Kalite Sorumlusu (Returns/Quality Agent)
 
 - [x] **IK-01**: Iade sorumlusu iade talebi yonetir (manage_return tool)
 - [x] **IK-02**: Iade sorumlusu sikayet takibi yapar (track_complaint tool)
-- [ ] **IK-03**: Iade sorumlusu icin return_requests ve quality_complaints tablolari olusturulur
+- [x] **IK-03**: Iade sorumlusu icin return_requests ve quality_complaints tablolari olusturulur
 
 ### Ajan Orkestrasyon
 
@@ -201,13 +201,13 @@
 | TU-01 | Phase 12 | Complete |
 | TU-02 | Phase 12 | Complete |
 | TU-03 | Phase 12 | Complete |
-| TU-04 | Phase 12 | Pending |
+| TU-04 | Phase 12 | Complete |
 | DK-01 | Phase 12 | Complete |
 | DK-02 | Phase 12 | Complete |
 | DK-03 | Phase 12 | Complete |
 | SS-01 | Phase 12 | Complete |
 | SS-02 | Phase 12 | Complete |
-| SS-03 | Phase 12 | Pending |
+| SS-03 | Phase 12 | Complete |
 | PZ-01 | Phase 12 | Complete |
 | PZ-02 | Phase 12 | Complete |
 | PZ-03 | Phase 12 | Complete |
@@ -216,10 +216,10 @@
 | UY-03 | Phase 12 | Complete |
 | SA-01 | Phase 12 | Complete |
 | SA-02 | Phase 12 | Complete |
-| SA-03 | Phase 12 | Pending |
+| SA-03 | Phase 12 | Complete |
 | IK-01 | Phase 12 | Complete |
 | IK-02 | Phase 12 | Complete |
-| IK-03 | Phase 12 | Pending |
+| IK-03 | Phase 12 | Complete |
 | AO-01 | Phase 12 | Pending |
 | AO-02 | Phase 12 | Pending |
 | AO-03 | Phase 12 | Pending |
