@@ -254,6 +254,15 @@ Phases execute in strict dependency order: 8 → 9 → 10 → 11 → 12
 | 11. Financial and Operations Agents | v3.0 | 4/4 | Complete | 2026-03-03 |
 | 12. Extended Agent Ecosystem | 7/7 | Complete    | 2026-03-04 | — |
 
+### Phase 13: Production Readiness
+
+**Goal:** [To be planned]
+**Depends on:** Phase 12
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 13 to break down)
+
 ---
 *Roadmap created: 2026-02-08*
 *v1 shipped: 2026-02-03 | v2.0 shipped: 2026-03-01*
