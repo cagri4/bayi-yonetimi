@@ -184,6 +184,13 @@ Progress: [████████░░] 86% — Phase 12 Plan 06 of 07 comple
 - as unknown as CampaignRow[] cast for analyze_campaigns — campaigns.name not surfaced in Supabase TS types, consistent with Phase 11 muhasebeci-tools TS2352 fix
 - segment_dealers uses client-side grouping in JavaScript Map — Supabase JS client does not support GROUP BY, consistent with Phase 11 check_reorder_level pattern
 
+### Phase 12 Decisions (from Plan 12-05)
+- handler-factory.ts introduced as single source of truth for role-to-handler mapping — both dispatcher and agent-bridge import buildHandlersForRole(), eliminating duplication risk as more roles are added
+- Sub-agent synthetic messages: MessageParam[] = [{ role: 'user', content: query }] — single-turn invocation, no conversation history passed to sub-agent (sub-agents are stateless within a cross-agent call)
+- telegramChatId: 0 in targetContext is critical guard — prevents sub-agent from attempting to send Telegram messages; only top-level dispatcher responds to user
+- callAgent() catch block returns { success: false, error } — structured error, never throws, consistent with existing logAgentCall/checkDeadlock error handling pattern
+- TOOL_REGISTRY destek role keeps placeholderTools — intentional (no dedicated destek bot in current deployment)
+
 ### Phase 12 Decisions (from Plan 12-04)
 - analyze_catalog uses two-step query (orders by company_id, then order_items IN orderIds) and JS-side aggregation — avoids Supabase JS join filter complexity with company_id scope
 - suggest_pricing corrected to use base_price (not price) from products and custom_price (not price) from dealer_prices — plan spec had wrong column names; TypeScript compile errors caught this at Task 1

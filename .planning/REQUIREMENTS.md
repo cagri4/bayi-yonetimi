@@ -118,7 +118,7 @@
 ### Ajan Orkestrasyon
 
 - [x] **AO-01**: Tum 12 ajanin Telegram bot'lari kayitli ve webhook'lari aktif
-- [ ] **AO-02**: Agent-to-agent handoff workflow'lari calisir (Sales -> Warehouse stok kontrolu vb.)
+- [x] **AO-02**: Agent-to-agent handoff workflow'lari calisir (Sales -> Warehouse stok kontrolu vb.)
 - [ ] **AO-03**: Proaktif bildirim sistemi calisir (gunluk brifing per ajan)
 
 ## v3.1 Requirements (Deferred)
@@ -221,7 +221,7 @@
 | IK-02 | Phase 12 | Complete |
 | IK-03 | Phase 12 | Complete |
 | AO-01 | Phase 12 | Complete |
-| AO-02 | Phase 12 | Pending |
+| AO-02 | Phase 12 | Complete |
 | AO-03 | Phase 12 | Pending |
 
 **Coverage:**
