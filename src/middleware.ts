@@ -5,7 +5,7 @@ export async function middleware(request: NextRequest) {
   const { supabaseResponse, user, supabase } = await updateSession(request)
 
   // Public paths that don't require authentication
-  const publicPaths = ['/login', '/forgot-password', '/reset-password']
+  const publicPaths = ['/login', '/forgot-password', '/reset-password', '/api/']
   const isPublicPath = publicPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   )
