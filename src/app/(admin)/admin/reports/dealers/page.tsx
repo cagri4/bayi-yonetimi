@@ -45,7 +45,7 @@ export default async function DealerPerformancePage({
           </p>
         </div>
         <ExportButton
-          exportFn={async () => exportDealerPerformanceCSV(startDate, endDate)}
+          exportFn={exportDealerPerformanceCSV.bind(null, startDate, endDate)}
           filename={`bayi-performans-${startDate}-${endDate}.csv`}
         />
       </div>

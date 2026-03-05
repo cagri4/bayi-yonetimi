@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,6 +33,9 @@ export function CampaignForm({ campaign, productIds = [], productDiscounts = new
         await createCampaign(formData)
       }
     } catch (error) {
+      if (isRedirectError(error)) {
+        throw error
+      }
       console.error('Error submitting campaign:', error)
       alert('Kampanya kaydedilirken bir hata oluştu')
       setIsSubmitting(false)

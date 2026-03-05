@@ -62,7 +62,7 @@ export default async function SalesReportPage({
           </p>
         </div>
         <ExportButton
-          exportFn={async () => exportSalesReportCSV(period, startDate, endDate)}
+          exportFn={exportSalesReportCSV.bind(null, period, startDate, endDate)}
           filename={`satis-raporu-${period}-${startDate}-${endDate}.csv`}
         />
       </div>

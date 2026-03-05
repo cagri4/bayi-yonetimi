@@ -45,7 +45,7 @@ export default async function TopProductsPage({
           </p>
         </div>
         <ExportButton
-          exportFn={async () => exportTopProductsCSV(startDate, endDate)}
+          exportFn={exportTopProductsCSV.bind(null, startDate, endDate)}
           filename={`urunler-${startDate}-${endDate}.csv`}
         />
       </div>
