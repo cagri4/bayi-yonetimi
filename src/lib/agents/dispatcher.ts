@@ -28,8 +28,113 @@ import type { AgentContext, AgentRole } from './types'
 // ─── Telegram Helper ─────────────────────────────────────────────────────────
 
 /**
+ * Attempts a single Telegram sendMessage API call.
+ * Returns the HTTP response, or throws on network error.
+ */
+async function attemptTelegramSend(
+  chatId: number,
+  text: string,
+  token: string
+): Promise<Response> {
+  return fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, text }),
+  })
+}
+
+/**
+ * Sends a text message to a Telegram chat with exponential backoff retry.
+ *
+ * Retry policy:
+ * - Max 3 retries (4 total attempts)
+ * - Exponential backoff: 1s, 2s, 4s between attempts
+ * - 4xx errors (except 429 rate limit) are NOT retried — permanent failures
+ * - 429 respects Telegram's Retry-After header when present
+ * - Network errors are retried with backoff
+ *
+ * Runs inside after() — retries do NOT block the webhook 200 response.
+ *
+ * @param chatId - Telegram chat ID to send message to
+ * @param text - Message text to send
+ * @param token - Bot token for the sending bot
+ * @param maxRetries - Maximum number of retries (default 3)
+ * @param baseDelayMs - Base delay in ms for backoff calculation (default 1000)
+ * @returns true if message was sent successfully, false otherwise
+ */
+async function sendWithRetry(
+  chatId: number,
+  text: string,
+  token: string,
+  maxRetries = 3,
+  baseDelayMs = 1000
+): Promise<boolean> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await attemptTelegramSend(chatId, text, token)
+
+      if (response.ok) return true
+
+      // Don't retry on 4xx client errors (bad request, unauthorized, etc.)
+      // except 429 (rate limited by Telegram)
+      if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+        console.error(`[telegram] Non-retryable error ${response.status} for chat ${chatId}`)
+        return false
+      }
+
+      // For 429, use Telegram's Retry-After header if available
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After')
+        const waitMs = retryAfter
+          ? parseInt(retryAfter) * 1000
+          : baseDelayMs * Math.pow(2, attempt)
+        if (attempt < maxRetries) {
+          console.warn(
+            `[telegram] Rate limited (429), retrying in ${waitMs}ms (attempt ${attempt + 1}/${maxRetries + 1})`
+          )
+          await new Promise((r) => setTimeout(r, waitMs))
+          continue
+        }
+        console.error(`[telegram] Rate limited (429) — exhausted all ${maxRetries + 1} attempts for chat ${chatId}`)
+        return false
+      }
+
+      // 5xx server errors — retry with exponential backoff
+      if (attempt < maxRetries) {
+        const delay = baseDelayMs * Math.pow(2, attempt) // 1s, 2s, 4s
+        console.warn(
+          `[telegram] Attempt ${attempt + 1} failed (${response.status}), retrying in ${delay}ms`
+        )
+        await new Promise((r) => setTimeout(r, delay))
+      } else {
+        const body = await response.text()
+        console.error(
+          `[telegram] All ${maxRetries + 1} attempts failed for chat ${chatId} — status: ${response.status}, body: ${body}`
+        )
+      }
+    } catch (error) {
+      // Network errors — retry with exponential backoff
+      if (attempt < maxRetries) {
+        const delay = baseDelayMs * Math.pow(2, attempt)
+        console.warn(
+          `[telegram] Attempt ${attempt + 1} failed (network error), retrying in ${delay}ms`
+        )
+        await new Promise((r) => setTimeout(r, delay))
+      } else {
+        console.error(
+          `[telegram] All ${maxRetries + 1} attempts failed for chat ${chatId}`,
+          error
+        )
+      }
+    }
+  }
+  return false
+}
+
+/**
  * Sends a text message to a Telegram chat via the Bot API.
  * Accepts a token parameter so each bot uses its own bot token.
+ * Retries up to 3 times with exponential backoff on transient failures.
  * Logs errors but never throws — the caller continues regardless.
  *
  * Note: parse_mode is intentionally omitted to avoid Telegram 400 errors
@@ -41,26 +146,7 @@ async function sendTelegramMessage(chatId: number, text: string, token: string):
     return
   }
 
-  try {
-    const response = await fetch(
-      `https://api.telegram.org/bot${token}/sendMessage`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text,
-        }),
-      }
-    )
-
-    if (!response.ok) {
-      const body = await response.text()
-      console.error('[dispatcher] sendMessage API error:', response.status, body)
-    }
-  } catch (err) {
-    console.error('[dispatcher] sendTelegramMessage fetch error:', err)
-  }
+  await sendWithRetry(chatId, text, token)
 }
 
 // ─── Main Dispatcher ─────────────────────────────────────────────────────────
