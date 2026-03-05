@@ -37,7 +37,7 @@ export async function login(
   if (error) {
     console.error('[LOGIN ERROR]', error.message, error.status, error.code)
     return {
-      message: 'Email veya sifre hatali',
+      message: `Login hatasi: ${error.message} (${error.status})`,
     }
   }
 
