@@ -44,6 +44,7 @@ export interface Database {
           plan: 'starter' | 'pro' | 'enterprise'
           is_active: boolean
           settings: Json
+          trial_ends_at: string | null
           created_at: string
           updated_at: string
         }
@@ -54,6 +55,7 @@ export interface Database {
           plan?: 'starter' | 'pro' | 'enterprise'
           is_active?: boolean
           settings?: Json
+          trial_ends_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -64,6 +66,7 @@ export interface Database {
           plan?: 'starter' | 'pro' | 'enterprise'
           is_active?: boolean
           settings?: Json
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1057,6 +1060,7 @@ export interface Database {
           system_prompt: string
           is_active: boolean
           settings: Json
+          subscription_tier: string | null
           created_at: string
           updated_at: string
         }
@@ -1070,6 +1074,7 @@ export interface Database {
           system_prompt?: string
           is_active?: boolean
           settings?: Json
+          subscription_tier?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -1083,6 +1088,7 @@ export interface Database {
           system_prompt?: string
           is_active?: boolean
           settings?: Json
+          subscription_tier?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -1226,6 +1232,204 @@ export interface Database {
         }
         Relationships: []
       }
+      onboarding_sessions: {
+        Row: {
+          id: string
+          company_id: string | null
+          deep_link_token: string
+          telegram_chat_id: number | null
+          status: 'pending' | 'in_progress' | 'completed' | 'expired'
+          collected_data: Json
+          step: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_id?: string | null
+          deep_link_token: string
+          telegram_chat_id?: number | null
+          status?: 'pending' | 'in_progress' | 'completed' | 'expired'
+          collected_data?: Json
+          step?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string | null
+          deep_link_token?: string
+          telegram_chat_id?: number | null
+          status?: 'pending' | 'in_progress' | 'completed' | 'expired'
+          collected_data?: Json
+          step?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          id: string
+          company_id: string
+          plan: 'starter' | 'pro' | 'enterprise'
+          status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'paused'
+          trial_ends_at: string | null
+          mollie_subscription_id: string | null
+          mollie_customer_id: string | null
+          current_period_start: string | null
+          current_period_end: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          plan?: 'starter' | 'pro' | 'enterprise'
+          status?: 'trialing' | 'active' | 'past_due' | 'canceled' | 'paused'
+          trial_ends_at?: string | null
+          mollie_subscription_id?: string | null
+          mollie_customer_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          plan?: 'starter' | 'pro' | 'enterprise'
+          status?: 'trialing' | 'active' | 'past_due' | 'canceled' | 'paused'
+          trial_ends_at?: string | null
+          mollie_subscription_id?: string | null
+          mollie_customer_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      agent_marketplace: {
+        Row: {
+          id: string
+          agent_role: string
+          display_name: string
+          description: string
+          monthly_price: number
+          minimum_plan: 'starter' | 'pro' | 'enterprise'
+          is_active: boolean
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          agent_role: string
+          display_name: string
+          description: string
+          monthly_price: number
+          minimum_plan?: 'starter' | 'pro' | 'enterprise'
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          agent_role?: string
+          display_name?: string
+          description?: string
+          monthly_price?: number
+          minimum_plan?: 'starter' | 'pro' | 'enterprise'
+          is_active?: boolean
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      payment_webhook_events: {
+        Row: {
+          id: string
+          mollie_event_id: string
+          event_type: string | null
+          payload: Json
+          processed_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          mollie_event_id: string
+          event_type?: string | null
+          payload?: Json
+          processed_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          mollie_event_id?: string
+          event_type?: string | null
+          payload?: Json
+          processed_at?: string
+        }
+        Relationships: []
+      }
+      superadmin_audit_log: {
+        Row: {
+          id: string
+          actor_id: string
+          action: string
+          target_table: string
+          target_id: string | null
+          old_value: Json | null
+          new_value: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          actor_id: string
+          action: string
+          target_table: string
+          target_id?: string | null
+          old_value?: Json | null
+          new_value?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          actor_id?: string
+          action?: string
+          target_table?: string
+          target_id?: string | null
+          old_value?: Json | null
+          new_value?: Json | null
+        }
+        Relationships: []
+      }
+      onboarding_invites: {
+        Row: {
+          id: string
+          company_id: string
+          token_hash: string
+          expires_at: string
+          used_at: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          token_hash: string
+          expires_at: string
+          used_at?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          token_hash?: string
+          expires_at?: string
+          used_at?: string | null
+          created_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       dealer_spending_summary: {
@@ -1351,3 +1555,31 @@ export type AgentCallUpdate = Database['public']['Tables']['agent_calls']['Updat
 export type DailyTokenUsage = Database['public']['Tables']['daily_token_usage']['Row']
 export type DailyTokenUsageInsert = Database['public']['Tables']['daily_token_usage']['Insert']
 export type DailyTokenUsageUpdate = Database['public']['Tables']['daily_token_usage']['Update']
+
+// ============================================
+// Convenience type aliases for Phase 14 v4.0 tables
+// ============================================
+
+export type OnboardingSession = Database['public']['Tables']['onboarding_sessions']['Row']
+export type OnboardingSessionInsert = Database['public']['Tables']['onboarding_sessions']['Insert']
+export type OnboardingSessionUpdate = Database['public']['Tables']['onboarding_sessions']['Update']
+
+export type Subscription = Database['public']['Tables']['subscriptions']['Row']
+export type SubscriptionInsert = Database['public']['Tables']['subscriptions']['Insert']
+export type SubscriptionUpdate = Database['public']['Tables']['subscriptions']['Update']
+
+export type AgentMarketplace = Database['public']['Tables']['agent_marketplace']['Row']
+export type AgentMarketplaceInsert = Database['public']['Tables']['agent_marketplace']['Insert']
+export type AgentMarketplaceUpdate = Database['public']['Tables']['agent_marketplace']['Update']
+
+export type PaymentWebhookEvent = Database['public']['Tables']['payment_webhook_events']['Row']
+export type PaymentWebhookEventInsert = Database['public']['Tables']['payment_webhook_events']['Insert']
+export type PaymentWebhookEventUpdate = Database['public']['Tables']['payment_webhook_events']['Update']
+
+export type SuperadminAuditLog = Database['public']['Tables']['superadmin_audit_log']['Row']
+export type SuperadminAuditLogInsert = Database['public']['Tables']['superadmin_audit_log']['Insert']
+export type SuperadminAuditLogUpdate = Database['public']['Tables']['superadmin_audit_log']['Update']
+
+export type OnboardingInvite = Database['public']['Tables']['onboarding_invites']['Row']
+export type OnboardingInviteInsert = Database['public']['Tables']['onboarding_invites']['Insert']
+export type OnboardingInviteUpdate = Database['public']['Tables']['onboarding_invites']['Update']
