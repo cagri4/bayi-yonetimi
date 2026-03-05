@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 13 — Production Readiness — IN PROGRESS
-Plan: 05 of 06 complete
-Status: IN PROGRESS — Plan 05 complete (Sentry error tracking, Telegram exponential backoff retry)
-Last activity: 2026-03-05 — Phase 13 Plan 05 complete (sentry.*.config.ts, next.config.ts withSentryConfig, dispatcher.ts sendWithRetry, P1-SENTRY + P2-RETRY satisfied)
+Phase: 13 — Production Readiness — COMPLETE
+Plan: 06 of 06 complete
+Status: COMPLETE — Phase 13 all plans complete (env validation, error boundaries, rate limiting, CI, Sentry, Vitest tests)
+Last activity: 2026-03-05 — Phase 13 Plan 06 complete (vitest.config.ts, 3 test files, CI test step, P2-TESTS satisfied)
 
-Progress: [████░░░░░░] 50% — Phase 13 Plan 05 of 06 complete
+Progress: [██████████] 100% — Phase 13 Plan 06 of 06 complete
 
 ## Milestones
 
@@ -232,8 +232,8 @@ Progress: [████░░░░░░] 50% — Phase 13 Plan 05 of 06 comple
 
 ## Session Continuity
 
-Last session: 2026-03-05 (Phase 13 Plan 05 complete — Sentry error tracking, Telegram exponential backoff retry)
-Stopped at: Completed 13-05-PLAN.md
+Last session: 2026-03-05 (Phase 13 Plan 06 complete — Vitest testing framework, 42 unit tests, CI test step)
+Stopped at: Completed 13-06-PLAN.md
 Resume file: None
 
 ---
@@ -276,4 +276,10 @@ Resume file: None
 - sendWithRetry() internal helper wraps single-attempt attemptTelegramSend(); sendTelegramMessage() public signature unchanged — callers unaffected
 - 4xx errors (except 429) fail immediately without retry — permanent failures (bad token, wrong chat_id) must not waste attempts; 429 respects Telegram Retry-After header
 
-*Last updated: 2026-03-05 (Phase 13 Plan 05 complete — Sentry error tracking integration, Telegram exponential backoff retry)*
+### Phase 13 Decisions (from Plan 13-06)
+- vi.stubEnv + dynamic import in beforeAll: env.ts runs module-level parse at import time; stub env vars before import to allow schema testing without parse failure
+- environment:'node' in vitest.config.ts: all tested utilities are server-side with no DOM dependency
+- parseBody() async helper wraps response.json(): NextResponse importable in Node test context, .json() returns Promise
+- No env vars in CI Test step: tests use vi.stubEnv for mocked values — no real Supabase/Anthropic credentials needed in CI
+
+*Last updated: 2026-03-05 (Phase 13 Plan 06 complete — Vitest testing framework, 42 unit tests, CI test step)*
