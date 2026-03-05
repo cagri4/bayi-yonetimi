@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 13 — Production Readiness — IN PROGRESS
-Plan: 04 of 06 complete
-Status: IN PROGRESS — Plan 04 complete (GitHub Actions CI workflow, database backup documentation)
-Last activity: 2026-03-05 — Phase 13 Plan 04 complete (.github/workflows/ci.yml, P0-CI + P1-DBBACKUP satisfied)
+Plan: 05 of 06 complete
+Status: IN PROGRESS — Plan 05 complete (Sentry error tracking, Telegram exponential backoff retry)
+Last activity: 2026-03-05 — Phase 13 Plan 05 complete (sentry.*.config.ts, next.config.ts withSentryConfig, dispatcher.ts sendWithRetry, P1-SENTRY + P2-RETRY satisfied)
 
-Progress: [██░░░░░░░░] 40% — Phase 13 Plan 04 of 06 complete
+Progress: [████░░░░░░] 50% — Phase 13 Plan 05 of 06 complete
 
 ## Milestones
 
@@ -232,8 +232,8 @@ Progress: [██░░░░░░░░] 40% — Phase 13 Plan 04 of 06 comple
 
 ## Session Continuity
 
-Last session: 2026-03-05 (Phase 13 Plan 02 complete — error boundaries, 404 page, API response helpers)
-Stopped at: Completed 13-02-PLAN.md
+Last session: 2026-03-05 (Phase 13 Plan 05 complete — Sentry error tracking, Telegram exponential backoff retry)
+Stopped at: Completed 13-05-PLAN.md
 Resume file: None
 
 ---
@@ -269,4 +269,11 @@ Resume file: None
 - Supabase Free tier: 7-day backup retention, no PITR; Pro tier: 14-day + PITR add-on
 - Manual pg_dump recommended before major migrations as additional safety beyond automated backups
 
-*Last updated: 2026-03-05 (Phase 13 Plan 03 complete — rate limiter, structured logger, middleware x-request-id + 429 rate limiting)*
+### Phase 13 Decisions (from Plan 13-05)
+- NEXT_PUBLIC_SENTRY_DSN used in sentry.client.config.ts (browser-exposed), SENTRY_DSN for server/edge — two separate env vars for two runtime scopes
+- withSentryConfig options: silent=true (clean CI logs), hideSourceMaps=true (no source map leakage), disableLogger=true (smaller bundle when Sentry not configured)
+- SENTRY_ORG/SENTRY_PROJECT read from process.env in next.config.ts — avoids org/project names hardcoded in source
+- sendWithRetry() internal helper wraps single-attempt attemptTelegramSend(); sendTelegramMessage() public signature unchanged — callers unaffected
+- 4xx errors (except 429) fail immediately without retry — permanent failures (bad token, wrong chat_id) must not waste attempts; 429 respects Telegram Retry-After header
+
+*Last updated: 2026-03-05 (Phase 13 Plan 05 complete — Sentry error tracking integration, Telegram exponential backoff retry)*
