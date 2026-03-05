@@ -1,6 +1,6 @@
-# Requirements: Bayi Yonetimi v3.0
+# Requirements: Bayi Yonetimi
 
-**Defined:** 2026-03-01
+**Defined:** 2026-03-01 (v3.0), 2026-03-05 (v4.0)
 **Core Value:** Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis verebilmesi — AI agent'lar ile 7/24 otonom is surecleri.
 
 ## v3.0 Requirements
@@ -121,7 +121,74 @@
 - [x] **AO-02**: Agent-to-agent handoff workflow'lari calisir (Sales -> Warehouse stok kontrolu vb.)
 - [x] **AO-03**: Proaktif bildirim sistemi calisir (gunluk brifing per ajan)
 
-## v3.1 Requirements (Deferred)
+## v4.0 Requirements
+
+### Superadmin Panel
+
+- [ ] **SA-01**: Superadmin yeni firma olusturabilir (firma adi, sektor, admin email, plan secimi)
+- [ ] **SA-02**: Superadmin firma olusturunca tek kullanimlik Telegram davet linki uretilir (UUID token, 7 gun gecerlilik)
+- [ ] **SA-03**: Superadmin tum firmalari dashboard'da gorebilir (firma adi, trial durumu, aktif agent sayisi, son aktivite)
+- [ ] **SA-04**: Superadmin firma deneme suresini tek tikla uzatabilir (trial_ends_at guncelleme + kullaniciya bildirim)
+- [ ] **SA-05**: Superadmin tum islemleri audit log'a kaydedilir (kim, ne, ne zaman, eski/yeni deger)
+- [ ] **SA-06**: Superadmin paneli is_superadmin() kontrolu ile korunur (normal admin erisemez)
+
+### Kurulum Sihirbazi (Onboarding Wizard)
+
+- [ ] **KS-01**: Firma sahibi davet linkine tikladiginda Telegram'da Kurulum Sihirbazi botu acilir
+- [ ] **KS-02**: Sihirbaz davet tokenini dogrular (tek kullanimlik, suresi gecmemis) ve Telegram chat_id'yi firmaya baglar
+- [ ] **KS-03**: Sihirbaz firma bilgilerini conversational olarak toplar (firma adi, sektor, urun sayisi, bayi sayisi, beklentiler)
+- [ ] **KS-04**: Sihirbaz 12 dijital calisani sirayla tanitir (her biri icin kisa Turkce aciklama — canli demo yok)
+- [ ] **KS-05**: Sihirbaz toplanan bilgilerle sistemi tek atomik islemde kurar (company + users + agent_definitions + subscription)
+- [ ] **KS-06**: Kurulum tamamlaninca firma sahibine web panel linki ve gecici sifre gonderilir
+- [ ] **KS-07**: Sihirbaz durumu onboarding_sessions tablosunda tutar (kullanici Telegram'i kapatip acsa bile devam edebilir)
+- [ ] **KS-08**: Sihirbaz ayri bir Telegram botu olarak calisir (kendi token'i, kendi webhook route'u)
+
+### Agent Aktivasyon ve Marketplace
+
+- [ ] **AM-01**: Her firma icin 12 agent_definitions satiri olusturulur (secili olanlar aktif, digerleri pasif)
+- [ ] **AM-02**: Firma admini "Dijital Ekibim" sayfasinda 12 ajanin durumunu gorebilir (aktif/pasif, aylik ucret, kullanim istatistigi)
+- [ ] **AM-03**: Firma admini agent'lari aktif/pasif toggle ile yonetebilir ("Ise Al" / "Cikart" metaforu)
+- [ ] **AM-04**: Aylik maliyet hesaplayici aktif agent'larin toplam ucretini gosterir
+- [ ] **AM-05**: Pasif agent'a mesaj gonderildiginde Turkce uyari mesaji doner ("Bu dijital calisan aktif degil. Aktif etmek icin: [link]")
+- [ ] **AM-06**: Agent devre disi birakilirken aktif konusma kontrolu yapilir (son 5 dk icerisinde mesaj varsa uyari)
+
+### Billing ve Abonelik
+
+- [ ] **BL-01**: Her firma icin subscriptions tablosunda abonelik kaydi olusturulur (plan, durum, trial_ends_at, aktif agent sayisi)
+- [ ] **BL-02**: Mollie ile aylik otomatik odeme sistemi calisir (aktif agent sayisi x birim fiyat = aylik tutar)
+- [ ] **BL-03**: Mollie webhook'lari idempotent sekilde islenir (ayni webhook 2 kez gelse bile tek islem yapilir)
+- [ ] **BL-04**: Basarisiz odeme durumunda 3 gun grace period uygulanir (agent'lar hemen kapanmaz, uyari gonderilir)
+- [ ] **BL-05**: Grace period sonunda odenmeyen firmanin agent'lari otomatik devre disi birakilir
+- [ ] **BL-06**: Billing webhook agent_definitions.is_active uzerinde tek yetkili yazicidir (marketplace UI desired state yazar, billing sync eder)
+
+### Deneme Suresi
+
+- [ ] **TR-01**: Yeni firma 14 gun ucretsiz deneme suresiyle baslar (tum 12 agent aktif)
+- [ ] **TR-02**: Deneme suresi T-7, T-3 ve T-1 gunlerinde Telegram uzerinden uyari bildirimi gonderilir
+- [ ] **TR-03**: Deneme suresi bittiginde firma sahibine "Hangi elemanlari tutmak istiyorsunuz?" secim akisi sunulur
+- [ ] **TR-04**: Secilen agent'larin toplam ucreti hesaplanarak aylik abonelik baslatilir
+- [ ] **TR-05**: Deneme suresi bildirimleri Vercel Cron job ile gunluk kontrol edilir
+
+### Veritabani Altyapisi
+
+- [ ] **DB-01**: onboarding_sessions tablosu olusturulur (wizard state, collected_data JSONB, deep_link_token, telegram_chat_id)
+- [ ] **DB-02**: subscriptions tablosu olusturulur (company_id, plan, status, trial_ends_at, mollie_subscription_id)
+- [ ] **DB-03**: agent_marketplace tablosu olusturulur (agent_role, display_name, description, monthly_price, minimum_plan)
+- [ ] **DB-04**: payment_webhook_events tablosu olusturulur (mollie_event_id, payload JSONB, processed_at — idempotency)
+- [ ] **DB-05**: superadmin_audit_log tablosu olusturulur (actor_id, action, target_table, old_value, new_value JSONB)
+- [ ] **DB-06**: companies tablosuna trial_ends_at kolonu eklenir
+- [ ] **DB-07**: agent_definitions tablosuna subscription_tier kolonu eklenir
+- [ ] **DB-08**: onboarding_invites tablosu olusturulur (token hash, used_at, expires_at — tek kullanimlik)
+
+## v4.1+ Requirements (Deferred)
+
+### Gelismis Onboarding
+
+- **ADV-08**: Wizard'da her bot canli demo yapar (Ali'yle 1-2 mesaj konusmasi)
+- **ADV-09**: Domain-specific veri toplama per agent (her bot kendi kurulum verisini toplar)
+- **ADV-10**: Wizard interrupted state'den resume (kullanici gidip gelince kaldigi yerden devam)
+- **ADV-11**: Outcome-based pricing (agent basari metrigi bazli ucretlendirme — 6+ ay kullanim verisi gerektirir)
+- **ADV-12**: Self-service tenant signup (davet linksiz, herkesin kayit olabilmesi)
 
 ### Gelismis Ozellikler
 
@@ -137,8 +204,8 @@
 
 | Feature | Reason |
 |---------|--------|
-| WhatsApp Business API | Telegram oncelikli, WhatsApp v4.0'da |
-| ERP entegrasyonu (Logo/Netsis) | API baglantisi v4.0'da |
+| WhatsApp Business API | Telegram oncelikli, WhatsApp v5.0'da |
+| ERP entegrasyonu (Logo/Netsis) | API baglantisi v5.0'da |
 | Sesli asistan | Text-based oncelikli |
 | Mobil uygulama agent | Web + Telegram oncelikli |
 | Coklu dil destegi | Sadece Turkce |
@@ -146,6 +213,8 @@
 | Redis/separate queue | after() + prompt caching yeterli |
 | LangChain/LangGraph | Over-engineered for 12 fixed roles |
 | A2A cross-vendor protocol | Internal tool calls yeterli |
+| iyzico/PayTR | Mollie secildi — Turkiye disinda da calisan global cozum |
+| Odeme sistemi entegrasyonu | Mollie ile v4.0'da cozuldu |
 | Odeme sistemi entegrasyonu | Mevcut odeme surecleri devam |
 
 ## Traceability
