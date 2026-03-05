@@ -49,6 +49,7 @@ const serverEnvSchema = z.object({
 
   // Error tracking — optional (used by Plan 05 Sentry integration)
   SENTRY_DSN: z.string().url().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 })
 
 // ─── Public-only schema (safe for client bundle) ─────────────────────────────
@@ -57,6 +58,7 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url('NEXT_PUBLIC_SUPABASE_URL must be a valid URL'),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required'),
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 })
 
 // ─── Parsed exports ───────────────────────────────────────────────────────────
