@@ -1,316 +1,300 @@
-# Technology Stack — Multi-Tenant + AI Agent Ecosystem
+# Stack Research — v4.0 Agent-Native SaaS Onboarding & Marketplace
 
-**Project:** B2B Dealer Management SaaS (Bayi Yönetimi) — AI Agent Milestone
-**Research Scope:** NEW additions only — multi-tenant architecture + 12 AI agents via Telegram + Claude API
-**Researched:** 2026-03-01
-**Confidence:** HIGH (primary sources verified for all core additions)
+**Project:** B2B Bayi Yönetimi — v4.0 milestone additions only
+**Domain:** Conversational onboarding + per-agent billing + agent marketplace + superadmin panel
+**Researched:** 2026-03-05
+**Confidence:** HIGH for all primary decisions (verified via npm, official docs, official provider docs)
 
 ---
 
-## Context: What Already Exists (DO NOT CHANGE)
+## Context: What Already Exists (DO NOT RE-RESEARCH)
 
-The validated production stack is frozen. This document only covers additions.
+The v3.0 stack is frozen and validated in production. This document covers ONLY net-new additions.
 
 | Existing Technology | Version | Status |
 |--------------------|---------|--------|
-| Next.js | 16.1.4 | KEEP — App Router, Server Actions |
+| Next.js | 16.1.4 | KEEP |
 | React | 19.2.3 | KEEP |
-| Supabase | @supabase/ssr ^0.8.0, @supabase/supabase-js ^2.91.1 | KEEP — Auth, DB, RLS, Realtime, Storage |
+| @supabase/supabase-js | ^2.91.1 | KEEP |
+| @anthropic-ai/sdk | ^0.78.0 | KEEP |
+| grammy | ^1.41.0 | KEEP |
 | TypeScript | ^5 | KEEP |
 | Tailwind CSS | ^4 | KEEP |
 | Zustand | ^5.0.10 | KEEP |
-| Zod | ^4.3.6 | KEEP — already works with Claude tool schemas |
-| React Hook Form | ^7.71.1 | KEEP |
-| Recharts | ^2.15.4 | KEEP |
-| Sonner | ^2.0.7 | KEEP |
-| Vercel | current | KEEP — deployment target, add Fluid Compute |
+| Zod | ^4.3.6 | KEEP |
+| Vercel | current, Fluid Compute enabled | KEEP |
+| Vitest | current | KEEP |
+| Sentry | @sentry/nextjs | KEEP |
 
 ---
 
 ## New Stack Additions
 
-### 1. Claude API — Core AI Engine
+### 1. Payment Processing — iyzico (Turkish Market)
 
-#### `@anthropic-ai/sdk` ^0.78.0 — REQUIRED
-**Purpose:** Direct API access to Claude models for all 12 AI agents
-**Why this over Vercel AI SDK:** This is a Claude-only project. Raw Anthropic SDK gives direct access to Anthropic-specific features (prompt caching, tool use with beta helpers, extended thinking) without abstraction overhead. Vercel AI SDK adds value when switching providers — irrelevant here.
+#### `iyzipay` ^2.0.65 — REQUIRED
 
-**Key capabilities used:**
-- `messages.create()` with tool definitions per agent role
-- `betaZodTool()` helper — wraps Zod schemas as tool definitions (Zod v4 already in stack)
-- `messages.toolRunner()` — automatic tool call loop until final text response
-- `cache_control` on system prompt — 90% cost reduction on repeated agent calls
+**Purpose:** Subscription billing with trial periods, per-agent monthly charges for Turkish companies
 
-**Model selection per agent role:**
-| Agent Role | Model | Rationale |
-|------------|-------|-----------|
-| Executive Advisor, Accountant | claude-sonnet-4-6 | Complex reasoning, financial analysis |
-| Sales Rep, Field Sales, Collections | claude-haiku-4-5 | High volume, conversational, cost-sensitive |
-| Warehouse, Distribution, Procurement | claude-haiku-4-5 | Tool-heavy, structured queries |
-| Marketing, Campaigns, Trainer | claude-sonnet-4-6 | Creative and instructional tasks |
-| Quality/Returns, Product Manager | claude-haiku-4-5 | Pattern matching, catalog queries |
+**Why iyzico over alternatives:**
 
-**Pricing reality check (multi-tenant scale):**
-- Haiku 4.5: $1.00/$5.00 per million input/output tokens
-- Sonnet 4.6: $3.00/$15.00 per million input/output tokens
-- With prompt caching (90% savings on cached system prompts): effectively $0.10/$0.50 and $0.30/$1.50
-- Batch API: additional 50% discount for non-real-time agent work
+Stripe does not support Turkish business entities (no native Turkish merchant accounts as of 2026). Stripe requires foreign entity incorporation (US LLC, UK Ltd, EU e-Residency) — not viable for a Turkey-first B2B SaaS selling to Turkish companies paying in TRY. PayTR has no reliable maintained npm package (community packages last updated 2022). iyzico is:
+- The dominant payment processor in Turkey (market leader, licensed by TCMB under Law No. 6493)
+- Supports full subscription/recurring billing API natively
+- Has an actively maintained official npm package (`iyzipay` 2.0.65, published February 2026)
+- Has a subscription product with `trialPeriodDays` configuration at the plan level
+- Supports WEEKLY/MONTHLY/YEARLY billing intervals
 
-**Confidence:** HIGH — Verified via npm (0.78.0 published Feb 2026), official Anthropic docs confirm all features
+**What iyzico Subscription API supports:**
+- Products + pricing plans with `paymentIntervalCount` (e.g., monthly per agent)
+- `trialPeriodDays` on pricing plan — card validated via 1 TL refundable charge, no billing during trial
+- Subscription status lifecycle: PENDING → ACTIVE → CANCELLED
+- Plan upgrades/downgrades (same product, same interval, applied NOW or NEXT_PERIOD)
+- Initialize Subscription, Activate, Retry, Upgrade, Cancel, Get Details, Search, Card Update
+
+**TypeScript limitation:** Official `iyzipay` package uses callback-based API (no native TypeScript types). Use `@types/iyzipay` (v2.0.3, community DefinitelyTyped) and promisify callbacks manually with a thin wrapper.
+
+**Critical architectural note:** iyzico does NOT support per-seat billing natively. The billing model for this project must be implemented at the application layer: one subscription per company, fixed monthly price calculated from active agent count, managed via a Supabase `company_subscriptions` table. iyzico handles the recurring card charge; the app handles the agent count → price calculation.
+
+**Confidence:** HIGH — npm version verified (2.0.65, February 2026), official iyzico docs verified subscription API, TCMB license confirmed
 
 **Sources:**
-- [Anthropic TypeScript SDK — GitHub](https://github.com/anthropics/anthropic-sdk-typescript)
-- [@anthropic-ai/sdk — npm](https://www.npmjs.com/package/@anthropic-ai/sdk)
-- [Claude API Pricing — Official](https://platform.claude.com/docs/en/about-claude/pricing)
-- [Prompt Caching — Official](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
+- [iyzipay npm package](https://www.npmjs.com/package/iyzipay) — version 2.0.65, last published Feb 2026
+- [iyzico Subscription Product docs](https://docs.iyzico.com/en/products/subscription)
+- [iyzico Subscription Transactions](https://docs.iyzico.com/en/products/subscription/subscription-implementation/subscription-transactions)
+- [@types/iyzipay npm](https://www.npmjs.com/package/@types/iyzipay)
 
 ---
 
-### 2. Telegram Bot Framework
+### 2. Telegram Conversations Plugin — Onboarding Wizard State
 
-#### `grammy` ^1.41.0 — REQUIRED
-**Purpose:** Receive and respond to dealer Telegram messages, route to appropriate AI agent
-**Why grammY over Telegraf:** grammY is TypeScript-first with clean, consistent types throughout. Telegraf v4's TypeScript migration resulted in complex, hard-to-understand types. grammY is actively maintained (1.41.0 published March 2026) and has explicit Vercel serverless webhook support via `webhookCallback`. grammY also has a plugin ecosystem for conversation state, sessions, and menus.
+#### `@grammyjs/conversations` ^2.1.1 — REQUIRED
 
-**Deployment mode: WEBHOOK (not long polling)**
-- Vercel serverless = no persistent process for long polling
-- Telegram pushes updates as HTTP POST to `POST /api/telegram/webhook`
-- grammY's `webhookCallback` converts incoming Next.js route handler request to bot update
+**Purpose:** Multi-step conversational state machine for the Kurulum Sihirbazi (13th agent — Setup Wizard). Enables the bot to ask sequential questions, wait for user replies, and advance through onboarding steps without managing state manually.
 
-**Integration pattern (Next.js App Router):**
+**Why this over manual state machines:**
+Without `@grammyjs/conversations`, every message requires reading a `wizard_step` column from Supabase and branching on it — O(N) branching code for N steps, hard to maintain. The conversations plugin models the entire onboarding flow as a sequential async function that "pauses" between messages, making the code read exactly like the conversation flows.
+
+**Serverless caveat — requires external storage adapter:**
+The conversations plugin warns against serverless use with in-memory storage due to race conditions. On Vercel (serverless), conversation state must be persisted externally. The `@grammyjs/storage-supabase` adapter (v2.5.0) solves this — conversation state is stored in Supabase, already in the stack.
+
+**Setup with Supabase adapter:**
 ```typescript
-// src/app/api/telegram/webhook/route.ts
-import { Bot, webhookCallback } from 'grammy';
+import { conversations } from '@grammyjs/conversations';
+import { SupabaseAdapter } from '@grammyjs/storage-supabase';
 
-const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN!);
-
-bot.on('message:text', async (ctx) => {
-  const tenantId = await resolveTenantFromChat(ctx.chat.id);
-  const agentRole = await resolveAgentRole(ctx.chat.id, tenantId);
-  await dispatchToAgent(ctx, agentRole, tenantId);
+const supabaseAdapter = new SupabaseAdapter(supabaseClient, {
+  tableName: 'grammy_conversations',
 });
 
-const handler = webhookCallback(bot, 'std/http'); // std/http = Web API Request/Response
-
-export const POST = handler;
-export const dynamic = 'force-dynamic'; // required for webhook
+bot.use(conversations({
+  storage: supabaseAdapter,
+}));
 ```
 
-**Local development:** Use `ngrok` to expose HTTPS tunnel → set Telegram webhook to ngrok URL. Switch to production URL on deploy.
-
-**Confidence:** HIGH — grammY 1.41.0 verified on npm, official Vercel hosting guide exists in grammY docs
-
-**Sources:**
-- [grammY — Official](https://grammy.dev/)
-- [grammY npm — current version](https://www.npmjs.com/package/grammy)
-- [grammY Vercel Hosting Guide](https://grammy.dev/hosting/vercel)
-- [grammY Deployment Types — Long Polling vs Webhook](https://grammy.dev/guide/deployment-types)
-
----
-
-### 3. Vercel Configuration Change
-
-#### Fluid Compute — ENABLE (config change, not a package)
-**Purpose:** AI agent processing requires up to 800 seconds execution time vs default 10-15s
-**Why needed:** Claude tool-calling loops for complex agent tasks (e.g., Accountant analyzing financial history, Procurement checking supplier catalog) can chain multiple tool calls taking 60-120 seconds each. Standard serverless timeout of 15s (Pro default) kills these mid-execution.
-
-**Configuration:**
+**Conversation flow pattern for onboarding wizard:**
 ```typescript
-// src/app/api/telegram/webhook/route.ts
-export const maxDuration = 300; // seconds, up to 800 on Pro plan with Fluid Compute
+async function setupWizard(conversation: Conversation, ctx: Context) {
+  await ctx.reply("Firma adınız nedir?");
+  const companyName = await conversation.waitFor('message:text');
+
+  await ctx.reply("Kaç bayiniz var?");
+  const dealerCount = await conversation.waitFor('message:text');
+
+  // ... additional steps for each agent domain
+  // then: create company in DB, configure all 12 agents, send completion message
+}
+
+bot.use(createConversation(setupWizard));
 ```
 
-**Fluid Compute limits (Pro plan):**
-- Default: 300 seconds
-- Maximum configurable: 800 seconds
-- Standard serverless: 300 seconds max
+**Version compatibility:** `@grammyjs/conversations` 2.1.1 requires `grammy ^1.20.1` — compatible with existing `grammy ^1.41.0`.
 
-**Recommendation:** Set `maxDuration = 300` initially. Increase to 800 only for async/batch agent tasks that justify it.
-
-**Confidence:** HIGH — Verified via Vercel official docs and changelog
+**Confidence:** HIGH — npm version 2.1.1 verified (last updated November 2025), Supabase adapter v2.5.0 confirmed, peer dependency compatibility verified
 
 **Sources:**
-- [Vercel Fluid Compute](https://vercel.com/docs/fluid-compute)
-- [Configuring maxDuration](https://vercel.com/docs/functions/configuring-functions/duration)
+- [@grammyjs/conversations npm](https://www.npmjs.com/package/@grammyjs/conversations) — v2.1.1
+- [grammY Conversations Plugin docs](https://grammy.dev/plugins/conversations)
+- [@grammyjs/storage-supabase npm](https://www.npmjs.com/package/@grammyjs/storage-supabase) — v2.5.0
 
 ---
 
-### 4. Multi-Tenant Architecture — Database Pattern
+### 3. Supabase Storage Adapter for grammY
 
-**No new package required.** Multi-tenancy is implemented via Supabase RLS + schema additions.
+#### `@grammyjs/storage-supabase` ^2.5.0 — REQUIRED (companion to conversations)
 
-#### Database schema additions (SQL migrations):
+**Purpose:** Persists multi-step conversation state between serverless function invocations. Required because Vercel functions are stateless — without external storage, the wizard loses its position on every message.
 
+**Why this over other storage adapters:**
+Supabase is already in the stack. Using the Supabase storage adapter means zero new infrastructure — conversation state lives in the same Postgres database as all other app data. Alternatives (Redis, file storage, Firestore) would add a new infrastructure dependency for a single-purpose store.
+
+**Requires a `grammy_conversations` table in Supabase:**
 ```sql
--- organizations table (each company = one tenant)
-CREATE TABLE organizations (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name        text NOT NULL,
-  slug        text UNIQUE NOT NULL,       -- for URL routing: /org/{slug}
-  plan        text DEFAULT 'starter',     -- starter | pro | enterprise
-  settings    jsonb DEFAULT '{}',         -- org-level config
-  created_at  timestamptz DEFAULT now()
+CREATE TABLE grammy_conversations (
+  key   text PRIMARY KEY,
+  value jsonb NOT NULL
 );
-
--- organization_members (users belong to orgs)
-CREATE TABLE organization_members (
-  organization_id  uuid REFERENCES organizations(id) ON DELETE CASCADE,
-  user_id          uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-  role             text CHECK (role IN ('owner', 'admin', 'dealer')),
-  PRIMARY KEY (organization_id, user_id)
-);
-
--- All existing tables get organization_id column
-ALTER TABLE dealers      ADD COLUMN organization_id uuid REFERENCES organizations(id);
-ALTER TABLE products     ADD COLUMN organization_id uuid REFERENCES organizations(id);
-ALTER TABLE orders       ADD COLUMN organization_id uuid REFERENCES organizations(id);
--- ... etc for all tables
-
--- RLS policy pattern on every table
-CREATE POLICY "tenant_isolation" ON dealers
-  USING (organization_id = (auth.jwt() ->> 'organization_id')::uuid);
+-- Exclude from RLS — accessed via service role from webhook handler
 ```
 
-#### Supabase Custom Access Token Hook (JWT enrichment):
-
-```sql
--- Postgres function runs before JWT issuance, injects organization_id into token
-CREATE OR REPLACE FUNCTION inject_organization_claim(event jsonb)
-RETURNS jsonb LANGUAGE plpgsql AS $$
-DECLARE
-  org_id uuid;
-  claims jsonb;
-BEGIN
-  SELECT organization_id INTO org_id
-  FROM organization_members
-  WHERE user_id = (event->>'user_id')::uuid
-  LIMIT 1;
-
-  claims := event->'claims';
-  IF org_id IS NOT NULL THEN
-    claims := jsonb_set(claims, '{organization_id}', to_jsonb(org_id::text));
-  END IF;
-
-  RETURN jsonb_set(event, '{claims}', claims);
-END;
-$$;
-```
-
-**Why JWT injection over per-query lookup:** RLS policies using `auth.jwt() ->> 'organization_id'` are evaluated by PostgreSQL — no application-level join needed. Every query is automatically scoped to the tenant without any code change in Server Actions.
-
-**Important caveat:** JWT is stale until refreshed. If a user is removed from an organization, their token remains valid until expiry. Mitigate by keeping token TTL short (1 hour, Supabase default) and triggering client-side refresh on sensitive operations.
-
-**Confidence:** HIGH — Supabase official docs confirm Custom Access Token Hook and JWT RLS pattern
+**Confidence:** HIGH — npm version 2.5.0 verified (last updated July 2025), official grammY storage package
 
 **Sources:**
-- [Supabase Custom Access Token Hook](https://supabase.com/docs/guides/auth/auth-hooks/custom-access-token-hook)
+- [@grammyjs/storage-supabase npm](https://www.npmjs.com/package/@grammyjs/storage-supabase) — v2.5.0
+
+---
+
+### 4. Telegram Deep Links — No New Package (grammY built-in)
+
+**Purpose:** Superadmin panel generates a unique onboarding link per company. Clicking the link opens the Setup Wizard bot pre-seeded with the company ID, so the wizard knows which company to configure.
+
+**How it works (Telegram-native, no library needed):**
+- Link format: `https://t.me/{BOT_USERNAME}?start={payload}` where payload is base64url-encoded company token
+- Payload limit: **64 characters** (Telegram enforces this — design tokens accordingly)
+- Bot receives `/start {payload}` — grammY handles with `bot.command('start', handler)`
+- Payload contains: a short-lived JWT or UUID lookup key pointing to `onboarding_tokens` table
+
+**Token design for 64-char limit:**
+```typescript
+// UUID (36 chars) fits comfortably within 64-char limit
+const token = crypto.randomUUID(); // e.g., "a1b2c3d4-..."
+// Store: { token, company_id, expires_at } in onboarding_tokens table
+// Link: `https://t.me/BayiYonetimBot?start=${token}`
+```
+
+**Superadmin generates the link; grammY's existing `bot.command('start')` receives it.** No new package needed.
+
+**Confidence:** HIGH — Telegram Bot API official docs confirm deep link format and 64-char payload limit
+
+**Sources:**
+- [Telegram Bot Features — Deep Linking](https://core.telegram.org/bots/features#deep-linking)
+- [Telegram API Links reference](https://core.telegram.org/api/links)
+
+---
+
+### 5. Superadmin Panel — No New Package (Next.js + Supabase service role)
+
+**Purpose:** Isolated admin interface at `/superadmin/*` for creating companies, generating onboarding links, viewing all tenants, enabling/disabling agents per company.
+
+**Why no new package:**
+The pattern is: Next.js Server Actions with a Supabase client initialized with the **service role key** (bypasses RLS entirely) — standard Supabase pattern for admin operations. Combined with a custom `is_superadmin()` check on the calling user, this provides cross-tenant read/write access without any new library.
+
+**Route isolation pattern:**
+```typescript
+// src/app/superadmin/layout.tsx
+import { isSuperadmin } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
+export default async function SuperadminLayout({ children }) {
+  const authorized = await isSuperadmin();
+  if (!authorized) redirect('/');
+  return <>{children}</>;
+}
+```
+
+**Supabase service role client for cross-tenant operations:**
+```typescript
+// src/lib/supabase/superadmin.ts
+import { createClient } from '@supabase/supabase-js';
+
+export const superadminClient = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!, // bypasses all RLS
+);
+```
+
+**Confidence:** HIGH — Supabase official docs confirm service role bypasses RLS, standard pattern
+
+**Sources:**
 - [Supabase RLS Guide](https://supabase.com/docs/guides/database/postgres/row-level-security)
-- [Multi-Tenant Applications with RLS on Supabase](https://www.antstack.com/blog/multi-tenant-applications-with-rls-on-supabase-postgress/)
+- [Supabase Service Role Key security](https://supabase.com/docs/guides/troubleshooting/why-is-my-service-role-key-client-getting-rls-errors-or-not-returning-data-7_1K9z)
 
 ---
 
-### 5. Agent Conversation Storage — Database Pattern
+### 6. Agent Marketplace — Database Pattern, No New Package
 
-**No new package.** Uses existing Supabase PostgreSQL with JSONB.
+**Purpose:** Per-company toggle of which AI agents are active ("Dijital Ekibim" / My Digital Team). Drives billing (active agents = monthly charge), conversation routing (only route to active agents), and UI display.
 
-#### Schema for agent conversations:
-
+**Schema pattern:**
 ```sql
--- One session per dealer-agent pair
-CREATE TABLE agent_sessions (
-  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  organization_id  uuid REFERENCES organizations(id) ON DELETE CASCADE,
-  dealer_id        uuid REFERENCES dealers(id) ON DELETE CASCADE,
-  agent_role       text NOT NULL,  -- 'sales_rep' | 'accountant' | etc.
-  telegram_chat_id bigint NOT NULL,
-  started_at       timestamptz DEFAULT now(),
-  last_active_at   timestamptz DEFAULT now(),
-  context_summary  text,           -- compressed memory after N turns
-  UNIQUE (dealer_id, agent_role)   -- one active session per dealer-agent pair
+-- One row per company-agent pair, tracks enabled state and trial
+CREATE TABLE company_agents (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id     uuid REFERENCES companies(id) ON DELETE CASCADE,
+  agent_role     text NOT NULL,  -- 'sales_rep' | 'accountant' | etc. (12 values)
+  enabled        boolean NOT NULL DEFAULT true,
+  trial_ends_at  timestamptz,
+  hired_at       timestamptz DEFAULT now(),
+  UNIQUE (company_id, agent_role)
 );
 
--- Messages (full conversation history for API calls)
-CREATE TABLE agent_messages (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id  uuid REFERENCES agent_sessions(id) ON DELETE CASCADE,
-  role        text CHECK (role IN ('user', 'assistant', 'tool')),
-  content     jsonb NOT NULL,     -- Anthropic message format stored directly
-  tokens_used int,
-  created_at  timestamptz DEFAULT now()
-);
+-- RLS: company members see only their agents
+CREATE POLICY "company_isolation" ON company_agents
+  USING (company_id = (auth.jwt() ->> 'company_id')::uuid);
 
--- Index for fast session retrieval
-CREATE INDEX idx_agent_messages_session ON agent_messages(session_id, created_at DESC);
-
--- RLS: agents can only read their own organization's conversations
-CREATE POLICY "org_isolation" ON agent_sessions USING (
-  organization_id = (auth.jwt() ->> 'organization_id')::uuid
-);
+-- Superadmin sees all (service role bypasses RLS)
 ```
 
-**Why JSONB for content:** Anthropic API message format (`ContentBlock[]`) maps directly to JSONB. No transformation needed — store what API returns, feed what API expects.
+**Why a table over JSONB column on companies:**
+- Per-agent queries ("which companies have sales_rep enabled?") are indexed
+- Audit trail possible (add `enabled_at`, `disabled_at` columns)
+- RLS policies apply cleanly
+- `unique(company_id, agent_role)` prevents duplicate rows naturally
 
-**Context window management:** Load last N messages per session (e.g., 20 turns). When context grows large, summarize older turns into `context_summary` and truncate `agent_messages`. This prevents unbounded token cost growth.
+**Monthly cost calculation (application layer):**
+```typescript
+const AGENT_PRICE_TRY = 299; // per agent per month
+const activeAgents = await getEnabledAgentCount(companyId);
+const monthlyTotal = activeAgents * AGENT_PRICE_TRY;
+// Update iyzico subscription plan price when agent count changes
+```
 
-**Confidence:** HIGH — Pattern confirmed by VoltAgent, LangChain, and direct Supabase AI docs
-
-**Sources:**
-- [VoltAgent Supabase Memory Pattern](https://voltagent.dev/docs/agents/memory/supabase/)
-- [PostgreSQL as AI Agent Memory](https://www.oreateai.com/blog/postgresql-as-the-cornerstone-of-the-ai-agent-operating-system-memory-storage-and-the-future-of-agent-infrastructure/318c62d30a90b6cd22df70af44eaf44d)
-- [Supabase Postgres Best Practices for AI Agents](https://supabase.com/blog/postgres-best-practices-for-ai-agents)
+**Confidence:** HIGH — standard Supabase table pattern, no external dependency
 
 ---
 
-### 6. Agent Tool Definitions — Integration Point, No New Package
+## Complete Installation
 
-**How existing Server Actions become Claude tools:**
+```bash
+# New production dependencies for v4.0
+npm install iyzipay @grammyjs/conversations @grammyjs/storage-supabase
 
-Every Server Action (`/src/lib/actions/*.ts`) can be exposed as a Claude tool. No new package needed — `@anthropic-ai/sdk` accepts Zod schemas (already in stack via `betaZodTool`).
-
-```typescript
-// src/lib/agents/tools/order-tools.ts
-import { betaZodTool } from '@anthropic-ai/sdk/helpers/beta/zod';
-import { z } from 'zod';
-import { getOrdersByDealer } from '@/lib/actions/orders';
-import { createOrder } from '@/lib/actions/orders';
-
-export const getOrdersTool = betaZodTool({
-  name: 'get_orders',
-  description: 'Retrieve recent orders for the current dealer',
-  inputSchema: z.object({
-    limit: z.number().optional().default(10),
-    status: z.enum(['pending', 'confirmed', 'shipped', 'delivered']).optional(),
-  }),
-  run: async (input, context) => {
-    // context carries dealerId + organizationId from session
-    const orders = await getOrdersByDealer(context.dealerId, input);
-    return JSON.stringify(orders);
-  }
-});
+# Type definitions (no native TypeScript in iyzipay)
+npm install -D @types/iyzipay
 ```
 
-**Tool set per agent role:**
+**Total new packages: 3 production + 1 dev type definition**
 
-| Agent Role | Tools Exposed |
-|------------|---------------|
-| Sales Rep | `get_catalog`, `create_order`, `get_order_status`, `get_campaigns` |
-| Accountant | `get_financials`, `get_payment_history`, `get_invoices`, `export_report` |
-| Warehouse Manager | `get_inventory_status`, `get_pending_orders`, `update_stock` |
-| Field Sales | `get_dealer_profile`, `get_order_history`, `create_campaign_target` |
-| Distribution Coordinator | `get_pending_shipments`, `update_delivery_status` |
-| Collections | `get_overdue_payments`, `create_payment_plan`, `send_reminder` |
-| Procurement | `get_product_catalog`, `create_purchase_request`, `get_supplier_list` |
-| Marketing | `get_campaigns`, `create_announcement`, `get_dealer_segments` |
-| Product Manager | `get_products`, `update_product_info`, `get_sales_by_product` |
-| Trainer | `get_dealer_onboarding_status`, `get_product_info`, `create_announcement` |
-| Quality/Returns | `get_return_requests`, `update_return_status`, `get_quality_metrics` |
-| Executive Advisor | ALL read-only tools + `get_dashboard_summary`, `export_report` |
+All packages are server-side only (API routes, Server Actions). No client bundle impact.
 
-**Confidence:** HIGH — `betaZodTool` confirmed in Anthropic SDK docs, Zod already in stack
+---
 
-**Sources:**
-- [Claude API Tool Calling Docs](https://platform.claude.com/docs/en/build-with-claude/tool-use)
-- [Anthropic SDK Tool Helpers Beta](https://github.com/anthropics/anthropic-sdk-typescript)
+## Environment Variables to Add
+
+```bash
+# iyzico Payment
+IYZICO_API_KEY=sandbox-...
+IYZICO_SECRET_KEY=sandbox-...
+IYZICO_BASE_URL=https://sandbox-api.iyzipay.com  # switch to https://api.iyzipay.com in prod
+
+# Superadmin access control
+SUPERADMIN_USER_IDS=uuid1,uuid2  # comma-separated Supabase user UUIDs
+```
+
+No new Telegram variables needed — existing `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` carry over.
+
+---
+
+## Alternatives Considered
+
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| Payment (Turkey) | iyzipay ^2.0.65 | PayTR | No official npm package; community packages abandoned since 2022 (last update October 2022). PayTR's recurring API exists but requires raw HTTP calls — builds same wrapper work as iyzico but without maintained SDK. |
+| Payment (Turkey) | iyzipay ^2.0.65 | Stripe | Turkey not in Stripe's supported countries for merchant accounts. Foreign entity workaround (US LLC, Estonia e-Residency) adds legal/tax complexity inappropriate for a Turkish-market B2B product. |
+| Payment (Turkey) | iyzipay ^2.0.65 | Paddle / Lemon Squeezy | Both are Merchant of Record services optimized for SaaS sold globally. Overkill for TRY-denominated B2B sales to Turkish companies; adds foreign currency conversion costs. |
+| Wizard state | @grammyjs/conversations | Manual wizard_step column | Manual step tracking requires O(N) switch-case branching and step re-validation logic. Conversations plugin models flow as linear async code — dramatically simpler, less error-prone. |
+| Conversation storage | @grammyjs/storage-supabase | Redis | Redis adds new infrastructure. Supabase already in stack. Only viable if conversation volume exceeds Postgres capacity (not a concern at 700 dealers). |
+| Superadmin access | Service role + is_superadmin() | Separate Supabase project | Single project is simpler. Service role bypasses RLS cleanly. Separate project creates deployment complexity and cross-project auth. |
 
 ---
 
@@ -318,120 +302,126 @@ export const getOrdersTool = betaZodTool({
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| **Vercel AI SDK** (`ai` package) | Adds abstraction for multi-provider switching — irrelevant (Claude-only). Adds 19KB+ bundle. | Raw `@anthropic-ai/sdk` |
-| **LangChain / LangGraph** | Heavyweight framework (300+ packages), complex debugging, slower iteration. Over-engineered for 12 fixed agent roles. | Custom orchestration with `@anthropic-ai/sdk` + `messages.toolRunner()` |
-| **OpenAI SDK** | No role here — not using OpenAI | `@anthropic-ai/sdk` |
-| **Telegraf** | TypeScript types are complex and inconsistent in v4; actively maintained alternative (grammY) exists | `grammy` |
-| **pgvector / semantic search** | Dealers don't need semantic product search — they search by catalog code or product name. Vector embeddings add complexity without business value at this scale. | Supabase full-text search (`tsvector`) already available |
-| **Redis / separate cache** | Prompt caching in Claude API eliminates need for external cache for system prompts. Conversation state in Postgres is sufficient. | Supabase PostgreSQL JSONB for sessions |
-| **Separate message queue (Bull, BullMQ)** | Telegram webhook → Next.js API route → Claude API is synchronous enough for MVP. Telegram allows 30s for bot responses. | Direct async handler in route, Vercel Fluid Compute for timeout |
-| **Separate vector DB (Pinecone, Weaviate)** | PostgreSQL handles sub-100M vector workloads. Supabase pgvector available if needed later. | Postgres JSONB for conversation, full-text search for products |
-| **Separate tenant schema per company** | Schema-per-tenant adds deployment complexity. Row-level isolation with `organization_id` column scales to 1000s of tenants. | Single schema + RLS |
-| **`@anthropic-ai/claude-agent-sdk`** | Claude Code SDK — built for coding agents (file system, bash). Wrong tool for business domain agents. | `@anthropic-ai/sdk` directly |
-
----
-
-## Complete Installation
-
-```bash
-# New production dependencies
-npm install @anthropic-ai/sdk grammy
-
-# No dev dependency additions required
-```
-
-**Total new packages: 2**
-**Estimated bundle impact:** ~50KB (server-side only, no client bundle impact — both libraries used exclusively in API routes)
-
----
-
-## Environment Variables to Add
-
-```bash
-# Claude API
-ANTHROPIC_API_KEY=sk-ant-...
-
-# Telegram Bot
-TELEGRAM_BOT_TOKEN=...
-TELEGRAM_WEBHOOK_SECRET=...  # grammy webhook secret for request verification
-```
+| **Paddle / Lemon Squeezy** | MoR services priced for global SaaS, add currency conversion fees on TRY transactions. Not designed for B2B invoice-based Turkish market. | `iyzipay` |
+| **node-paytr / paytr-js** | Community packages, both last published October 2022. No TypeScript types, no maintenance, no subscription API coverage. | `iyzipay` |
+| **@types/iyzipay community fork** | Use official DefinitelyTyped `@types/iyzipay` instead. Third-party forks vary in completeness. | `@types/iyzipay` from DefinitelyTyped |
+| **grammY Scenes plugin** | Older pattern superseded by conversations plugin. Less expressive for multi-step flows. grammY docs explicitly recommend conversations over scenes for complex flows. | `@grammyjs/conversations` |
+| **Separate feature flag service (LaunchDarkly, etc.)** | Agent enable/disable is a core billing feature, not a deployment flag. Billing state belongs in the app database, not an external flag service. | `company_agents` table in Supabase |
+| **Clerk / Auth0 for superadmin** | Already have Supabase Auth. Adding a second auth system for superadmin creates session management complexity. Simple `is_superadmin()` function checking against a `superadmins` table is sufficient. | Supabase service role + custom role check |
+| **BullMQ / job queue for billing** | iyzico subscription API handles recurring charge scheduling autonomously. No queue needed for billing triggers. Webhook callback from iyzico notifies of payment events. | iyzico webhook callbacks + Supabase |
 
 ---
 
 ## Version Compatibility Matrix
 
-| Package | Version | Next.js 16 | React 19 | Supabase | Zod v4 | Node.js |
-|---------|---------|-----------|---------|---------|--------|---------|
-| `@anthropic-ai/sdk` | ^0.78.0 | ✅ | N/A (server) | ✅ | ✅ (betaZodTool) | 20 LTS+ |
-| `grammy` | ^1.41.0 | ✅ | N/A (server) | ✅ | N/A | 18+ |
+| Package | Version | grammy 1.41 | Next.js 16 | Supabase JS 2.91 | Node.js |
+|---------|---------|-------------|-----------|-----------------|---------|
+| `iyzipay` | ^2.0.65 | N/A | ✅ (server only) | N/A | 18+ |
+| `@grammyjs/conversations` | ^2.1.1 | ✅ (requires grammy ^1.20.1) | ✅ (webhook) | N/A | 18+ |
+| `@grammyjs/storage-supabase` | ^2.5.0 | ✅ | ✅ | ✅ | 18+ |
+| `@types/iyzipay` | ^2.0.3 | N/A | ✅ | N/A | N/A (dev only) |
 
-**Note:** Both packages run exclusively in Next.js API routes (server-side). No client bundle impact.
-
----
-
-## Architecture Topology
-
-```
-Dealer                Telegram            Next.js (Vercel)         Supabase
-  │                      │                      │                      │
-  │──── message ────────>│                      │                      │
-  │                      │──── POST /webhook ──>│                      │
-  │                      │                      │── load session ─────>│
-  │                      │                      │<─ messages[] ────────│
-  │                      │                      │                      │
-  │                      │                      │── Claude API ──────> Anthropic
-  │                      │                      │<─ tool_call ─────────│
-  │                      │                      │                      │
-  │                      │                      │── Server Action ────>│ (Supabase DB)
-  │                      │                      │<─ result ────────────│
-  │                      │                      │                      │
-  │                      │                      │── Claude API ──────> Anthropic
-  │                      │                      │<─ final text ────────│
-  │                      │                      │                      │
-  │                      │                      │── save message ─────>│
-  │                      │                      │                      │
-  │<── bot reply ────────│<── sendMessage ──────│                      │
-```
-
-**Key design decision:** Agent dispatch happens inside the Next.js webhook handler. No separate agent server. All 12 agent roles are instantiated on-demand per incoming message. Session state persists in Supabase.
+**Known constraint:** `@grammyjs/conversations` requires external storage in serverless environments. `@grammyjs/storage-supabase` satisfies this requirement with zero new infrastructure.
 
 ---
 
-## Confidence Assessment
+## Architecture Integration Map
 
-| Area | Level | Reasoning |
-|------|-------|-----------|
-| Claude API (`@anthropic-ai/sdk`) | HIGH | npm version 0.78.0 confirmed, official docs verify tool calling, betaZodTool, prompt caching |
-| Telegram (grammy) | HIGH | npm version 1.41.0 confirmed March 2026, official Vercel hosting guide exists |
-| Multi-tenant RLS pattern | HIGH | Supabase official docs + multiple production references confirm organization_id + JWT pattern |
-| Agent conversation storage | HIGH | JSONB pattern confirmed by VoltAgent, multiple Supabase AI guides |
-| Vercel Fluid Compute | HIGH | Official Vercel docs confirm 800s max on Pro plan |
-| Tool-to-Server-Action mapping | MEDIUM | Pattern is straightforward but the 12-agent tool taxonomy is project-specific and untested |
-| Prompt caching cost reduction | HIGH | Official Anthropic docs confirm 90% reduction on cached system prompts |
+```
+Superadmin Panel (/superadmin/*)
+  │── Next.js Server Actions
+  │── Supabase service role client (bypasses RLS)
+  │── Creates: companies, onboarding_tokens, company_agents
+  └── Generates: t.me/BayiYonetimBot?start={UUID} deep links
+
+Telegram Webhook (POST /api/telegram/webhook)
+  │── grammy bot.command('start', handler)  ← receives deep link payload
+  │── Looks up onboarding_tokens table → gets company_id
+  │── Launches setupWizard conversation (13th agent)
+  │   └── @grammyjs/conversations persists state via @grammyjs/storage-supabase
+  │── After completion: populates DB, activates company_agents, sends web panel link
+  └── For non-onboarding messages: existing AgentRunner/AgentBridge (unchanged)
+
+Agent Marketplace (Admin Panel — /admin/agents)
+  │── Next.js Server Actions with company-scoped Supabase client
+  │── Reads/writes company_agents table (enable/disable toggles)
+  │── Calculates monthly cost (activeAgents × AGENT_PRICE_TRY)
+  └── Updates iyzico subscription plan when agent count changes
+
+Billing (iyzico)
+  │── iyzipay SDK for subscription creation (company signs up → subscription initialized)
+  │── Trial period: trialPeriodDays configured per pricing plan
+  │── Recurring charge: iyzico autonomously charges monthly
+  │── Webhook callback → POST /api/billing/iyzico-webhook → updates company status
+  └── Plan upgrade/downgrade when agent count changes (same product, same interval)
+```
+
+---
+
+## New Database Tables Required
+
+```sql
+-- Onboarding deep link tokens (short-lived, consumed once)
+CREATE TABLE onboarding_tokens (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id  uuid REFERENCES companies(id) ON DELETE CASCADE,
+  token       text UNIQUE NOT NULL DEFAULT gen_random_uuid()::text,
+  expires_at  timestamptz NOT NULL DEFAULT now() + interval '7 days',
+  used_at     timestamptz,  -- null = unused
+  created_by  uuid REFERENCES auth.users(id)  -- superadmin who generated it
+);
+
+-- Per-company per-agent enable/disable state
+CREATE TABLE company_agents (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id     uuid REFERENCES companies(id) ON DELETE CASCADE,
+  agent_role     text NOT NULL,
+  enabled        boolean NOT NULL DEFAULT true,
+  trial_ends_at  timestamptz,
+  hired_at       timestamptz DEFAULT now(),
+  UNIQUE (company_id, agent_role)
+);
+
+-- Subscription billing state (synced from iyzico webhooks)
+CREATE TABLE company_subscriptions (
+  id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id            uuid REFERENCES companies(id) ON DELETE CASCADE UNIQUE,
+  iyzico_subscription_ref  text UNIQUE,  -- iyzico's subscription reference code
+  status                text NOT NULL DEFAULT 'trial',  -- trial | active | cancelled | past_due
+  trial_ends_at         timestamptz,
+  current_period_start  timestamptz,
+  current_period_end    timestamptz,
+  active_agent_count    int NOT NULL DEFAULT 12,  -- all agents active during trial
+  monthly_amount_try    numeric(10,2),
+  updated_at            timestamptz DEFAULT now()
+);
+
+-- grammY conversation state storage (required by @grammyjs/storage-supabase)
+CREATE TABLE grammy_conversations (
+  key   text PRIMARY KEY,
+  value jsonb NOT NULL
+);
+-- No RLS — accessed via service role key from webhook handler
+```
 
 ---
 
 ## Sources
 
-- [Anthropic TypeScript SDK — GitHub](https://github.com/anthropics/anthropic-sdk-typescript)
-- [@anthropic-ai/sdk — npm 0.78.0](https://www.npmjs.com/package/@anthropic-ai/sdk)
-- [Claude API Pricing 2026 — Official](https://platform.claude.com/docs/en/about-claude/pricing)
-- [Claude Prompt Caching — Official](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
-- [grammY — Official](https://grammy.dev/)
-- [grammY npm 1.41.0](https://www.npmjs.com/package/grammy)
-- [grammY Vercel Hosting Guide](https://grammy.dev/hosting/vercel)
-- [grammY vs Telegraf Comparison](https://grammy.dev/resources/comparison)
-- [Vercel Fluid Compute](https://vercel.com/docs/fluid-compute)
-- [Vercel Function maxDuration](https://vercel.com/docs/functions/configuring-functions/duration)
-- [Supabase Custom Access Token Hook](https://supabase.com/docs/guides/auth/auth-hooks/custom-access-token-hook)
-- [Supabase RLS Multi-Tenant](https://www.antstack.com/blog/multi-tenant-applications-with-rls-on-supabase-postgress/)
-- [Supabase Postgres Best Practices for AI Agents](https://supabase.com/blog/postgres-best-practices-for-ai-agents)
-- [VoltAgent Supabase Memory](https://voltagent.dev/docs/agents/memory/supabase/)
-- [AI SDK 6 — Vercel](https://vercel.com/blog/ai-sdk-6)
-- [Vercel AI SDK vs Anthropic SDK — Strapi](https://strapi.io/blog/langchain-vs-vercel-ai-sdk-vs-openai-sdk-comparison-guide)
+- [iyzipay npm](https://www.npmjs.com/package/iyzipay) — v2.0.65 verified, February 2026
+- [iyzico Subscription Docs](https://docs.iyzico.com/en/products/subscription) — subscription features, trial period
+- [iyzico Subscription Transactions](https://docs.iyzico.com/en/products/subscription/subscription-implementation/subscription-transactions) — lifecycle, trial mechanics
+- [iyzico Subscription Product API](https://docs.iyzico.com/en/products/subscription/subscription-implementation/subscription-product) — billing intervals, trialPeriodDays
+- [Stripe Turkey availability](https://stripe.com/resources/more/payments-in-turkey) — confirms no native Turkish merchant support
+- [@grammyjs/conversations npm](https://www.npmjs.com/package/@grammyjs/conversations) — v2.1.1 verified
+- [grammY Conversations Plugin](https://grammy.dev/plugins/conversations) — serverless warning, storage adapters confirmed
+- [@grammyjs/storage-supabase npm](https://www.npmjs.com/package/@grammyjs/storage-supabase) — v2.5.0 verified
+- [Telegram Deep Linking](https://core.telegram.org/bots/features#deep-linking) — 64-char payload limit confirmed
+- [Supabase RLS + Service Role](https://supabase.com/docs/guides/database/postgres/row-level-security) — superadmin bypass pattern
+- [PayTR node-paytr](https://www.npmjs.com/package/node-paytr) — abandoned 2022, not recommended
 
 ---
 
-*Stack research for: Multi-tenant SaaS + AI Agent Ecosystem*
-*Researched: 2026-03-01*
-*Scope: NEW additions to existing Next.js 16 + Supabase stack*
+*Stack research for: v4.0 Agent-Native SaaS Onboarding & Marketplace*
+*Scope: NEW additions to existing Next.js 16 + Supabase + grammY + Anthropic stack*
+*Researched: 2026-03-05*

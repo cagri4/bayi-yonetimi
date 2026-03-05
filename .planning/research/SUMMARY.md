@@ -1,321 +1,237 @@
 # Project Research Summary
 
-**Project:** Bayi Yonetimi v3.0 -- Multi-Tenant SaaS + AI Agent Ecosystem
-**Domain:** B2B Dealer Management SaaS with 12 AI Digital Workers
-**Researched:** 2026-03-01
-**Confidence:** HIGH (stack, multi-tenant) / MEDIUM-HIGH (agent ecosystem)
+**Project:** Bayi Yönetimi — v4.0 Agent-Native SaaS Onboarding & Marketplace
+**Domain:** B2B Dealer Management SaaS — Conversational Onboarding + Per-Agent Billing + Agent Marketplace + Superadmin Panel
+**Researched:** 2026-03-05
+**Confidence:** HIGH (stack, architecture, pitfalls) / MEDIUM-HIGH (features)
+
+---
 
 ## Executive Summary
 
-v3.0 transforms the existing single-tenant B2B dealer management system into a multi-tenant SaaS platform with 12 AI digital workers (not assistants -- autonomous agents that replace human business roles) accessible via Telegram. Research across all four domains (stack, features, architecture, pitfalls) converges on a clear consensus: **multi-tenancy must be completed before any agent work begins**, and the agent ecosystem should be built incrementally in role-based groups ordered by risk and dependency. The existing Next.js 16 + Supabase stack requires only two new packages (`@anthropic-ai/sdk` and `grammy`) -- a remarkably lean addition for the scope of the transformation.
+This milestone transforms an existing multi-tenant Telegram-first B2B SaaS (12 deployed AI agents, 38 web routes, production Supabase + Vercel infrastructure) into an agent-native platform with conversational onboarding, per-agent subscription billing, and an agent marketplace. The v3.0 stack is frozen and validated — all research covers only net-new additions. The recommended approach is surgical integration: three new production packages, four to seven new database tables, one new Telegram bot (the 13th "Kurulum Sihirbazi" setup wizard), and two new route groups (superadmin panel and billing webhooks). The wizard must be architecturally isolated from the existing AgentRunner/dispatcher pipeline because it operates before a company record exists — a dedicated DB-backed finite state machine (WizardOrchestrator) is the correct pattern; AgentRunner must not be used here.
 
-The recommended approach is shared-schema multi-tenancy using Supabase RLS with `company_id` on all 20+ existing tables, JWT claim injection for tenant isolation, and a `current_company_id()` SECURITY DEFINER function as the policy anchor. For the agent ecosystem, all four researchers agree: agent-per-role with specialized tool sets outperforms general-purpose assistants by a wide margin (45% faster resolution, 60% better accuracy per Anthropic's own multi-agent research). The architecture centers on a single `AgentRunner` class that executes Claude tool-calling loops, with each agent loading only its own tools. Telegram webhooks hit Next.js API routes, respond HTTP 200 immediately, and process via `after()` in Vercel Fluid Compute (up to 800s). Agent-to-agent communication uses lightweight direct tool calls (no Claude invocation) for data queries, reserving full sub-agent loops for complex reasoning tasks only.
+The recommended stack additions are iyzipay 2.0.65 for Turkish subscription billing (Stripe does not support Turkish merchant accounts as of 2026), @grammyjs/conversations 2.1.1 with @grammyjs/storage-supabase 2.5.0 for wizard state persistence in serverless environments, and standard Next.js Server Actions plus Supabase service role for the superadmin panel. Per-agent billing is implemented at the application layer (one subscription per company, agent count drives monthly TRY price) because iyzico does not natively support per-seat billing. The "digital employee" mental model — framing agents as hires rather than feature toggles — is the emerging standard for AI agent SaaS and directly informs copy and UX decisions across the entire milestone. Note: ARCHITECTURE.md recommends against the grammY conversations plugin in favor of a custom WizardOrchestrator FSM due to the existing webhook pattern not instantiating a full grammY Bot object — the phase author must resolve this before writing wizard code.
 
-The critical risks, in order of severity, are: (1) cross-company data leakage from unmigrated materialized views and stale admin RLS policies -- this is catastrophic and unrecoverable; (2) Telegram webhook timeout loops causing cost multiplication when Claude processing exceeds response windows; (3) unbounded Claude API costs from long conversations without token budgets -- a 700-dealer deployment could reach $14,000/month without controls; and (4) agent hallucination on financial data leading to incorrect business decisions. All four risks have concrete, proven prevention strategies documented in the research. The key insight is that cost controls and security boundaries must be foundational infrastructure, not retrofitted features.
+The top risks are architectural, not technical: partial DB records from wizard dropout (mitigate with a staging-first onboarding_sessions table and a single atomic commit transaction), billing state diverging from agent active state (mitigate by making billing the sole writer to is_active), iyzico webhook double-processing (mitigate with immediate 200 response plus paymentId-keyed idempotency store), and superadmin cross-tenant writes (mitigate with mandatory company_id parameters and a superadmin audit log). A 3-day grace period on payment failure and proactive trial expiry warnings at T-7 and T-1 days are required to avoid abrupt mid-conversation cutoffs that drive churn. All pitfalls have concrete prevention strategies derived from official iyzico, Telegram, and Supabase documentation plus direct codebase analysis.
+
+---
 
 ## Key Findings
 
 ### Recommended Stack
 
-Only 2 new npm packages are needed. Both are server-side only with zero client bundle impact.
+The v3.0 stack (Next.js 16, React 19, Supabase JS 2.91+, grammY 1.41, Anthropic SDK 0.78, Tailwind 4, Zustand 5, Zod 4, Vercel Fluid Compute) is unchanged. Three production packages and one dev type definition are added. All are server-side only with zero client bundle impact.
 
-**Core technology additions:**
-- **`@anthropic-ai/sdk` ^0.78.0:** Direct Claude API access for all 12 agents -- chosen over Vercel AI SDK because this is a Claude-only project; raw SDK provides prompt caching, `betaZodTool()` (Zod v4 already in stack), and `messages.toolRunner()` without abstraction overhead
-- **`grammy` ^1.41.0:** TypeScript-first Telegram bot framework with explicit Vercel webhook support via `webhookCallback('std/http')` -- chosen over Telegraf for cleaner TypeScript types and active maintenance
-- **Vercel Fluid Compute (config change):** Enable `maxDuration = 300` on webhook routes (up to 800s on Pro plan) for Claude tool-calling loops that can take 60-120 seconds
+**Core technologies — new additions:**
+- `iyzipay ^2.0.65`: Turkish subscription billing — required because Stripe has no Turkish merchant account support; iyzico is the TCMB-licensed market leader, with a maintained npm package (published February 2026) and a native subscription API supporting trial periods, plan upgrades, and recurring charges; per-seat billing is implemented at the application layer
+- `@grammyjs/conversations ^2.1.1`: Wizard state machine — models the multi-step onboarding flow as sequential async code; requires external storage on Vercel serverless (peer dep: grammy ^1.20.1, compatible with existing 1.41); ARCHITECTURE.md recommends against this in favor of a custom FSM
+- `@grammyjs/storage-supabase ^2.5.0`: Persists wizard conversation state between serverless invocations using existing Supabase infrastructure — zero new infrastructure dependency if using the conversations plugin
+- `@types/iyzipay ^2.0.3` (dev): Community DefinitelyTyped types for the callback-based iyzipay SDK; callbacks must be promisified manually with a thin wrapper
 
-**Explicitly rejected (all researchers agree):**
-- Vercel AI SDK (unnecessary abstraction for single-provider), LangChain/LangGraph (over-engineered for 12 fixed roles), pgvector (dealers search by code/name, not semantics), Redis (prompt caching eliminates need), separate message queue (Telegram 30s window + `after()` is sufficient), schema-per-tenant (overkill until 50+ tenants)
+**Environment variables to add:** `IYZICO_API_KEY`, `IYZICO_SECRET_KEY`, `IYZICO_BASE_URL` (sandbox vs. prod URL switch), `SUPERADMIN_USER_IDS` (comma-separated Supabase user UUIDs).
 
-**Model tiering by agent role:**
-- Haiku 4.5 ($1/$5 per MTok): Sales Rep, Field Sales, Collections, Warehouse, Distribution, Procurement, Quality/Returns, Product Manager (8 of 12 agents)
-- Sonnet 4.6 ($3/$15 per MTok): Executive Advisor, Accountant, Marketing, Trainer (4 agents requiring complex reasoning or creative output)
-- With prompt caching: 90% cost reduction on stable tokens (system prompts + tool definitions)
-
-**Cost projection at 700 dealers:**
-- Conservative (20% daily active, 5 msg/day): ~$800/month
-- With per-dealer token budgets (50K/day soft, 100K hard): ~$630/month ceiling
-- Without any controls: up to $14,000/month
+**What NOT to add:** PayTR (community npm packages abandoned 2022), Paddle/Lemon Squeezy (MoR services priced for global SaaS, add currency conversion costs on TRY), grammY Scenes plugin (superseded by conversations plugin), separate feature flag service (agent billing state belongs in app DB), Clerk/Auth0 for superadmin (already have Supabase Auth), BullMQ (iyzico subscription API handles recurring charge scheduling autonomously).
 
 ### Expected Features
 
-**Must have -- Multi-Tenant Infrastructure (table stakes for SaaS):**
-- `companies` table as root tenant entity with slug, plan tier, settings
-- `company_id` column on all 20+ existing tables with NOT NULL constraint after backfill
-- All RLS policies updated with `company_id = current_company_id()` as first condition
-- JWT claim injection via Supabase Custom Access Token Hook
-- `superadmin` role for SaaS platform operator, distinct from company `admin`
-- Company-scoped admin authentication (admin of Company A cannot see Company B)
-- Materialized view (`dealer_spending_summary`) rebuilt with company_id and wrapped in RPC function
+**Must have (table stakes — v4.0 milestone fails without these):**
+- Superadmin: create company + generate single-use invite deep link (UUID token, 7-day expiry)
+- Superadmin: companies dashboard showing all tenants, trial status, active agent count
+- Kurulum Sihirbazi: /start validates invite token, links Telegram chat_id to company
+- Wizard: collects company profile conversationally (name, sector, admin email, plan selection)
+- Wizard: introduces 3-4 key agents with mini-demonstrations (not all 12 — research shows 12 in one session causes dropout)
+- Wizard: auto-populates DB on confirmation via single atomic transaction
+- Trial period: 14 days, all 12 agents active by default, trial_ends_at column on companies
+- Trial countdown notifications: Telegram messages at T-7 and T-1 days to company admin
+- agent_subscriptions table: one row per company+agent; is_active, monthly_price, is_trial columns
+- Dijital Ekibim page: list all 12 agents with activate/deactivate toggle and monthly cost calculator
+- Webhook gate: checkAgentAccess() inside after() before dispatchAgentUpdate() — enforced for all 12 existing routes
 
-**Must have -- Agent Infrastructure (blocks all 12 agents):**
-- `AgentRunner` class with Claude tool-calling loop (max 10 iterations)
-- `ToolRegistry` per agent role (each agent loads only its own 4-7 tools)
-- `ConversationManager` with rolling window (last 50 messages) + periodic summarization
-- Telegram webhook with immediate 200 response + `after()` background processing
-- Telegram `update_id` idempotency (prevent duplicate processing on retries)
-- `AgentBridge` for cross-agent tool calls (direct DB query, no Claude invocation)
-- Per-dealer daily token budget with soft/hard limits
-- Depth limit (max 5) and cycle detection for agent-to-agent calls
-- Agent conversation storage: `agent_definitions`, `agent_conversations`, `agent_messages`, `agent_calls` tables
+**Should have (differentiators that justify per-agent pricing model):**
+- "Digital employee" mental model in copy — "Ise Al" / "Aylik maas: X TL" framing throughout
+- Sequential agent introductions in wizard (live capability demo, not a feature list)
+- Trial progress indicator: proactive Telegram nudge during trial to drive activation ("Day 7 of 14 — 3 agents not yet activated")
+- Onboarding completion celebration message ("your digital team is ready" with full roster)
+- Superadmin: one-click trial extension (update trial_ends_at + notify user)
+- Usage stats per agent in marketplace (message count, last active) — data-driven reason to keep each agent
 
-**Should have -- First Agent Group (launch with):**
-- Egitimci (Trainer): read-only, lowest risk, validates full pipeline
-- Satis Temsilcisi (Sales): highest dealer value, 6 tools using existing data
-- Muhasebeci (Accountant): financial queries, read-only, second most requested
-- Depo Sorumlusu (Warehouse): internal operations, validates write tools
-- Genel Mudur Danismani (Executive): reads all data, build last, high demo value
+**Defer to v4.x (validate core flow with 2-3 real tenants first):**
+- Full 12-agent introduction sequence in wizard (currently: 4 key agents)
+- Domain-specific data collection per agent during setup (each agent collects its own setup data)
+- Wizard resumption from interrupted state
 
-**Defer to v3.1+:**
-- Collections, Field Sales, Distribution, Marketing (need existing core agents proven first)
-- Procurement, Product Manager, Returns/Quality (need new DB tables)
-- All agent-to-agent handoffs (need both participating agents to exist)
-- Proactive daily briefings (need usage patterns validated first)
-- ERP real-time sync, voice interface, A2A cross-vendor protocol, predictive ML
+**Defer to v5.0+:**
+- Automated iyzico payment collection — v4.0 billing is manual (invoice/EFT + DB flag); iyzico SDK wired up but full automation deferred
+- Self-service tenant signup — Turkish SMB market is relationship-driven; superadmin-provisioned invite outperforms cold self-signup at this stage
+- Outcome-based pricing — requires 6+ months of agent performance data
+- WhatsApp channel for onboarding
 
 ### Architecture Approach
 
-The architecture is a 4-layer system: Presentation (Next.js App Router + Telegram bots), API/Webhook (Server Actions + API routes), Agent Layer (AgentRunner + ToolRegistry + ConversationManager + AgentBridge), and Data Layer (Supabase PostgreSQL with RLS). The critical design decision is that agent dispatch happens inside the Next.js webhook handler -- no separate agent server. All 12 agent roles are instantiated on-demand per incoming message, with session state persisted in Supabase. The agent layer uses the service role key (bypasses RLS intentionally) but enforces company scoping in code via a mandatory `companyId` parameter on every tool handler.
+The v4.0 additions integrate with existing infrastructure via clearly defined seams. The wizard (Kurulum Sihirbazi) is a fully isolated subsystem: its own Telegram bot token, its own webhook route (`/api/telegram/sihirbaz/route.ts`), its own state persistence in `onboarding_sessions`, and a WizardOrchestrator FSM that shares only the Supabase service client with the rest of the app. It does not use AgentRunner, dispatcher.ts, or ConversationManager because those require an existing dealer + company record that does not exist during onboarding. The subscription guard (`subscription-guard.ts`) is a new module called inside `after()` in each of the 12 existing webhook routes before dispatchAgentUpdate — this is the single enforcement point for per-agent billing. The superadmin panel uses a new route group (`src/app/(superadmin)/superadmin/`) protected by middleware, with a service role Supabase client for cross-tenant access.
 
 **Major components:**
-1. **Multi-Tenant Data Layer** -- `companies` table as root, `company_id` FK on all tables, `current_company_id()` SECURITY DEFINER function, JWT claim injection, composite indexes on `(company_id, dealer_id)`
-2. **Telegram Webhook Handler** -- `/api/telegram/[agentId]/route.ts` validates secret token, responds 200 immediately, processes in `after()` with Fluid Compute
-3. **AgentRunner** -- Claude API tool-calling loop with iteration cap (10), model selection per role, prompt caching on system prompts and tool definitions
-4. **ToolRegistry** -- Per-role tool sets (4-7 tools each, NOT all 120 tools on every agent); tools are wrappers around existing Server Actions with company scoping
-5. **ConversationManager** -- DB-backed message history with rolling window (50 active messages), automatic archival and summarization via Haiku for older context
-6. **AgentBridge** -- Lightweight cross-agent tool calls via internal HTTP POST (no Claude invocation for data queries); full agent loop only for reasoning tasks; logged to `agent_calls` audit table
+1. **WizardOrchestrator** (`src/lib/agents/wizard-orchestrator.ts`) — DB-backed FSM with 7 states from AWAITING_COMPANY_NAME through COMPLETED; calls Claude Haiku only at confirmation step for natural language summary; reads/writes onboarding_sessions table
+2. **subscription-guard.ts** (`src/lib/agents/subscription-guard.ts`) — `checkAgentAccess(companyId, agentRole)` reads subscriptions + agent_definitions tables; O(1) indexed lookups; called in all 12 existing webhook routes
+3. **create-company.ts** (`src/lib/actions/create-company.ts`) — atomic Postgres transaction: companies then subscriptions then auth.createUser then users then 12 agent_definitions rows (selected=active, unselected=inactive); called by WizardOrchestrator at COMPLETED state
+4. **Billing webhook route** (`/api/billing/webhook/route.ts`) — immediate 200, stores raw payload in payment_webhook_events, processes async; sole authority over agent_definitions.is_active; validates X-IYZ-SIGNATURE-V3 before any DB write
+5. **Superadmin panel** (`src/app/(superadmin)/superadmin/`) — service role client, mandatory company_id scope on all server actions, audit log for all writes, soft-delete not hard DELETE
+6. **New DB tables required**: onboarding_sessions, subscriptions, agent_marketplace, payment_webhook_events, superadmin_audit_log, onboarding_invites; plus grammy_conversations if using the conversations plugin
 
-**New file structure:**
-- `src/lib/agents/` -- entire new subsystem (runner.ts, conversation.ts, bridge.ts, telegram.ts)
-- `src/lib/agents/tools/` -- one file per agent role + registry.ts + common-tools.ts
-- `src/lib/agents/system-prompts/` -- role-specific system prompts as TypeScript templates
-- `src/app/api/telegram/[agentId]/route.ts` -- dynamic webhook handler for all 12 bots
-- `src/app/api/agents/[agentId]/tools/route.ts` -- internal cross-agent tool endpoint
-- `src/lib/supabase/service.ts` -- new service role client for agent layer only
+**Existing components modified:** dispatcher.ts (hard block on is_active=false instead of fallback to generic prompt), all 12 webhook routes (add subscription guard call inside after()), agent_definitions table (add subscription_tier column), companies table (add trial_ends_at column), middleware.ts (add /superadmin route protection).
+
+**Build order (hard dependencies):** DB schema first, then company creation infrastructure, then wizard bot, then billing integration, then agent access gating, then superadmin panel.
 
 ### Critical Pitfalls
 
-All four researchers identified overlapping concerns. Here are the top 8 pitfalls ranked by severity and cross-researcher consensus:
+1. **Wizard creates orphan DB records on user dropout** — Avoid by writing only to `onboarding_sessions` staging table during wizard; create companies/users/agent_definitions in a single atomic transaction only when state reaches COMPLETED. Add pg_cron daily cleanup for expired sessions. Never INSERT directly into companies or users from wizard tool calls.
 
-1. **Materialized view exposes cross-company data** -- PostgreSQL does NOT support RLS on materialized views. The existing `dealer_spending_summary` will leak all companies' financial data after company_id migration. Prevention: rebuild view with company_id in SELECT/GROUP BY, wrap in RPC function with company filter, never expose directly via Supabase API. Phase: Multi-Tenant DB Migration. Severity: CRITICAL.
+2. **Invite token replay attacks and link sharing** — Use one-time tokens (cryptographically random 64-char hex, stored as SHA-256 hash in DB). Mark `used_at` immediately on first use in a Postgres transaction. If `used_at IS NOT NULL`, reject with "Bu davet linki zaten kullanilmistir." Rate-limit /start attempts by chat_id (max 3 attempts per 10 minutes).
 
-2. **company_id backfill fails on live system** -- Adding NOT NULL without backfill crashes migration; adding nullable and forgetting to constrain later creates silent integrity bugs. Prevention: 3-step pattern (add nullable, backfill from related tables, verify zero NULLs then add NOT NULL + FK + index). Phase: Multi-Tenant DB Migration. Severity: CRITICAL.
+3. **Billing state and agent active state diverge (split-brain)** — Billing webhook must be the SOLE writer to `agent_definitions.is_active`. Marketplace UI updates a desired_agents intermediate state; billing webhook syncs desired to actual. Never let the UI toggle directly set is_active. Add daily reconciliation job to detect mismatches.
 
-3. **Admin RLS policies become cross-company** -- Existing `is_admin()` has no company scope. After migration, any admin can access all companies' data. Prevention: replace with `is_company_admin()` that checks both role AND company_id; introduce separate `superadmin` role. Phase: Multi-Tenant DB Migration. Severity: CRITICAL.
+4. **iyzico webhook double-processing** — iyzico explicitly documents non-idempotent architecture and retries every 15 minutes up to 3 times. Implement: immediate 200 response, store raw payload in payment_webhook_events, process async. Use paymentId as idempotency key — check processed_at before any billing activation. Validate X-IYZ-SIGNATURE-V3 with HMAC-SHA256 using crypto.timingSafeEqual() before any DB write.
 
-4. **Telegram webhook sync timeout causes retry loop** -- Awaiting Claude API in webhook handler causes Vercel timeout, Telegram retries, cost multiplication. Prevention: respond 200 immediately, process in `after()`, implement `update_id` deduplication. Phase: Agent Infrastructure. Severity: CRITICAL.
+5. **Trial expiry causes mid-conversation cutoff** — Send proactive Telegram warnings at T-7, T-3, and T-1 days. On expiry, check at dispatch entry (not mid-tool-call). Allow current conversation turn to complete (soft cutoff), then block on next message with upgrade URL embedded in block message.
 
-5. **Agent uses service role key without company scoping** -- Bypasses all RLS; any tool bug exposes cross-company data. Prevention: every tool handler receives `companyId` as mandatory parameter; never query without it; use typed `AgentToolHandler` signature. Phase: Agent Infrastructure. Severity: CRITICAL.
+6. **Superadmin cross-tenant writes** — All superadmin server actions require explicit companyId parameter in function signature. All writes logged to superadmin_audit_log with old_value/new_value JSONB. Use soft-delete (deleted_at timestamp) not hard DELETE. Superadmin UI always shows active company context prominently.
 
-6. **Claude API cost explosion** -- Unbounded conversations grow exponentially expensive. A 30-turn Sonnet conversation costs $0.60+ per message in input tokens alone. Prevention: 20-turn session limit with summarize-and-reset, per-dealer daily token budget (50K soft/100K hard), model tiering (Haiku for 8/12 agents), minimal structured tool results (80 tokens, not 2000). Phase: Agent Infrastructure. Severity: HIGH.
+7. **Payment failure disables agents mid-active-conversation** — Implement 3-day grace period: soft failure sends warning email plus Telegram to admin but does NOT disable agents; hard disable only after grace period, and only after checking for in-flight conversations (last_message < 5 minutes).
 
-7. **Agent hallucination on financial data** -- LLMs confabulate when data is absent. Financial agents stating wrong amounts has real monetary impact. Prevention: system prompt mandates tool-only responses for financial facts, structured output validation with confirmation tokens, human confirmation for write operations. Phase: Individual Agent Implementation. Severity: HIGH.
-
-8. **Agent-to-agent deadlock and infinite loops** -- Without cycle detection and depth limits, cross-agent calls create distributed system deadlocks. Prevention: `depth > 5` guard, `call_trace` array for cycle detection, 10 tool calls per turn cap, 30-second timeout per sub-call. Phase: Agent Infrastructure. Severity: HIGH.
+---
 
 ## Implications for Roadmap
 
-Based on combined research, v3.0 should be structured into 5 phases following strict dependency order.
+Based on dependency analysis across all four research files, a 6-phase build order emerges. Schema must come first because everything depends on it. The wizard must come before billing because the wizard creates the company records that billing tracks. Access gating must come after billing because it reads subscription state. Superadmin panel comes last because it displays data from all other phases.
 
-### Phase 1: Multi-Tenant Database Migration
-**Rationale:** This is the absolute prerequisite. Every other phase depends on company_id isolation being complete and correct. All four researchers agree: multi-tenancy must be done first, done completely, and verified exhaustively before any agent work begins. A single RLS policy oversight creates unrecoverable trust damage.
+### Phase 1: Database Schema Foundation
+**Rationale:** Every feature in v4.0 requires new tables or column additions. Nothing else can be built or tested without this. Schema migrations are also the safest unit of work — easy to review, easy to rollback, and they surface constraint design questions before code is written.
+**Delivers:** `onboarding_sessions`, `subscriptions`, `agent_marketplace`, `payment_webhook_events`, `superadmin_audit_log`, `onboarding_invites` tables; `companies.trial_ends_at` and `agent_definitions.subscription_tier` columns; RLS policies for all new tables; agent_marketplace seeded with all 12 agent roles.
+**Addresses:** All v4.0 features depend on schema being correct before code is written
+**Avoids:** Pitfall 1 (staging table design prevents orphan records), Pitfall 2 (invite token schema with hash + used_at + single_use constraint), Pitfall 3 (subscriptions table as authoritative billing source)
+**Research flag:** Standard Supabase migration pattern — skip additional research. Use Supabase Dashboard SQL Editor (no CLI access token available). All table structures fully specified in STACK.md and ARCHITECTURE.md.
 
-**Delivers:**
-- `companies` table with seed company for existing 700 dealers
-- `company_id` column on all 20+ existing tables (3-step: nullable, backfill, constrain)
-- `current_company_id()` and `is_company_admin()` SECURITY DEFINER functions
-- All existing RLS policies updated with `company_id` as first condition
-- `superadmin` role for platform operator
-- Materialized view rebuilt with company_id + RPC wrapper
-- Composite indexes on `(company_id, dealer_id)` for all tenant-scoped tables
-- JWT claim injection via Custom Access Token Hook
-- Database types regenerated
+### Phase 2: Company Creation Infrastructure
+**Rationale:** The wizard's COMPLETED state calls createCompanyFromWizard(). This action must exist and be verified in isolation before the wizard is built around it. agent-defaults.ts (canonical system prompts for all 12 roles) is also required here since it is what seeds agent_definitions at company creation time.
+**Delivers:** `agent-defaults.ts` with canonical names, models, and system prompts for all 12 agent roles; `create-company.ts` atomic server action that creates company + subscription + auth user + users row + 12 agent_definitions rows in a single transaction; verified end-to-end creation flow.
+**Uses:** Supabase service role client, Supabase Auth Admin API (createUser)
+**Avoids:** Pitfall 1 (atomic transaction — all 12 rows or none), Pitfall 10 from PITFALLS.md (audit log infrastructure ready)
+**Research flag:** Standard pattern — skip additional research.
 
-**Addresses features:** Multi-tenant infrastructure (all table stakes)
-**Avoids pitfalls:** #1 materialized view exposure, #2 backfill failure, #3 admin RLS escalation
-**Estimated complexity:** HIGH -- touches every table, every policy, live data migration
-**Research flag:** Standard Supabase RLS patterns, well-documented. No additional research needed. Focus on exhaustive verification testing.
+### Phase 3: Kurulum Sihirbazi (13th Bot)
+**Rationale:** The wizard is the entry point for every new tenant. Without it, no company can be onboarded through the platform flow. It depends on Phase 1 (onboarding_sessions table and onboarding_invites) and Phase 2 (create-company.ts exists for the COMPLETED state transition).
+**Delivers:** New Telegram bot registered with BotFather; `/api/telegram/sihirbaz/route.ts`; WizardOrchestrator FSM with all states; invite token validation with single-use enforcement; company profile collection conversationally; 4-agent introduction sequence (Satis Temsilcisi, Muhasebeci, Depo Sorumlusu, Genel Mudur Danismani); atomic company creation on COMPLETED; welcome message with admin panel URL and temp password.
+**Implements:** WizardOrchestrator component; onboarding_sessions staging pattern; deep link token validation
+**Avoids:** Pitfall 1 (staging table + atomic commit only at COMPLETED), Pitfall 2 (single-use token validation in Postgres transaction), Pitfall 6 from PITFALLS.md (wizard sub-agent context — use onboarding_mode flag or skip sub-agent delegation in v4.0 MVP and introduce agents via scripted messages instead)
+**Research flag:** NEEDS resolution on grammY conversations plugin vs. custom WizardOrchestrator FSM before coding begins. ARCHITECTURE.md's reasoning (existing webhook routes do not instantiate a grammY Bot object; plugin adds replay overhead; most wizard steps are deterministic and do not need Claude) is more technically grounded. Recommendation: implement custom WizardOrchestrator FSM.
 
----
+### Phase 4: Billing Integration
+**Rationale:** The subscriptions table (Phase 1) and company creation (Phase 2) must exist before billing can be wired up. The billing webhook handler and subscription guard module are prerequisites for Phase 5 (access gating reads subscription state).
+**Delivers:** iyzico subscription initialization flow (company signs up, subscription created via iyzipay SDK); `/api/billing/webhook/route.ts` with immediate 200 response, paymentId idempotency store, and async processing; `subscription-guard.ts` module with checkAgentAccess() function; grace period logic (3-day soft failure before hard agent disable); manual billing flag for v4.0 MVP (automated iyzico recurring charge is v5.0). Note: ARCHITECTURE.md references Stripe in billing flow diagrams — use iyzico throughout; the architectural patterns (checkout session, webhook receiver, idempotency) are identical.
+**Uses:** `iyzipay ^2.0.65` with `@types/iyzipay ^2.0.3`; iyzico sandbox environment for testing
+**Avoids:** Pitfall 3 (billing webhook as sole is_active authority — UI writes to desired state only), Pitfall 4 (grace period model with grace_period_ends_at column), Pitfall 7 from PITFALLS.md (iyzico idempotency + signature validation with X-IYZ-SIGNATURE-V3), Pitfall 8 from PITFALLS.md (PayTR mobile 3DS — applicable if PayTR is added later)
+**Research flag:** iyzico sandbox subscription lifecycle (trial → active → cancelled) should be validated before implementation. The iyzico non-idempotent architecture requires explicit retry simulation testing — send same webhook payload twice and verify billing activation fires exactly once.
 
-### Phase 2: Agent Infrastructure Foundation
-**Rationale:** All 12 agents depend on this shared infrastructure. Building it correctly -- with cost controls, security boundaries, and deadlock guards baked in from the start -- prevents every "retrofit" pitfall identified in research. This phase produces zero user-visible agents but is the most architecturally critical phase of v3.0.
+### Phase 5: Agent Access Gating + Dijital Ekibim Marketplace
+**Rationale:** Access gating reads from subscriptions (Phase 4 must deliver subscription-guard.ts first). The Dijital Ekibim marketplace page toggles agents and must enforce state through the guard layer, not bypass it.
+**Delivers:** `subscription-guard.ts` integrated into all 12 webhook routes inside `after()`; hard block in `dispatcher.ts` when is_active=false (Turkish-language denial message with upgrade URL); `activate-agent.ts` server action that writes to desired_agents table (not directly to agent_definitions.is_active); `/admin/dijital-ekibim` page with 12 agent cards, activate/deactivate toggles, monthly cost calculator, and trial status indicators; in-flight conversation check before agent disable.
+**Implements:** Subscription guard component; modified dispatcher behavior; per-agent marketplace page
+**Avoids:** Pitfall 3 (marketplace UI writes to desired_agents not is_active directly), Pitfall 5 from PITFALLS.md (trial expiry at dispatch entry with grace message and upgrade URL), Pitfall 9 from PITFALLS.md (in-flight conversation count shown before disable, 5-minute effective window disclosed in UI)
+**Research flag:** Standard patterns — skip additional research. The 12-route modification is repetitive but mechanically straightforward.
 
-**Delivers:**
-- `agent_definitions`, `agent_conversations`, `agent_messages`, `agent_calls` tables
-- `src/lib/supabase/service.ts` -- service role client for agent layer
-- `AgentRunner` class with Claude tool-calling loop, iteration cap, model selection
-- `ToolRegistry` base class with company-scoped execution pattern
-- `ConversationManager` with rolling window (50 messages) + archival + summarization
-- Telegram webhook route (`/api/telegram/[agentId]/route.ts`) with immediate 200 response + `after()` processing
-- `update_id` idempotency in database
-- `AgentBridge` with depth limit, cycle detection, tool call cap
-- `/api/agents/[agentId]/tools/route.ts` for internal cross-agent calls
-- Per-dealer daily token budget tracking
-- Prompt caching configuration (`cache_control` on system prompts + tool definitions)
-- Common tools (dealer lookup, company config)
-- Agent definition seeding for all 12 roles
-
-**Addresses features:** Agent infrastructure (all prerequisite features)
-**Avoids pitfalls:** #4 webhook timeout loop, #5 service key bypass, #6 cost explosion, #8 deadlock
-**Estimated complexity:** HIGH -- new subsystem, multiple integration points
-**Research flag:** NEEDS RESEARCH on Telegram bot registration workflow (one bot per agent vs single bot with routing), webhook secret management for 12 bots, and `after()` error handling patterns in Next.js 16.
-
----
-
-### Phase 3: First Agent Group -- Dealer-Facing, Low Risk
-**Rationale:** Start with the lowest-risk, highest-value agents. Trainer is read-only (zero financial risk) and validates the entire pipeline end-to-end. Sales Rep is the highest dealer value (replaces WhatsApp order taking) and uses only existing data. These two agents prove the architecture works before touching financial data.
-
-**Delivers:**
-- **Egitimci (Trainer)** -- 2 tools: `get_product_info`, `get_faq`. Read-only. Uses existing products and FAQ tables. System prompt tested with adversarial prompts.
-- **Satis Temsilcisi (Sales Rep)** -- 6 tools: `get_catalog`, `create_order`, `get_order_status`, `get_campaigns`, `check_stock`, `get_dealer_profile`. Highest business value.
-- Role-specific system prompts in Turkish
-- Tool implementations wrapping existing Server Actions with company scoping
-- End-to-end Telegram conversation flow validated
-
-**Addresses features:** First agents (launch with), table stakes for AI ecosystem
-**Avoids pitfalls:** #7 hallucination (trainer is factual only; sales tools return structured data)
-**Estimated complexity:** MEDIUM -- infrastructure exists from Phase 2; focus is on tool quality and prompt engineering
-**Research flag:** Standard patterns. Focus on Turkish language prompt engineering and adversarial testing. No additional research needed.
-
----
-
-### Phase 4: Financial and Operations Agents
-**Rationale:** After the pipeline is validated with low-risk agents, add financial agents (highest business value after Sales) and operations agents (Warehouse validates write operations). The Accountant is read-only financial access -- the safest entry into financial agent territory. Executive Advisor comes last because it needs all other agents' data tools to exist.
-
-**Delivers:**
-- **Muhasebeci (Accountant)** -- 5 tools: `get_financials`, `get_payment_history`, `get_invoices`, `get_dealer_balance`, `export_report`. Read-only. System prompt enforces "never state financial facts without tool evidence."
-- **Depo Sorumlusu (Warehouse)** -- 5 tools: `get_inventory_status`, `get_pending_orders`, `update_stock`, `check_reorder_level`, `get_shipments`. First agent with write operations.
-- **Genel Mudur Danismani (Executive Advisor)** -- 6+ tools: ALL read-only tools from other agents + `get_dashboard_summary`, `export_report`. Uses Sonnet 4.6 for complex reasoning.
-- Cross-agent tool calls: Sales asks Warehouse for stock, Executive reads all domains
-- Financial hallucination prevention verified with adversarial prompts
-
-**Addresses features:** Financial agents (P1), operations agents (P2), executive (P2)
-**Avoids pitfalls:** #7 financial hallucination (strict tool-only response rules), #8 cross-agent deadlock (bridge with guards)
-**Estimated complexity:** MEDIUM-HIGH -- financial agents require careful prompt engineering and exhaustive testing
-**Research flag:** NEEDS RESEARCH on Turkish financial terminology for agent prompts (borc/alacak, fatura, irsaliye, cari hesap vocabulary). Also research write-operation confirmation UX in Telegram (inline keyboards for approve/reject).
-
----
-
-### Phase 5: Extended Agent Ecosystem
-**Rationale:** After core agents are proven in production, expand to the remaining 7 agents. These require new database tables (dealer_visits, sales_targets, suppliers, purchase_orders, return_requests, quality_complaints, collection_activities) and have dependencies on existing agents. Build in sub-groups based on data dependencies.
-
-**Delivers:**
-- **Group A -- Financial extensions:** Tahsilat Uzmani (Collections, builds on Accountant data)
-- **Group B -- Operations extensions:** Dagitim Koordinatoru (Distribution), Saha Satis Sorumlusu (Field Sales -- needs new dealer_visits table)
-- **Group C -- Business intelligence:** Pazarlamaci (Marketing), Urun Yoneticisi (Product Manager)
-- **Group D -- Supply chain:** Satin Alma Sorumlusu (Procurement -- needs suppliers/PO tables, depends on Warehouse)
-- **Group E -- Quality:** Iade/Kalite Sorumlusu (Returns -- needs return_requests table)
-- All agent-to-agent handoff workflows
-- Proactive notification system (daily briefings per agent)
-- New database tables for agents requiring net-new data
-
-**Addresses features:** Extended ecosystem (v3.1), all remaining agents
-**Avoids pitfalls:** All pitfalls addressed by infrastructure from Phase 2; focus is on per-agent prompt quality
-**Estimated complexity:** HIGH (volume -- 7 agents + new tables, but each individual agent is MEDIUM)
-**Research flag:** NEEDS RESEARCH on Field Sales visit tracking patterns, Procurement workflow for Turkish B2B distributors, and returns/quality management domain specifics.
-
----
+### Phase 6: Superadmin Panel + Trial Notifications
+**Rationale:** Superadmin panel displays and manages data from all prior phases (company list, subscription status, active agent count, invite management). Trial countdown notifications require the subscriptions and cron infrastructure from Phase 4. This is the final integration layer that makes the platform operator-ready.
+**Delivers:** `/superadmin/*` route group with middleware protection checking is_superadmin(); companies dashboard (list all tenants, trial status, days remaining, active agent count); invite generation UI with pending/clicked/completed status tracking and one-click resend; one-click trial extension; `superadmin_audit_log` writes on all mutations with old_value and new_value; Vercel Cron job for trial countdown notifications at T-7 and T-1; trial expiry proactive Telegram messages with upgrade URL; soft-delete throughout (never hard DELETE).
+**Uses:** Supabase service role client; existing Vercel Cron pattern; existing Telegram send capability
+**Avoids:** Pitfall 10 from PITFALLS.md (mandatory company_id scope on every server action + audit log shipped from day 1), Pitfall 5 from PITFALLS.md (proactive warning messages before trial expiry eliminate abrupt mid-conversation cutoffs)
+**Research flag:** Standard patterns — skip additional research. Audit log schema is fully specified in PITFALLS.md.
 
 ### Phase Ordering Rationale
 
-**Dependency chain is strict and non-negotiable:**
-- Multi-tenant isolation (Phase 1) blocks everything -- agents operating on un-isolated data is a security catastrophe
-- Agent infrastructure (Phase 2) blocks all agents -- building agents without cost controls and security boundaries creates technical debt that compounds with each agent added
-- First agents (Phase 3) validate the pipeline with minimum risk before financial data is touched
-- Financial/operations agents (Phase 4) add business value incrementally, with each agent proving a new capability layer
-- Extended ecosystem (Phase 5) is parallel work once the foundation is solid
+Schema first: every other phase reads or writes new tables — there is no alternative ordering.
 
-**Grouping logic:**
-- Phase 1 is pure database work (SQL migrations, RLS policies) -- no application code
-- Phase 2 is pure infrastructure (no user-visible features) -- framework and plumbing
-- Phase 3 is the proof point -- 2 agents that validate everything works
-- Phase 4 adds the high-value agents that make v3.0 compelling
-- Phase 5 completes the ecosystem at lower urgency
+Company creation before wizard: the wizard's terminal state calls createCompanyFromWizard(); building the wizard first would require mocking a function that doesn't exist.
 
-**Risk mitigation sequence:**
-- Security-critical work (RLS, company isolation) before any new features
-- Cost controls before any Claude API calls in production
-- Read-only agents before write-capable agents
-- Single-agent validation before cross-agent communication
-- Low-financial-risk agents before financial data agents
+Wizard before billing: the wizard generates the company records that billing tracks; testing billing requires real company records to subscribe.
+
+Billing before access gating: the guard module reads subscriptions rows; access gating without billing data is untestable and meaningless.
+
+Marketplace after access gating: agent toggles must route through the guard layer, not bypass it; building the toggle before the guard creates a coupling inversion that requires rework.
+
+Superadmin panel last: it is a dashboard and management layer over all other features; it has no blocking dependencies on other phases but displays data from all of them.
 
 ### Research Flags
 
-**Phases needing deeper research during planning:**
-- **Phase 2 (Agent Infrastructure):** Telegram multi-bot management (12 bots, webhook registration automation), `after()` error handling and retry patterns in Next.js 16, Vercel Fluid Compute behavior under concurrent webhook load
-- **Phase 4 (Financial Agents):** Turkish financial terminology for agent prompts, write-operation confirmation UX in Telegram inline keyboards, audit trail requirements for financial agent actions
-- **Phase 5 (Extended Ecosystem):** Field sales visit tracking domain patterns, Turkish B2B procurement workflows, returns/quality management regulatory requirements
+Phases needing deeper research or decisions before coding begins:
+- **Phase 3 (Wizard):** The grammY conversations plugin vs. custom WizardOrchestrator FSM decision is unresolved between STACK.md and ARCHITECTURE.md. This must be resolved before writing any wizard code. Recommendation: custom FSM (ARCHITECTURE.md approach).
+- **Phase 4 (Billing):** iyzico sandbox behavior for subscription lifecycle and webhook retry simulation must be tested before writing production billing code. iyzico's non-idempotent architecture is a known risk; verify idempotency implementation empirically.
 
-**Phases with standard patterns (skip research):**
-- **Phase 1 (Multi-Tenant Migration):** Supabase RLS multi-tenant patterns are exhaustively documented in official docs and community guides
-- **Phase 3 (First Agents):** Claude tool calling is well-documented, Telegram bot interaction is standard, product catalog and order tools map directly to existing Server Actions
+Phases with well-documented standard patterns (skip research-phase):
+- **Phase 1 (Schema):** All table structures fully specified in research files; standard Supabase migration pattern.
+- **Phase 2 (Company Creation):** Standard server action + Supabase Auth Admin API; fully specified including error cases.
+- **Phase 5 (Access Gating):** Clear, mechanically specified 12-route modification with subscription-guard.ts pattern.
+- **Phase 6 (Superadmin):** Standard Next.js route group + service role client + audit log; all patterns well-documented.
+
+---
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Only 2 new packages, both verified on npm with current versions. Anthropic SDK 0.78.0 confirmed. grammY 1.41.0 confirmed. Zod v4 compatibility verified via `betaZodTool`. |
-| Features -- Multi-Tenant | HIGH | Shared schema + RLS is industry standard for B2B SaaS at this scale. Confirmed by AWS, Azure, Supabase official docs, and Citus multi-tenant guides. |
-| Features -- Agent Roles | MEDIUM | Agent-per-role architecture validated by Anthropic multi-agent research. Individual role capabilities inferred from comparable B2B platforms (BeatRoute, HighRadius, ZBrain). Mapping to this specific business needs involves judgment. |
-| Architecture -- Multi-Tenant | HIGH | Supabase custom access token hook, JWT claim injection, `current_company_id()` SECURITY DEFINER -- all from official Supabase docs. Migration pattern from Citus docs. |
-| Architecture -- Agent Ecosystem | MEDIUM | Claude API tool calling loop verified from official docs. AgentRunner/ToolRegistry/ConversationManager/AgentBridge patterns are design decisions informed by research but not copied from a single reference implementation. |
-| Pitfalls | HIGH | All critical pitfalls sourced from official docs (Supabase RLS footguns, Anthropic advanced tool use, Telegram webhook guides) and community post-mortems. Cost calculations verified against official Anthropic pricing page. |
+| Stack | HIGH | All package versions verified on npm (iyzipay 2.0.65 Feb 2026, @grammyjs/conversations 2.1.1 Nov 2025, @grammyjs/storage-supabase 2.5.0 Jul 2025). Stripe Turkey unavailability confirmed. iyzico TCMB license confirmed. Version compatibility matrix verified. |
+| Features | MEDIUM-HIGH | Core patterns (14-day trial, per-agent billing, conversational onboarding) verified across multiple industry sources (Chargebee, 1Capture, Voiceflow, EMA.ai). Turkish market specifics (flat fee preference, relationship-driven sales model, SMB budget predictability) are reasoned extrapolations from general B2B SMB research — no Turkey-specific SaaS conversion data found. Treat as LOW confidence. |
+| Architecture | HIGH | Integration point analysis based on direct codebase reading (agent-runner.ts, dispatcher.ts, agent-bridge.ts, migrations 009 and 010). WizardOrchestrator pattern reasoning is sound. Note: ARCHITECTURE.md references Stripe in billing diagrams — iyzico is correct per STACK.md. Build order derived from hard dependency analysis, not assumption. |
+| Pitfalls | HIGH | Based on official iyzico docs (idempotency explicitly documented as non-idempotent, webhook signature validation, 3DS flow), Telegram API docs (64-char payload limit confirmed, deep link format confirmed), and direct codebase analysis of existing dispatcher/guard patterns. Grace period and trial cutoff patterns verified against Stripe and RevenueCat official documentation for industry precedent. |
 
-**Overall confidence: MEDIUM-HIGH**
+**Overall confidence: HIGH**
 
-Multi-tenancy is HIGH confidence -- well-trodden ground. Agent ecosystem is MEDIUM -- the individual technologies are proven (Claude API, Telegram, Supabase) but their integration into a 12-agent system at this scale is project-specific design. The research provides strong architectural patterns but implementation will require iterative refinement, particularly around prompt engineering and cost optimization.
+The stack is fully verified. The architecture integration points are derived from direct codebase analysis, not assumption. The pitfalls have official documentation backing. The only genuine uncertainty is Turkish market behavioral data (trial conversion rates, payment preference specifics) which is extrapolated from general B2B SMB research.
 
 ### Gaps to Address
 
-**Telegram multi-bot management at scale:**
-- Research confirms grammY webhook pattern for a single bot. Managing 12 bots (12 tokens, 12 webhook registrations, per-company bot provisioning) needs a deployment automation strategy. Handle during Phase 2 planning.
+**iyzico vs. Stripe in ARCHITECTURE.md billing diagrams:** The architecture document references Stripe Checkout sessions and Stripe webhook events in its billing flow. STACK.md correctly identifies iyzico as the required payment processor for the Turkish market. All architectural patterns (checkout session redirect, webhook receiver, idempotency store, event type handling) apply to both providers — only the SDK, API endpoints, and signature validation header differ. Phase 4 author must use iyzico exclusively. The ARCHITECTURE.md billing section is a pattern reference, not a technology mandate.
 
-**Agent prompt engineering in Turkish:**
-- Claude has strong Turkish language capability, but financial and business terminology (borc/alacak, cari hesap, fatura, irsaliye, KDV) requires domain-specific prompt testing. Handle during Phase 4 with native speaker review.
+**grammY conversations plugin vs. custom WizardOrchestrator FSM:** STACK.md recommends @grammyjs/conversations 2.1.1; ARCHITECTURE.md argues against it on grounds that existing webhook routes do not instantiate a grammY Bot object, the replay-based plugin state accumulates in Supabase over time, and most wizard steps are deterministic prompts that do not benefit from the plugin's sequential async model. This is an unresolved implementation decision that must be made before Phase 3 begins. Both approaches are technically correct — the FSM approach is leaner and avoids adding plugin overhead to an established non-plugin webhook pattern.
 
-**Vercel `after()` reliability under load:**
-- `after()` is stable in Next.js 16 but its behavior under concurrent webhook load (50+ dealers messaging simultaneously) is not extensively documented. Monitor during Phase 3 rollout; fall back to Upstash QStash if needed.
+**Manual vs. automated billing in v4.0:** FEATURES.md explicitly defers automated iyzico payment collection to v5.0 — v4.0 billing is manual (invoice or EFT, superadmin sets an is_paid flag). STACK.md researches iyzico subscription API thoroughly as if it will be used in v4.0. The roadmap resolves this: Phase 4 wires up iyzico SDK and webhook receiving infrastructure, but automated recurring charge and agent gating by payment status is treated as v4.x optional enhancement. The subscriptions table and payment_webhook_events table are built now; full billing automation ships when at least 3 tenants have validated the manual flow.
 
-**Per-company agent customization:**
-- Research assumes all companies use the same 12 agents. In practice, companies may want different agent configurations, custom system prompts, or different model selections. The `agent_definitions` table supports this, but the admin UI for it is not in scope for v3.0. Handle post-launch.
+**Turkish market trial conversion benchmarks:** FEATURES.md cites 14-day trial as 71% better converting than 30-day, sourced from US/EU SaaS benchmarks. No Turkey-specific trial conversion data was found. Treat 14 days as a reasonable starting hypothesis; adjust based on data from the first 3 real tenants. The proactive warning cadence (T-7, T-3, T-1) is derived from the same US/EU research and should be validated against Turkish SMB behavior.
 
-**Existing data migration verification:**
-- The company_id backfill for 700 dealers across 20+ tables requires zero-NULL verification. Research provides the pattern but the actual migration must be tested on a staging copy of production data before running live. Handle during Phase 1 execution with a staging environment.
-
-**Cost model validation:**
-- The $800/month conservative estimate assumes 20% daily active users with 5 messages each. Actual usage patterns are unknown until agents are live. Implement comprehensive token tracking from day one and review after 2 weeks of Phase 3 production usage. Adjust model tiering and token budgets based on real data.
+---
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [Anthropic TypeScript SDK -- GitHub](https://github.com/anthropics/anthropic-sdk-typescript) -- SDK features, betaZodTool, toolRunner
-- [@anthropic-ai/sdk -- npm 0.78.0](https://www.npmjs.com/package/@anthropic-ai/sdk) -- Version verification
-- [Claude API Pricing 2026 -- Official](https://platform.claude.com/docs/en/about-claude/pricing) -- Cost calculations
-- [Claude Prompt Caching -- Official](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) -- 90% cost reduction
-- [Claude Tool Calling -- Official](https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview) -- Tool use patterns
-- [grammY -- Official](https://grammy.dev/) -- Bot framework, Vercel hosting guide
-- [grammY npm 1.41.0](https://www.npmjs.com/package/grammy) -- Version verification
-- [Vercel Fluid Compute](https://vercel.com/docs/fluid-compute) -- maxDuration, after() behavior
-- [Supabase Custom Access Token Hook](https://supabase.com/docs/guides/auth/auth-hooks/custom-access-token-hook) -- JWT claim injection
-- [Supabase RLS Documentation](https://supabase.com/docs/guides/database/postgres/row-level-security) -- Multi-tenant policies
-- [Supabase Postgres Best Practices for AI Agents](https://supabase.com/blog/postgres-best-practices-for-ai-agents) -- Conversation storage
+- [iyzipay npm](https://www.npmjs.com/package/iyzipay) — v2.0.65 verified, February 2026
+- [iyzico Subscription Docs](https://docs.iyzico.com/en/products/subscription) — subscription features, trial period, lifecycle
+- [iyzico Subscription Transactions](https://docs.iyzico.com/en/products/subscription/subscription-implementation/subscription-transactions) — status lifecycle, trial mechanics
+- [iyzico Webhook Docs](https://docs.iyzico.com/en/advanced/webhook) — retry behavior, signature headers
+- [iyzico Idempotency Docs](https://docs.iyzico.com/en/getting-started/preliminaries/idempotency) — non-idempotent architecture explicitly confirmed
+- [iyzico 3DS Implementation](https://docs.iyzico.com/en/payment-methods/api/3ds/3ds-implementation) — 3DS flow, mobile redirect issues
+- [@grammyjs/conversations npm](https://www.npmjs.com/package/@grammyjs/conversations) — v2.1.1, Nov 2025, peer dep compatibility verified
+- [@grammyjs/storage-supabase npm](https://www.npmjs.com/package/@grammyjs/storage-supabase) — v2.5.0, Jul 2025
+- [grammY Conversations Plugin docs](https://grammy.dev/plugins/conversations) — serverless storage requirement confirmed
+- [Telegram Bot Deep Linking](https://core.telegram.org/bots/features#deep-linking) — 64-char payload limit confirmed, format confirmed
+- [Telegram API Links](https://core.telegram.org/api/links) — deep link specification
+- [Supabase RLS + Service Role](https://supabase.com/docs/guides/database/postgres/row-level-security) — service role bypass pattern
+- Existing codebase: `agent-runner.ts`, `agent-bridge.ts`, `dispatcher.ts`, `conversation-manager.ts`, migrations 009_multi_tenant.sql and 010_agent_tables.sql — analyzed directly (ground truth)
 
 ### Secondary (MEDIUM confidence)
-- [Multi-Tenant Applications with RLS on Supabase](https://www.antstack.com/blog/multi-tenant-applications-with-rls-on-supabase-postgress/) -- Implementation patterns
-- [VoltAgent Supabase Memory Pattern](https://voltagent.dev/docs/agents/memory/supabase/) -- Agent conversation storage
-- [Postgres RLS Footguns -- Bytebase](https://www.bytebase.com/blog/postgres-row-level-security-footguns/) -- Pitfall identification
-- [Multi-Agent Orchestration Collapse -- DEV](https://dev.to/onestardao/-ep-6-why-multi-agent-orchestration-collapses-deadlocks-infinite-loops-and-memory-overwrites-1e52) -- Deadlock patterns
-- [AI Agent Design Patterns -- Microsoft Azure](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/ai-agent-design-patterns) -- Architecture reference
-- [How AI Agents Will Transform B2B Sales -- BCG](https://www.bcg.com/publications/2025/how-ai-agents-will-transform-b2b-sales) -- Business case
-- [Anthropic Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system) -- Multi-agent patterns
+- [Chargebee: Selling Intelligence — 2026 Playbook For Pricing AI Agents](https://www.chargebee.com/blog/pricing-ai-agents-playbook/) — per-agent pricing models, flat vs. usage-based tradeoffs
+- [1Capture: Free Trial Conversion Benchmarks 2025](https://www.1capture.io/blog/free-trial-conversion-benchmarks-2025) — trial length and conversion rate data
+- [Voiceflow: Build an AI Onboarding Bot for Your SaaS App](https://www.voiceflow.com/blog/saas-onboarding-chatbot) — onboarding flow phases, progressive disclosure pattern
+- [EMA.ai: 8 AI Agent Pricing Models](https://www.ema.ai/additional-blogs/addition-blogs/ai-agents-pricing-strategies-models-guide) — per-agent vs. usage-based vs. outcome-based
+- [Stripe Grace Period and Failed Payments — RevenueCat](https://www.revenuecat.com/docs/subscription-guidance/how-grace-periods-work) — grace period industry standard
+- [Architecture Patterns for SaaS Billing, RBAC, Onboarding — AppFoster](https://medium.com/appfoster/architecture-patterns-for-saas-platforms-billing-rbac-and-onboarding-964ea071f571) — feature gating patterns
+- [AI Agent Context Handoff — XTrace](https://xtrace.ai/blog/ai-agent-context-handoff) — wizard sub-agent delegation patterns
+- [Handling Payment Webhooks Reliably — Sohail](https://medium.com/@sohail_saifii/handling-payment-webhooks-reliably-idempotency-retries-validation-69b762720bf5) — idempotency implementation
 
-### Tertiary (LOW confidence, needs validation)
-- [Telegram B2B Business Promotion](https://magnetto.com/blog/top-ways-to-promote-your-b2b-business-on-telegram) -- Turkish B2B Telegram adoption rates (secondary source)
-- [Multi-Tenant AI Agent Architecture -- Fast.io](https://fast.io/resources/ai-agent-multi-tenant-architecture/) -- General multi-tenant agent patterns (not Supabase-specific)
-- Agent-per-role performance statistics (45%/60% improvement) -- from Anthropic blog, specific numbers may vary by domain
+### Tertiary (LOW confidence)
+- Turkish SMB market SaaS adoption patterns — extrapolated from general B2B SMB research; no Turkey-specific SaaS conversion data found; treat Turkish market behavioral assumptions as hypotheses to validate with first 3 tenants
+- PayTR mobile 3DS behavior in Telegram in-app browser — documented from general 3DS redirect behavior analysis; not empirically tested against PayTR specifically
 
 ---
-*Research completed: 2026-03-01*
+*Research completed: 2026-03-05*
 *Ready for roadmap: yes*
-*Synthesized from: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md*
+*Synthesized from: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md (v4.0 research)*
