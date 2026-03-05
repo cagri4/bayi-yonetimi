@@ -2,7 +2,7 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-01)
+See: .planning/PROJECT.md (updated 2026-03-05)
 
 **Core value:** Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis verebilmesi — AI agent'lar ile 7/24 otonom is surecleri.
 
@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 14 — Database Schema Foundation (not started)
 Plan: —
-Status: Defining requirements for v4.0
-Last activity: 2026-03-05 — Milestone v4.0 started
+Status: Roadmap created, ready for Phase 14 planning
+Last activity: 2026-03-05 — v4.0 roadmap written
 
 ## Milestones
 
@@ -23,7 +23,7 @@ Last activity: 2026-03-05 — Milestone v4.0 started
 - v3.0 — Multi-Tenant SaaS + AI Agent Ecosystem (2026-03-05) — 6 phases (8-13), 71 requirements + production readiness
 
 **In Progress:**
-- v4.0 — Agent-Native SaaS Onboarding & Marketplace — defining requirements
+- v4.0 — Agent-Native SaaS Onboarding & Marketplace — Phases 14-19, 39 requirements, roadmap ready
 
 ## Accumulated Context
 
@@ -216,24 +216,48 @@ Last activity: 2026-03-05 — Milestone v4.0 started
 - Phase 10 (First Agents) → blocks Phase 11
 - Phase 11 (Financial + Ops Agents) → blocks Phase 12
 
+### v4.0 Key Decisions (from roadmap + research)
+- Billing: Mollie (NOT iyzico) — user confirmed Mollie account; iyzico removed from stack
+- Wizard: 12 agents introduced with scripted Turkish descriptions only — no live demo (deferred to v4.1+)
+- Trial: 14 days, all 12 agents active from day 1
+- Wizard implementation: Custom WizardOrchestrator FSM (NOT grammY conversations plugin) — existing webhook routes do not instantiate a grammY Bot object
+- Billing authority: Mollie webhook is the SOLE writer to agent_definitions.is_active; marketplace UI writes to desired_state only
+- Superadmin: Full audit log on every write from day 1; soft-delete (deleted_at) never hard DELETE
+- Grace period: 3 days after payment failure before agents deactivated
+- Trial warnings: T-7, T-3, T-1 via Vercel Cron + Telegram
+- Invite tokens: Single-use, stored as SHA-256 hash, 7-day expiry, chat_id bound on first use
+- WizardOrchestrator: DB-backed FSM, state in onboarding_sessions JSONB, does NOT use AgentRunner (no company exists yet)
+- create-company: Single atomic Postgres transaction (companies + subscriptions + auth.createUser + users + 12 agent_definitions) — all or nothing
+- Superadmin panel route: /superadmin/* protected by middleware checking is_superadmin()
+- New env vars required: MOLLIE_API_KEY, MOLLIE_WEBHOOK_SECRET, TELEGRAM_BOT_TOKEN_SIHIRBAZ, SUPERADMIN_USER_IDS
+
+### v4.0 Phase Dependencies (strict)
+- Phase 14 (DB Schema) → blocks Phase 15
+- Phase 15 (Company Creation) → blocks Phase 16
+- Phase 16 (Wizard) → blocks Phase 17
+- Phase 17 (Billing + Trial) → blocks Phase 18
+- Phase 18 (Access Gating + Marketplace) → blocks Phase 19
+
 ### Pending Todos
-- None carried over from v2.0
-- Phase 8 requires staging environment copy of production data for migration dry-run
-- Claude API key needed for Phase 9+ (user has key from another project)
+- None carried over from v3.0
+- Register new Telegram bot with BotFather for Kurulum Sihirbazi before Phase 16
+- Set up Mollie sandbox account before Phase 17
+- Add new env vars to Vercel before Phase 15 deployment
 
 ### Roadmap Evolution
-- Phase 13 added: Production Readiness
+- Phase 13 added: Production Readiness (during v3.0)
+- Phases 14-19 added: v4.0 Agent-Native SaaS Onboarding & Marketplace (2026-03-05)
 
 ### Blockers/Concerns
 - Database SQL execution requires Dashboard SQL Editor (no CLI access token)
-- Phase 8 migration must be dry-run on staging before production (700 dealers, 20+ tables)
-- Telegram multi-bot management: 12 bots need automated webhook registration strategy (research during Phase 9 planning)
+- Mollie sandbox credentials needed before Phase 17 coding begins
+- Telegram bot token for Sihirbaz needed before Phase 16 coding begins
 
 ## Session Continuity
 
-Last session: 2026-03-05 (v4.0 milestone started — defining requirements)
-Stopped at: Requirements definition
-Resume file: None
+Last session: 2026-03-05 (v4.0 roadmap created)
+Stopped at: Roadmap written, ready for Phase 14 planning
+Resume file: None — start with `/gsd:plan-phase 14`
 
 ---
 ### Phase 12 Decisions (from Plan 12-07)
@@ -281,4 +305,4 @@ Resume file: None
 - parseBody() async helper wraps response.json(): NextResponse importable in Node test context, .json() returns Promise
 - No env vars in CI Test step: tests use vi.stubEnv for mocked values — no real Supabase/Anthropic credentials needed in CI
 
-*Last updated: 2026-03-05 (v4.0 milestone started)*
+*Last updated: 2026-03-05 (v4.0 roadmap created — Phases 14-19 defined)*

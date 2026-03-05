@@ -219,93 +219,140 @@
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| MT-01 | Phase 8 | Complete |
-| MT-02 | Phase 8 | Complete |
-| MT-03 | Phase 8 | Complete |
-| MT-04 | Phase 8 | Complete |
-| MT-05 | Phase 8 | Complete |
-| MT-06 | Phase 8 | Complete |
-| MT-07 | Phase 8 | Complete |
-| MT-08 | Phase 8 | Complete |
-| AI-01 | Phase 9 | Complete |
-| AI-02 | Phase 9 | Complete |
-| AI-03 | Phase 9 | Complete |
-| AI-04 | Phase 9 | Complete |
-| AI-05 | Phase 9 | Complete |
-| AI-06 | Phase 9 | Complete |
-| AI-07 | Phase 9 | Complete |
-| AI-08 | Phase 9 | Complete |
-| AI-09 | Phase 9 | Complete |
-| AI-10 | Phase 9 | Complete |
-| AI-11 | Phase 9 | Complete |
-| TR-01 | Phase 10 | Complete |
-| TR-02 | Phase 10 | Complete |
-| TR-03 | Phase 10 | Complete |
-| TR-04 | Phase 10 | Complete |
-| SR-01 | Phase 10 | Complete |
-| SR-02 | Phase 10 | Complete |
-| SR-03 | Phase 10 | Complete |
-| SR-04 | Phase 10 | Complete |
-| SR-05 | Phase 10 | Complete |
-| SR-06 | Phase 10 | Complete |
-| SR-07 | Phase 10 | Complete |
-| MH-01 | Phase 11 | Complete |
-| MH-02 | Phase 11 | Complete |
-| MH-03 | Phase 11 | Complete |
-| MH-04 | Phase 11 | Complete |
-| MH-05 | Phase 11 | Complete |
-| MH-06 | Phase 11 | Complete |
-| DS-01 | Phase 11 | Complete |
-| DS-02 | Phase 11 | Complete |
-| DS-03 | Phase 11 | Complete |
-| DS-04 | Phase 11 | Complete |
-| DS-05 | Phase 11 | Complete |
-| GM-01 | Phase 11 | Complete |
-| GM-02 | Phase 11 | Complete |
-| GM-03 | Phase 11 | Complete |
-| GM-04 | Phase 11 | Complete |
-| GM-05 | Phase 11 | Complete |
-| TU-01 | Phase 12 | Complete |
-| TU-02 | Phase 12 | Complete |
-| TU-03 | Phase 12 | Complete |
-| TU-04 | Phase 12 | Complete |
-| DK-01 | Phase 12 | Complete |
-| DK-02 | Phase 12 | Complete |
-| DK-03 | Phase 12 | Complete |
-| SS-01 | Phase 12 | Complete |
-| SS-02 | Phase 12 | Complete |
-| SS-03 | Phase 12 | Complete |
-| PZ-01 | Phase 12 | Complete |
-| PZ-02 | Phase 12 | Complete |
-| PZ-03 | Phase 12 | Complete |
-| UY-01 | Phase 12 | Complete |
-| UY-02 | Phase 12 | Complete |
-| UY-03 | Phase 12 | Complete |
-| SA-01 | Phase 12 | Complete |
-| SA-02 | Phase 12 | Complete |
-| SA-03 | Phase 12 | Complete |
-| IK-01 | Phase 12 | Complete |
-| IK-02 | Phase 12 | Complete |
-| IK-03 | Phase 12 | Complete |
-| AO-01 | Phase 12 | Complete |
-| AO-02 | Phase 12 | Complete |
-| AO-03 | Phase 12 | Complete |
+| Requirement | Milestone | Phase | Status |
+|-------------|-----------|-------|--------|
+| MT-01 | v3.0 | Phase 8 | Complete |
+| MT-02 | v3.0 | Phase 8 | Complete |
+| MT-03 | v3.0 | Phase 8 | Complete |
+| MT-04 | v3.0 | Phase 8 | Complete |
+| MT-05 | v3.0 | Phase 8 | Complete |
+| MT-06 | v3.0 | Phase 8 | Complete |
+| MT-07 | v3.0 | Phase 8 | Complete |
+| MT-08 | v3.0 | Phase 8 | Complete |
+| AI-01 | v3.0 | Phase 9 | Complete |
+| AI-02 | v3.0 | Phase 9 | Complete |
+| AI-03 | v3.0 | Phase 9 | Complete |
+| AI-04 | v3.0 | Phase 9 | Complete |
+| AI-05 | v3.0 | Phase 9 | Complete |
+| AI-06 | v3.0 | Phase 9 | Complete |
+| AI-07 | v3.0 | Phase 9 | Complete |
+| AI-08 | v3.0 | Phase 9 | Complete |
+| AI-09 | v3.0 | Phase 9 | Complete |
+| AI-10 | v3.0 | Phase 9 | Complete |
+| AI-11 | v3.0 | Phase 9 | Complete |
+| TR-01 (v3.0) | v3.0 | Phase 10 | Complete |
+| TR-02 (v3.0) | v3.0 | Phase 10 | Complete |
+| TR-03 (v3.0) | v3.0 | Phase 10 | Complete |
+| TR-04 (v3.0) | v3.0 | Phase 10 | Complete |
+| SR-01 | v3.0 | Phase 10 | Complete |
+| SR-02 | v3.0 | Phase 10 | Complete |
+| SR-03 | v3.0 | Phase 10 | Complete |
+| SR-04 | v3.0 | Phase 10 | Complete |
+| SR-05 | v3.0 | Phase 10 | Complete |
+| SR-06 | v3.0 | Phase 10 | Complete |
+| SR-07 | v3.0 | Phase 10 | Complete |
+| MH-01 | v3.0 | Phase 11 | Complete |
+| MH-02 | v3.0 | Phase 11 | Complete |
+| MH-03 | v3.0 | Phase 11 | Complete |
+| MH-04 | v3.0 | Phase 11 | Complete |
+| MH-05 | v3.0 | Phase 11 | Complete |
+| MH-06 | v3.0 | Phase 11 | Complete |
+| DS-01 | v3.0 | Phase 11 | Complete |
+| DS-02 | v3.0 | Phase 11 | Complete |
+| DS-03 | v3.0 | Phase 11 | Complete |
+| DS-04 | v3.0 | Phase 11 | Complete |
+| DS-05 | v3.0 | Phase 11 | Complete |
+| GM-01 | v3.0 | Phase 11 | Complete |
+| GM-02 | v3.0 | Phase 11 | Complete |
+| GM-03 | v3.0 | Phase 11 | Complete |
+| GM-04 | v3.0 | Phase 11 | Complete |
+| GM-05 | v3.0 | Phase 11 | Complete |
+| TU-01 | v3.0 | Phase 12 | Complete |
+| TU-02 | v3.0 | Phase 12 | Complete |
+| TU-03 | v3.0 | Phase 12 | Complete |
+| TU-04 | v3.0 | Phase 12 | Complete |
+| DK-01 | v3.0 | Phase 12 | Complete |
+| DK-02 | v3.0 | Phase 12 | Complete |
+| DK-03 | v3.0 | Phase 12 | Complete |
+| SS-01 | v3.0 | Phase 12 | Complete |
+| SS-02 | v3.0 | Phase 12 | Complete |
+| SS-03 | v3.0 | Phase 12 | Complete |
+| PZ-01 | v3.0 | Phase 12 | Complete |
+| PZ-02 | v3.0 | Phase 12 | Complete |
+| PZ-03 | v3.0 | Phase 12 | Complete |
+| UY-01 | v3.0 | Phase 12 | Complete |
+| UY-02 | v3.0 | Phase 12 | Complete |
+| UY-03 | v3.0 | Phase 12 | Complete |
+| SA-01 (v3.0 Satin Alma) | v3.0 | Phase 12 | Complete |
+| SA-02 (v3.0 Satin Alma) | v3.0 | Phase 12 | Complete |
+| SA-03 (v3.0 Satin Alma) | v3.0 | Phase 12 | Complete |
+| IK-01 | v3.0 | Phase 12 | Complete |
+| IK-02 | v3.0 | Phase 12 | Complete |
+| IK-03 | v3.0 | Phase 12 | Complete |
+| AO-01 | v3.0 | Phase 12 | Complete |
+| AO-02 | v3.0 | Phase 12 | Complete |
+| AO-03 | v3.0 | Phase 12 | Complete |
+| DB-01 | v4.0 | Phase 14 | Pending |
+| DB-02 | v4.0 | Phase 14 | Pending |
+| DB-03 | v4.0 | Phase 14 | Pending |
+| DB-04 | v4.0 | Phase 14 | Pending |
+| DB-05 | v4.0 | Phase 14 | Pending |
+| DB-06 | v4.0 | Phase 14 | Pending |
+| DB-07 | v4.0 | Phase 14 | Pending |
+| DB-08 | v4.0 | Phase 14 | Pending |
+| SA-01 (v4.0 Superadmin) | v4.0 | Phase 15 | Pending |
+| SA-02 (v4.0 Superadmin) | v4.0 | Phase 15 | Pending |
+| SA-05 (v4.0 Superadmin) | v4.0 | Phase 15 | Pending |
+| SA-06 (v4.0 Superadmin) | v4.0 | Phase 15 | Pending |
+| KS-05 | v4.0 | Phase 15 | Pending |
+| KS-06 | v4.0 | Phase 15 | Pending |
+| KS-08 | v4.0 | Phase 15 | Pending |
+| KS-01 | v4.0 | Phase 16 | Pending |
+| KS-02 | v4.0 | Phase 16 | Pending |
+| KS-03 | v4.0 | Phase 16 | Pending |
+| KS-04 | v4.0 | Phase 16 | Pending |
+| KS-07 | v4.0 | Phase 16 | Pending |
+| BL-01 | v4.0 | Phase 17 | Pending |
+| BL-02 | v4.0 | Phase 17 | Pending |
+| BL-03 | v4.0 | Phase 17 | Pending |
+| BL-04 | v4.0 | Phase 17 | Pending |
+| BL-05 | v4.0 | Phase 17 | Pending |
+| BL-06 | v4.0 | Phase 17 | Pending |
+| TR-01 (v4.0) | v4.0 | Phase 17 | Pending |
+| TR-02 (v4.0) | v4.0 | Phase 17 | Pending |
+| TR-03 (v4.0) | v4.0 | Phase 17 | Pending |
+| TR-04 (v4.0) | v4.0 | Phase 17 | Pending |
+| TR-05 (v4.0) | v4.0 | Phase 17 | Pending |
+| AM-01 | v4.0 | Phase 18 | Pending |
+| AM-02 | v4.0 | Phase 18 | Pending |
+| AM-03 | v4.0 | Phase 18 | Pending |
+| AM-04 | v4.0 | Phase 18 | Pending |
+| AM-05 | v4.0 | Phase 18 | Pending |
+| AM-06 | v4.0 | Phase 18 | Pending |
+| SA-03 (v4.0 Superadmin) | v4.0 | Phase 19 | Pending |
+| SA-04 (v4.0 Superadmin) | v4.0 | Phase 19 | Pending |
 
 **Coverage:**
 - v3.0 requirements: 71 total (8 MT + 11 AI + 4 TR + 7 SR + 6 MH + 5 DS + 5 GM + 4 TU + 3 DK + 3 SS + 3 PZ + 3 UY + 3 SA + 3 IK + 3 AO)
-- Mapped to phases: 71/71
-- Unmapped: 0
+- v3.0 mapped to phases: 71/71
+- v4.0 requirements: 39 total (6 SA + 8 KS + 6 AM + 6 BL + 5 TR + 8 DB)
+- v4.0 mapped to phases: 39/39
+- Total unmapped: 0
 
-| Phase | Requirements | Count |
-|-------|-------------|-------|
-| Phase 8 — Multi-Tenant Database Migration | MT-01 through MT-08 | 8 |
-| Phase 9 — Agent Infrastructure Foundation | AI-01 through AI-11 | 11 |
-| Phase 10 — First Agent Group (Trainer + Sales) | TR-01..04, SR-01..07 | 11 |
-| Phase 11 — Financial and Operations Agents | MH-01..06, DS-01..05, GM-01..05 | 16 |
-| Phase 12 — Extended Agent Ecosystem | TU-01..04, DK-01..03, SS-01..03, PZ-01..03, UY-01..03, SA-01..03, IK-01..03, AO-01..03 | 25 |
+| Phase | Milestone | Requirements | Count |
+|-------|-----------|-------------|-------|
+| Phase 8 — Multi-Tenant Database Migration | v3.0 | MT-01 through MT-08 | 8 |
+| Phase 9 — Agent Infrastructure Foundation | v3.0 | AI-01 through AI-11 | 11 |
+| Phase 10 — First Agent Group (Trainer + Sales) | v3.0 | TR-01..04, SR-01..07 | 11 |
+| Phase 11 — Financial and Operations Agents | v3.0 | MH-01..06, DS-01..05, GM-01..05 | 16 |
+| Phase 12 — Extended Agent Ecosystem | v3.0 | TU-01..04, DK-01..03, SS-01..03, PZ-01..03, UY-01..03, SA-01..03, IK-01..03, AO-01..03 | 25 |
+| Phase 14 — Database Schema Foundation | v4.0 | DB-01..08 | 8 |
+| Phase 15 — Company Creation Infrastructure | v4.0 | SA-01, SA-02, SA-05, SA-06, KS-05, KS-06, KS-08 | 7 |
+| Phase 16 — Kurulum Sihirbazi | v4.0 | KS-01, KS-02, KS-03, KS-04, KS-07 | 5 |
+| Phase 17 — Billing + Deneme Suresi | v4.0 | BL-01..06, TR-01..05 | 11 |
+| Phase 18 — Agent Access Gating + Dijital Ekibim | v4.0 | AM-01..06 | 6 |
+| Phase 19 — Superadmin Panel Dashboard + Trial Notifications | v4.0 | SA-03, SA-04 | 2 |
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 — traceability mapped to Phases 8-12*
+*Last updated: 2026-03-05 — v4.0 traceability mapped to Phases 14-19*
