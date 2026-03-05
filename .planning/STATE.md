@@ -255,6 +255,12 @@ Resume file: None
 - apiSuccess/apiError use 'as const' on success field — TypeScript discriminated union narrows correctly
 - Existing 15+ API routes NOT refactored — helpers available for incremental adoption to minimize diff scope
 
+### Phase 13 Decisions (from Plan 13-03)
+- request.ip removed — not available on NextRequest in Next.js 16; IP sourced from x-forwarded-for header only (Rule 1 auto-fix)
+- Rate limit logic for /api/ routes runs before updateSession() auth check — avoids unnecessary Supabase auth round-trip on blocked requests
+- logger.ts NOT imported in middleware — Edge runtime safe; logger is for API route and server-side use only
+- cleanup() called on every rate-limited request but only executes every 60s (lastCleanup guard) — avoids per-request Map scan
+
 ### Phase 13 Decisions (from Plan 13-04)
 - pnpm --frozen-lockfile in CI — enforces lockfile consistency, fails if pnpm-lock.yaml diverges from package.json
 - Node 20 LTS in CI — matches Vercel default build environment
@@ -263,4 +269,4 @@ Resume file: None
 - Supabase Free tier: 7-day backup retention, no PITR; Pro tier: 14-day + PITR add-on
 - Manual pg_dump recommended before major migrations as additional safety beyond automated backups
 
-*Last updated: 2026-03-05 (Phase 13 Plan 01 complete — Zod env validation, .env.example, /api/health endpoint)*
+*Last updated: 2026-03-05 (Phase 13 Plan 03 complete — rate limiter, structured logger, middleware x-request-id + 429 rate limiting)*
