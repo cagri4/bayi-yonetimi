@@ -232,8 +232,8 @@ Progress: [██░░░░░░░░] 40% — Phase 13 Plan 04 of 06 comple
 
 ## Session Continuity
 
-Last session: 2026-03-05 (Phase 13 Plan 04 complete — CI workflow + backup docs)
-Stopped at: Completed 13-04-PLAN.md
+Last session: 2026-03-05 (Phase 13 Plan 02 complete — error boundaries, 404 page, API response helpers)
+Stopped at: Completed 13-02-PLAN.md
 Resume file: None
 
 ---
@@ -242,6 +242,12 @@ Resume file: None
 - Overdue scope via dealer_id IN (...) join — dealer_transactions has no company_id column (consistent with Phase 11 muhasebeci-tools decision)
 - Middleware fix: /api/ routes excluded from auth redirect — cron route would 302-redirect without Bearer header otherwise (Rule 3 auto-fix)
 - briefingsSent counter in JSON response — enables manual test verification without Telegram bot configured
+
+### Phase 13 Decisions (from Plan 13-02)
+- error.tsx files log via useEffect(console.error) — Sentry will hook into this in Plan 05 without file changes
+- not-found.tsx is a server component (no 'use client') — Next.js convention, 404 pages don't receive reset props
+- apiSuccess/apiError use 'as const' on success field — TypeScript discriminated union narrows correctly
+- Existing 15+ API routes NOT refactored — helpers available for incremental adoption to minimize diff scope
 
 ### Phase 13 Decisions (from Plan 13-04)
 - pnpm --frozen-lockfile in CI — enforces lockfile consistency, fails if pnpm-lock.yaml diverges from package.json
