@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 12 — Extended Agent Ecosystem — COMPLETE
-Plan: 07 of 07 complete
-Status: COMPLETE — All 7 plans executed (domain tables SQL, types, 5 tool files, tool-registry wired, 3 wave-2 tool files + 7 webhook routes + agent_definitions seed + daily briefing cron)
-Last activity: 2026-03-04 — Phase 12 Plan 07 complete (vercel.json cron, daily-briefing route deployed, CRON_SECRET verified live)
+Phase: 13 — Production Readiness — IN PROGRESS
+Plan: 04 of 06 complete
+Status: IN PROGRESS — Plan 04 complete (GitHub Actions CI workflow, database backup documentation)
+Last activity: 2026-03-05 — Phase 13 Plan 04 complete (.github/workflows/ci.yml, P0-CI + P1-DBBACKUP satisfied)
 
-Progress: [██████████] 100% — Phase 12 Plan 07 of 07 complete
+Progress: [██░░░░░░░░] 40% — Phase 13 Plan 04 of 06 complete
 
 ## Milestones
 
@@ -232,8 +232,8 @@ Progress: [██████████] 100% — Phase 12 Plan 07 of 07 compl
 
 ## Session Continuity
 
-Last session: 2026-03-04 (Phase 12 Plan 07 fully complete — all 7 plans done, daily briefing cron live, CRON_SECRET verified)
-Stopped at: Completed 12-07-PLAN.md — Phase 12 fully complete
+Last session: 2026-03-05 (Phase 13 Plan 04 complete — CI workflow + backup docs)
+Stopped at: Completed 13-04-PLAN.md
 Resume file: None
 
 ---
@@ -243,4 +243,12 @@ Resume file: None
 - Middleware fix: /api/ routes excluded from auth redirect — cron route would 302-redirect without Bearer header otherwise (Rule 3 auto-fix)
 - briefingsSent counter in JSON response — enables manual test verification without Telegram bot configured
 
-*Last updated: 2026-03-04 (Phase 12 fully complete — all 7 plans done, proactive daily briefing cron live on Vercel)*
+### Phase 13 Decisions (from Plan 13-04)
+- pnpm --frozen-lockfile in CI — enforces lockfile consistency, fails if pnpm-lock.yaml diverges from package.json
+- Node 20 LTS in CI — matches Vercel default build environment
+- Placeholder NEXT_PUBLIC_* env vars in CI build step — Next.js inlines these at build time; without placeholders the build fails; server-side-only vars not needed
+- No test step in CI yet — Plan 06 adds Vitest step after test infrastructure is configured
+- Supabase Free tier: 7-day backup retention, no PITR; Pro tier: 14-day + PITR add-on
+- Manual pg_dump recommended before major migrations as additional safety beyond automated backups
+
+*Last updated: 2026-03-05 (Phase 13 Plan 04 complete — GitHub Actions CI + database backup docs)*
