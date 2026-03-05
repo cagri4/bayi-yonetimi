@@ -6,25 +6,24 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis verebilmesi — AI agent'lar ile 7/24 otonom is surecleri.
 
-**Current focus:** v3.0 — Multi-Tenant SaaS + AI Agent Ecosystem
+**Current focus:** v4.0 — Agent-Native SaaS Onboarding & Marketplace
 
 ## Current Position
 
-Phase: 13 — Production Readiness — COMPLETE
-Plan: 06 of 06 complete
-Status: COMPLETE — Phase 13 all plans complete (env validation, error boundaries, rate limiting, CI, Sentry, Vitest tests)
-Last activity: 2026-03-05 — Phase 13 Plan 06 complete (vitest.config.ts, 3 test files, CI test step, P2-TESTS satisfied)
-
-Progress: [██████████] 100% — Phase 13 Plan 06 of 06 complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v4.0
+Last activity: 2026-03-05 — Milestone v4.0 started
 
 ## Milestones
 
 **Shipped:**
 - v1 MVP (2026-02-03) — 3 phases, 14 plans, 38 requirements
 - v2.0 — Bayi Deneyimi ve Finansal Takip (2026-03-01) — 4 phases, 20 plans, 36 requirements
+- v3.0 — Multi-Tenant SaaS + AI Agent Ecosystem (2026-03-05) — 6 phases (8-13), 71 requirements + production readiness
 
 **In Progress:**
-- v3.0 — Multi-Tenant SaaS + AI Agent Ecosystem — 5 phases (8-12), 71 requirements
+- v4.0 — Agent-Native SaaS Onboarding & Marketplace — defining requirements
 
 ## Accumulated Context
 
@@ -232,8 +231,8 @@ Progress: [██████████] 100% — Phase 13 Plan 06 of 06 compl
 
 ## Session Continuity
 
-Last session: 2026-03-05 (Phase 13 Plan 06 complete — Vitest testing framework, 42 unit tests, CI test step)
-Stopped at: Completed 13-06-PLAN.md
+Last session: 2026-03-05 (v4.0 milestone started — defining requirements)
+Stopped at: Requirements definition
 Resume file: None
 
 ---
@@ -282,4 +281,4 @@ Resume file: None
 - parseBody() async helper wraps response.json(): NextResponse importable in Node test context, .json() returns Promise
 - No env vars in CI Test step: tests use vi.stubEnv for mocked values — no real Supabase/Anthropic credentials needed in CI
 
-*Last updated: 2026-03-05 (Phase 13 Plan 06 complete — Vitest testing framework, 42 unit tests, CI test step)*
+*Last updated: 2026-03-05 (v4.0 milestone started)*

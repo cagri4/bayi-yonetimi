@@ -60,44 +60,48 @@ Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis ve
 - [x] Siparis durumlari: Beklemede -> Onaylandi -> Hazirlaniyor -> Kargoya Verildi -> Teslim Edildi — v1
 - [x] Minimum siparis tutari kontrolu (bayi grubuna gore) — v1
 
+### Validated (v3.0 — shipped)
+
+- [x] Multi-tenant mimari (company_id izolasyonu, RLS, JWT claim injection)
+- [x] Agent altyapisi (AgentRunner, ToolRegistry, AgentBridge, ConversationManager)
+- [x] 12 AI dijital calisan (Telegram uzerinden, Claude API tool calling)
+- [x] Production readiness (env validation, error boundaries, rate limiting, CI, Sentry, Vitest)
+
 ### Active
 
-**Current Milestone: v3.0 — Multi-Tenant SaaS + AI Agent Ecosystem**
+**Current Milestone: v4.0 — Agent-Native SaaS Onboarding & Marketplace**
 
-**Goal:** Mevcut SaaS'i multi-tenant yapiya donustur, 12 AI dijital calisani Telegram uzerinden Claude API ile insa et. Birden fazla firmaya satilabilir urun haline getir.
+**Goal:** Platformu agent-native SaaS'a donustur — superadmin panelden firma olustur, Telegram uzerinden Kurulum Sihirbazi ile conversational onboarding, per-agent fiyatlandirma ve dijital ekip yonetimi.
 
-**Multi-Tenant Mimari:**
-- [ ] companies tablosu ve firma yonetimi
-- [ ] Tum tablolara company_id ekleme
-- [ ] RLS policy'leri company-aware guncelleme
-- [ ] Firma bazli login ve routing
+**Superadmin Panel + Tenant Onboarding:**
+- [ ] Superadmin panelden yeni firma olusturma
+- [ ] Telegram onboarding linki uretimi
+- [ ] Firma bazinda agent aktivasyon tablosu (acik/kapali)
 
-**Agent Altyapisi:**
-- [ ] Claude API entegrasyonu (tool calling framework)
-- [ ] Telegram Bot entegrasyonu
-- [ ] Agent konusma hafizasi ve state yonetimi
-- [ ] Agent-to-agent iletisim protokolu
-- [ ] Agent tool sarmalama (mevcut server actions -> tools)
+**Kurulum Sihirbazi (13. Agent):**
+- [ ] Conversational onboarding — firma bilgisi toplama
+- [ ] Diger bot'lara gorev atama mekanizmasi (AgentBridge task mode)
+- [ ] Toplanan verilerle DB'yi otomatik doldurma
 
-**12 AI Dijital Calisan:**
-- [ ] Satis Temsilcisi (bayi siparisi, urun onerme, fiyat verme)
-- [ ] Muhasebeci (cari hesap, fatura, tahsilat takibi)
-- [ ] Depo Sorumlusu (stok yonetimi, siparis hazirlama)
-- [ ] Saha Satis Sorumlusu (rut planlama, bayi ziyaret)
-- [ ] Dagitim Koordinatoru (rut optimizasyonu, teslimat takibi)
-- [ ] Tahsilat Uzmani (vadesi gecen alacak, odeme hatirlatma)
-- [ ] Satin Alma Sorumlusu (tedarikci siparisi, stok yenileme)
-- [ ] Pazarlamaci (kampanya yonetimi, bayi segmentasyonu)
-- [ ] Urun Yoneticisi (katalog yonetimi, fiyat stratejisi)
-- [ ] Egitimci (bayi onboarding, urun egitimi)
-- [ ] Iade/Kalite Sorumlusu (iade sureci, sikayet takibi)
-- [ ] Genel Mudur Danismani (KPI, stratejik analiz, trend tespiti)
+**Bot Tanitim + Sirali Kurulum Akisi:**
+- [ ] Sihirbaz her botu sirayla tanitir, bayiyle konusturur
+- [ ] Her bot kendi alaninin verilerini toplar/dogrular
+- [ ] Kurulum tamamlandi bildirimi + web panel linki
+
+**Billing + Deneme Suresi:**
+- [ ] Deneme suresi mekanizmasi (tum ajanlar aktif)
+- [ ] Per-agent fiyatlandirma modeli
+- [ ] Deneme sonu mesaji + eleman secimi akisi
+
+**Agent Marketplace (Admin Panel):**
+- [ ] "Dijital Ekibim" sayfasi (ise al / cikar toggle)
+- [ ] Aylik maliyet hesaplayici
+- [ ] Kullanim istatistikleri
 
 ### Out of Scope
 
-- ERP entegrasyonu (Logo/Netsis) — API baglantisi v4.0'da
-- Odeme sistemi entegrasyonu — Mevcut odeme surecleri devam edecek
-- WhatsApp Business API — Telegram oncelikli, WhatsApp v4.0'da
+- ERP entegrasyonu (Logo/Netsis) — API baglantisi v5.0'da
+- WhatsApp Business API — Telegram oncelikli, WhatsApp v5.0'da
 - Sesli asistan — Text-based oncelikli
 - Mobil uygulama agent entegrasyonu — Web + Telegram oncelikli
 - Coklu dil destegi — Sadece Turkce
@@ -151,4 +155,4 @@ Bayilerin mesai saatlerinden bagimsiz, anlik stok ve fiyat bilgisiyle siparis ve
 | Agent-per-role design | Each business role = separate agent with own tools/authority | — Pending |
 
 ---
-*Last updated: 2026-03-01 after v3.0 milestone start*
+*Last updated: 2026-03-05 after v4.0 milestone start*
