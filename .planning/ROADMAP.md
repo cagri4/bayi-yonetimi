@@ -256,12 +256,28 @@ Phases execute in strict dependency order: 8 → 9 → 10 → 11 → 12
 
 ### Phase 13: Production Readiness
 
-**Goal:** [To be planned]
+**Goal:** The application is production-hardened with env validation, error boundaries, health monitoring, rate limiting, structured logging, CI pipeline, error tracking, standardized API responses, and a basic test suite
 **Depends on:** Phase 12
-**Plans:** 0 plans
+**Requirements:** P0-ENV, P0-ERRBOUND, P0-HEALTH, P0-RATELIMIT, P0-LOGGING, P0-CI, P1-SENTRY, P1-ENVDOC, P1-APISTANDARD, P1-DBBACKUP, P2-TESTS, P2-RETRY
+**Success Criteria** (what must be TRUE):
+  1. Missing required env vars cause a clear startup error listing all problems
+  2. Unhandled React errors show a branded Turkish error page with retry option
+  3. GET /api/health returns JSON with database connectivity and env status
+  4. API routes reject excessive requests with 429 and Retry-After header
+  5. Every HTTP response carries an x-request-id header for log correlation
+  6. Every push to master triggers lint + type-check + test + build in GitHub Actions
+  7. Runtime errors are captured by Sentry when configured (graceful no-op when not)
+  8. Failed Telegram sends retry with exponential backoff before giving up
+  9. `pnpm test` runs Vitest suite covering env, API response, and rate limiter utilities
+**Plans:** 6 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 13 to break down)
+- [ ] 13-01-PLAN.md — Env validation (Zod schema) + .env.example + /api/health endpoint
+- [ ] 13-02-PLAN.md — Error boundaries (error.tsx + not-found.tsx) + API response standardization
+- [ ] 13-03-PLAN.md — Rate limiting middleware + Structured logging with request ID
+- [ ] 13-04-PLAN.md — GitHub Actions CI pipeline + Database backup verification
+- [ ] 13-05-PLAN.md — Sentry error tracking integration + Agent Telegram retry logic
+- [ ] 13-06-PLAN.md — Vitest setup + Critical path unit tests + CI test step
 
 ---
 *Roadmap created: 2026-02-08*
