@@ -243,6 +243,12 @@ Resume file: None
 - Middleware fix: /api/ routes excluded from auth redirect — cron route would 302-redirect without Bearer header otherwise (Rule 3 auto-fix)
 - briefingsSent counter in JSON response — enables manual test verification without Telegram bot configured
 
+### Phase 13 Decisions (from Plan 13-01)
+- env.ts uses try/catch wrapping serverEnvSchema.parse — ZodError formatted into human-readable table before re-throwing (shows exact missing var names)
+- health/route.ts validates env vars inline (not via import { env }) — prevents route from throwing when env is misconfigured; health endpoint reports problems, not propagates them
+- .gitignore updated with !.env.example negation — .env* pattern was blocking example file from git
+- publicEnvSchema exported separately — safe for client component imports without exposing server secrets
+
 ### Phase 13 Decisions (from Plan 13-02)
 - error.tsx files log via useEffect(console.error) — Sentry will hook into this in Plan 05 without file changes
 - not-found.tsx is a server component (no 'use client') — Next.js convention, 404 pages don't receive reset props
@@ -257,4 +263,4 @@ Resume file: None
 - Supabase Free tier: 7-day backup retention, no PITR; Pro tier: 14-day + PITR add-on
 - Manual pg_dump recommended before major migrations as additional safety beyond automated backups
 
-*Last updated: 2026-03-05 (Phase 13 Plan 04 complete — GitHub Actions CI + database backup docs)*
+*Last updated: 2026-03-05 (Phase 13 Plan 01 complete — Zod env validation, .env.example, /api/health endpoint)*
