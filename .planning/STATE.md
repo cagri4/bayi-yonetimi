@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 ## Current Position
 
-Phase: 14 — Database Schema Foundation (not started)
-Plan: —
-Status: Roadmap created, ready for Phase 14 planning
-Last activity: 2026-03-05 — v4.0 roadmap written
+Phase: 14 — Database Schema Foundation
+Plan: 01 complete, 02 pending
+Status: Plan 01 complete — migration SQL and TypeScript types created
+Last activity: 2026-03-05 — Phase 14 Plan 01 executed
 
 ## Milestones
 
@@ -216,6 +216,14 @@ Last activity: 2026-03-05 — v4.0 roadmap written
 - Phase 10 (First Agents) → blocks Phase 11
 - Phase 11 (Financial + Ops Agents) → blocks Phase 12
 
+### Phase 14 Decisions (from Plan 14-01)
+- agent_marketplace seed uses actual AgentRole enum values (egitimci, satis_temsilcisi, etc.) not English placeholders — 12 roles excluding destek (placeholderTools only, intentional)
+- onboarding_sessions.company_id is nullable — wizard session must exist before company is provisioned; NOT NULL would block wizard from starting
+- update_updated_at_column() uses CREATE OR REPLACE — safe re-run even if function existed from earlier migrations (001-011)
+- subscriptions.plan and companies.plan both kept — subscriptions.plan is billing source of truth; companies.plan sync resolved in Phase 17
+- BLOCK 6 DO block verification raises EXCEPTION if agent_marketplace count != 12 — loud failure on seed error is intentional
+- agent_marketplace: all authenticated SELECT (USING true) + superadmin FOR ALL — global catalog, no tenant scoping (no company_id column)
+
 ### v4.0 Key Decisions (from roadmap + research)
 - Billing: Mollie (NOT iyzico) — user confirmed Mollie account; iyzico removed from stack
 - Wizard: 12 agents introduced with scripted Turkish descriptions only — no live demo (deferred to v4.1+)
@@ -255,9 +263,9 @@ Last activity: 2026-03-05 — v4.0 roadmap written
 
 ## Session Continuity
 
-Last session: 2026-03-05 (v4.0 roadmap created)
-Stopped at: Roadmap written, ready for Phase 14 planning
-Resume file: None — start with `/gsd:plan-phase 14`
+Last session: 2026-03-05 (Phase 14 Plan 01 executed)
+Stopped at: Completed 14-01-PLAN.md — migration SQL + TypeScript types
+Resume file: None — continue with Phase 14 Plan 02
 
 ---
 ### Phase 12 Decisions (from Plan 12-07)

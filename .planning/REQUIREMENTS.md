@@ -171,14 +171,14 @@
 
 ### Veritabani Altyapisi
 
-- [ ] **DB-01**: onboarding_sessions tablosu olusturulur (wizard state, collected_data JSONB, deep_link_token, telegram_chat_id)
-- [ ] **DB-02**: subscriptions tablosu olusturulur (company_id, plan, status, trial_ends_at, mollie_subscription_id)
-- [ ] **DB-03**: agent_marketplace tablosu olusturulur (agent_role, display_name, description, monthly_price, minimum_plan)
-- [ ] **DB-04**: payment_webhook_events tablosu olusturulur (mollie_event_id, payload JSONB, processed_at — idempotency)
-- [ ] **DB-05**: superadmin_audit_log tablosu olusturulur (actor_id, action, target_table, old_value, new_value JSONB)
-- [ ] **DB-06**: companies tablosuna trial_ends_at kolonu eklenir
-- [ ] **DB-07**: agent_definitions tablosuna subscription_tier kolonu eklenir
-- [ ] **DB-08**: onboarding_invites tablosu olusturulur (token hash, used_at, expires_at — tek kullanimlik)
+- [x] **DB-01**: onboarding_sessions tablosu olusturulur (wizard state, collected_data JSONB, deep_link_token, telegram_chat_id)
+- [x] **DB-02**: subscriptions tablosu olusturulur (company_id, plan, status, trial_ends_at, mollie_subscription_id)
+- [x] **DB-03**: agent_marketplace tablosu olusturulur (agent_role, display_name, description, monthly_price, minimum_plan)
+- [x] **DB-04**: payment_webhook_events tablosu olusturulur (mollie_event_id, payload JSONB, processed_at — idempotency)
+- [x] **DB-05**: superadmin_audit_log tablosu olusturulur (actor_id, action, target_table, old_value, new_value JSONB)
+- [x] **DB-06**: companies tablosuna trial_ends_at kolonu eklenir
+- [x] **DB-07**: agent_definitions tablosuna subscription_tier kolonu eklenir
+- [x] **DB-08**: onboarding_invites tablosu olusturulur (token hash, used_at, expires_at — tek kullanimlik)
 
 ## v4.1+ Requirements (Deferred)
 
