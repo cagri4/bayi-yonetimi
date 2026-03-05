@@ -51,6 +51,7 @@ export async function createOrder(
     .from('dealers')
     .select(`
       id,
+      company_id,
       dealer_group:dealer_groups(
         id,
         min_order_amount
@@ -59,7 +60,7 @@ export async function createOrder(
     .eq('user_id', user.id)
     .single()
 
-  const dealer = dealerResult.data as DealerForOrder | null
+  const dealer = dealerResult.data as (DealerForOrder & { company_id: string }) | null
   if (!dealer) {
     return { message: 'Bayi kaydı bulunamadı' }
   }
@@ -102,6 +103,7 @@ export async function createOrder(
     .insert({
       order_number: orderNumber,
       dealer_id: dealer.id,
+      company_id: dealer.company_id,
       status_id: pendingStatus.id,
       subtotal: subtotal,
       discount_amount: 0,
@@ -121,6 +123,7 @@ export async function createOrder(
   // Create order items
   const orderItems = items.map((item) => ({
     order_id: order.id,
+    company_id: dealer.company_id,
     product_id: item.productId,
     product_code: item.productCode,
     product_name: item.productName,
@@ -144,6 +147,7 @@ export async function createOrder(
     .from('order_status_history')
     .insert({
       order_id: order.id,
+      company_id: dealer.company_id,
       status_id: pendingStatus.id,
       changed_by: user.id,
       notes: 'Siparis olusturuldu',
