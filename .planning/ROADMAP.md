@@ -393,7 +393,11 @@ Plans:
   3. agent_marketplace table contains exactly 12 seed rows — one per agent role — with Turkish display names, descriptions, and monthly prices
   4. RLS policies on all new tables permit superadmin unrestricted access and restrict company-scoped tables to their own company_id
   5. A deliberate attempt to insert a duplicate onboarding_invites token (same hash) is rejected by the UNIQUE constraint before application code can process it
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 14-01-PLAN.md — SQL migration file (6 tables, 2 column additions, seed data, RLS) + TypeScript types
+- [ ] 14-02-PLAN.md — Dashboard execution, UNIQUE constraint verification, build check
 
 ### Phase 15: Company Creation Infrastructure
 **Goal**: Superadmin can create a new tenant company and generate a single-use Telegram invite link — and the atomic create-company action that the wizard calls at completion works correctly in isolation before the wizard is built around it
