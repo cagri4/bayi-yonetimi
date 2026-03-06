@@ -425,7 +425,11 @@ Plans:
   3. The wizard introduces all 12 dijital calisanlar by name with a short Turkish description for each, in sequential order, before asking for setup confirmation
   4. After the user confirms setup, the wizard calls the atomic create-company action and sends a completion message containing the web panel URL and temporary admin password
   5. The wizard collects company name, sektor, urun sayisi, bayi sayisi, and beklentiler through natural Turkish conversation before the introduction sequence begins
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — WizardOrchestrator FSM core: session management, step handlers, agent descriptions
+- [ ] 16-02-PLAN.md — Dispatcher + webhook route integration + build verification
 
 ### Phase 17: Billing + Deneme Suresi
 **Goal**: Every new company starts a 14-day trial with all agents active, receives countdown warnings via Telegram, and can transition to a paid per-agent subscription via Mollie — with payment failures handled gracefully through a 3-day grace period
@@ -483,7 +487,7 @@ Phases 1-13 complete. v4.0 executes in strict dependency order: 14 → 15 → 16
 | 13. Production Readiness | v3.0 | 6/6 | Complete | 2026-03-05 |
 | 14. Database Schema Foundation | 2/2 | Complete    | 2026-03-06 | — |
 | 15. Company Creation Infrastructure | 2/2 | Complete    | 2026-03-06 | — |
-| 16. Kurulum Sihirbazi | v4.0 | 0/? | Not started | — |
+| 16. Kurulum Sihirbazi | v4.0 | 0/2 | Planned | — |
 | 17. Billing + Deneme Suresi | v4.0 | 0/? | Not started | — |
 | 18. Agent Access Gating + Dijital Ekibim | v4.0 | 0/? | Not started | — |
 | 19. Superadmin Panel Dashboard + Trial Notifications | v4.0 | 0/? | Not started | — |
