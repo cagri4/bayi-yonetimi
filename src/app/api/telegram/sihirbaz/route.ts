@@ -5,7 +5,7 @@
  * This is NOT an AI agent — it is a conversational onboarding wizard.
  *
  * Phase 15: Route skeleton with idempotency — logs receipt only.
- * Phase 16: Full WizardOrchestrator FSM integration.
+ * Phase 16: WizardOrchestrator FSM — full conversational onboarding.
  *
  * Protocol (identical to all 12 agent routes):
  * 1. Parse incoming Update from Telegram
@@ -16,6 +16,7 @@
 import { after } from 'next/server'
 import type { Update } from 'grammy/types'
 import { createServiceClient } from '@/lib/supabase/service-client'
+import { dispatchSihirbazUpdate } from '@/lib/sihirbaz/dispatcher'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,25 +40,9 @@ export async function POST(request: Request): Promise<Response> {
     console.error('[telegram/sihirbaz] idempotency insert error:', idempotencyError)
   }
 
-  const botToken = process.env.TELEGRAM_BOT_TOKEN_SIHIRBAZ || ''
-
   after(async () => {
     try {
-      // Phase 15 stub — log receipt, Phase 16 replaces with dispatchSihirbazUpdate()
-      const chatId = update.message?.chat?.id
-      console.log(`[sihirbaz] received update ${update.update_id} from chat ${chatId}`)
-
-      // Send a placeholder reply if there is a chat to respond to
-      if (chatId && botToken) {
-        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: 'Kurulum Sihirbazi henuz hazir degil. Lutfen daha sonra tekrar deneyin.',
-          }),
-        })
-      }
+      await dispatchSihirbazUpdate(update)
     } catch (err) {
       console.error('[telegram/sihirbaz] dispatch error:', err)
     }
