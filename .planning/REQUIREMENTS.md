@@ -292,14 +292,14 @@
 | AO-01 | v3.0 | Phase 12 | Complete |
 | AO-02 | v3.0 | Phase 12 | Complete |
 | AO-03 | v3.0 | Phase 12 | Complete |
-| DB-01 | v4.0 | Phase 14 | Pending |
-| DB-02 | v4.0 | Phase 14 | Pending |
-| DB-03 | v4.0 | Phase 14 | Pending |
-| DB-04 | v4.0 | Phase 14 | Pending |
-| DB-05 | v4.0 | Phase 14 | Pending |
-| DB-06 | v4.0 | Phase 14 | Pending |
-| DB-07 | v4.0 | Phase 14 | Pending |
-| DB-08 | v4.0 | Phase 14 | Pending |
+| DB-01 | v4.0 | Phase 14 | Complete |
+| DB-02 | v4.0 | Phase 14 | Complete |
+| DB-03 | v4.0 | Phase 14 | Complete |
+| DB-04 | v4.0 | Phase 14 | Complete |
+| DB-05 | v4.0 | Phase 14 | Complete |
+| DB-06 | v4.0 | Phase 14 | Complete |
+| DB-07 | v4.0 | Phase 14 | Complete |
+| DB-08 | v4.0 | Phase 14 | Complete |
 | SA-01 (v4.0 Superadmin) | v4.0 | Phase 15 | Pending |
 | SA-02 (v4.0 Superadmin) | v4.0 | Phase 15 | Pending |
 | SA-05 (v4.0 Superadmin) | v4.0 | Phase 15 | Pending |

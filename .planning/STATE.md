@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 ## Current Position
 
 Phase: 14 — Database Schema Foundation
-Plan: 01 complete, 02 pending
-Status: Plan 01 complete — migration SQL and TypeScript types created
-Last activity: 2026-03-05 — Phase 14 Plan 01 executed
+Plan: 02 complete, moving to Phase 15
+Status: Plan 02 complete — v4.0 schema executed in live Supabase DB, build verified passing
+Last activity: 2026-03-06 — Phase 14 Plan 02 executed (migration run + build verification)
 
 ## Milestones
 
@@ -216,6 +216,13 @@ Last activity: 2026-03-05 — Phase 14 Plan 01 executed
 - Phase 10 (First Agents) → blocks Phase 11
 - Phase 11 (Financial + Ops Agents) → blocks Phase 12
 
+### Phase 14 Decisions (from Plan 14-02)
+- All 10 SQL blocks from 012_v4_schema_foundation.sql executed successfully in Supabase Dashboard SQL Editor
+- agent_marketplace COUNT(*) = 12 confirmed via verification query
+- UNIQUE constraint on onboarding_invites.token_hash verified: duplicate INSERT rejected with error 23505
+- pnpm build passed with exit code 0 — nullable columns (trial_ends_at, subscription_tier) cause zero breaking TypeScript changes across all 38 routes
+- Task 2 is verification-only: no source files modified; SQL was already in DB from Task 1 human-action
+
 ### Phase 14 Decisions (from Plan 14-01)
 - agent_marketplace seed uses actual AgentRole enum values (egitimci, satis_temsilcisi, etc.) not English placeholders — 12 roles excluding destek (placeholderTools only, intentional)
 - onboarding_sessions.company_id is nullable — wizard session must exist before company is provisioned; NOT NULL would block wizard from starting
@@ -263,9 +270,9 @@ Last activity: 2026-03-05 — Phase 14 Plan 01 executed
 
 ## Session Continuity
 
-Last session: 2026-03-05 (Phase 14 Plan 01 executed)
-Stopped at: Completed 14-01-PLAN.md — migration SQL + TypeScript types
-Resume file: None — continue with Phase 14 Plan 02
+Last session: 2026-03-06 (Phase 14 Plan 02 executed)
+Stopped at: Completed 14-02-PLAN.md — v4.0 schema live in Supabase, build verified
+Resume file: None — continue with Phase 15 (Company Creation)
 
 ---
 ### Phase 12 Decisions (from Plan 12-07)

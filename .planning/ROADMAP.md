@@ -256,7 +256,7 @@ Plans:
 
 **Milestone Goal:** Transform the platform into an agent-native SaaS — superadmin provisions new tenants via invite links, a 13th Telegram bot (Kurulum Sihirbazi) onboards them conversationally, Mollie handles per-agent billing with a 14-day trial, and company admins manage their digital team via the Dijital Ekibim marketplace.
 
-- [ ] **Phase 14: Database Schema Foundation** - All new tables + column additions that every v4.0 feature depends on
+- [x] **Phase 14: Database Schema Foundation** - All new tables + column additions that every v4.0 feature depends on (completed 2026-03-06)
 - [ ] **Phase 15: Company Creation Infrastructure** - Superadmin create-company action, invite link generation, atomic tenant provisioning
 - [ ] **Phase 16: Kurulum Sihirbazi** - 13th Telegram bot, WizardOrchestrator FSM, conversational onboarding flow
 - [ ] **Phase 17: Billing + Deneme Suresi** - Mollie integration, subscription lifecycle, trial period with countdown notifications
@@ -477,7 +477,7 @@ Phases 1-13 complete. v4.0 executes in strict dependency order: 14 → 15 → 16
 | 11. Financial and Operations Agents | v3.0 | 4/4 | Complete | 2026-03-03 |
 | 12. Extended Agent Ecosystem | v3.0 | 7/7 | Complete | 2026-03-04 |
 | 13. Production Readiness | v3.0 | 6/6 | Complete | 2026-03-05 |
-| 14. Database Schema Foundation | 1/2 | In Progress|  | — |
+| 14. Database Schema Foundation | 2/2 | Complete   | 2026-03-06 | — |
 | 15. Company Creation Infrastructure | v4.0 | 0/? | Not started | — |
 | 16. Kurulum Sihirbazi | v4.0 | 0/? | Not started | — |
 | 17. Billing + Deneme Suresi | v4.0 | 0/? | Not started | — |
