@@ -47,6 +47,10 @@ const serverEnvSchema = z.object({
   TELEGRAM_BOT_TOKEN_SATIN_ALMA: z.string().optional(),
   TELEGRAM_BOT_TOKEN_IADE_KALITE: z.string().optional(),
 
+  // Sihirbaz (Onboarding Wizard) bot
+  TELEGRAM_BOT_TOKEN_SIHIRBAZ: z.string().optional(),
+  TELEGRAM_BOT_USERNAME_SIHIRBAZ: z.string().optional(),
+
   // Error tracking — optional (used by Plan 05 Sentry integration)
   SENTRY_DSN: z.string().url().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
