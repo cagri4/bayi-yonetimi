@@ -141,7 +141,7 @@
 - [x] **KS-05**: Sihirbaz toplanan bilgilerle sistemi tek atomik islemde kurar (company + users + agent_definitions + subscription)
 - [x] **KS-06**: Kurulum tamamlaninca firma sahibine web panel linki ve gecici sifre gonderilir
 - [ ] **KS-07**: Sihirbaz durumu onboarding_sessions tablosunda tutar (kullanici Telegram'i kapatip acsa bile devam edebilir)
-- [ ] **KS-08**: Sihirbaz ayri bir Telegram botu olarak calisir (kendi token'i, kendi webhook route'u)
+- [x] **KS-08**: Sihirbaz ayri bir Telegram botu olarak calisir (kendi token'i, kendi webhook route'u)
 
 ### Agent Aktivasyon ve Marketplace
 

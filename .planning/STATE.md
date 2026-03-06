@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 ## Current Position
 
 Phase: 15 — Company Creation Infrastructure
-Plan: 01 complete, moving to Plan 02
-Status: Plan 01 complete — provision_company RPC + superadmin guard + createCompany + generateInviteLink Server Actions built, build verified passing
-Last activity: 2026-03-06 — Phase 15 Plan 01 executed (backend infrastructure for superadmin company creation)
+Plan: 02 complete, phase complete
+Status: Plan 02 complete — superadmin route group (/superadmin/*) + create-company UI + Sihirbaz webhook skeleton built, build verified passing
+Last activity: 2026-03-06 — Phase 15 Plan 02 executed (superadmin UI and Sihirbaz webhook route)
 
 ## Milestones
 
@@ -232,6 +232,14 @@ Last activity: 2026-03-06 — Phase 15 Plan 01 executed (backend infrastructure 
 - (serviceClient as any) cast for RPC and new table inserts — consistent with Phase 10-12 pattern; custom RPC not in TS client types
 - generateInviteLink is both inline (in createCompany) and standalone Server Action — Phase 16 wizard uses standalone for regeneration
 
+### Phase 15 Decisions (from Plan 15-02)
+- useActionState (React 19, not deprecated useFormState) used in create-company-form.tsx — matches v3.0 React 19 stack
+- Superadmin layout redirects non-superadmin to /admin (not /catalog or /login) — superadmins need admin UI access
+- Sihirbaz route does NOT import dispatchAgentUpdate — wizard is NOT an AI agent; Phase 16 will add WizardOrchestrator FSM
+- Placeholder Turkish reply sent in sihirbaz after() stub — friendly UX before Phase 16 deploys
+- Plain HTML form elements with Tailwind classes (no shadcn/ui) — consistent with existing admin form patterns
+- Idempotency INSERT via processed_telegram_updates with 23505 dedup, same pattern as all 12 agent routes
+
 ### Phase 14 Decisions (from Plan 14-01)
 - agent_marketplace seed uses actual AgentRole enum values (egitimci, satis_temsilcisi, etc.) not English placeholders — 12 roles excluding destek (placeholderTools only, intentional)
 - onboarding_sessions.company_id is nullable — wizard session must exist before company is provisioned; NOT NULL would block wizard from starting
@@ -279,9 +287,9 @@ Last activity: 2026-03-06 — Phase 15 Plan 01 executed (backend infrastructure 
 
 ## Session Continuity
 
-Last session: 2026-03-06 (Phase 15 Plan 01 executed)
-Stopped at: Completed 15-01-PLAN.md — company creation backend infrastructure built and build verified
-Resume file: None — continue with Phase 15 Plan 02
+Last session: 2026-03-06 (Phase 15 Plan 02 executed)
+Stopped at: Completed 15-02-PLAN.md — superadmin UI (route group, layout guard, create-company form, sihirbaz webhook) built and build verified
+Resume file: None — Phase 15 complete, continue with Phase 16 (Wizard FSM)
 
 ---
 ### Phase 12 Decisions (from Plan 12-07)
