@@ -409,7 +409,11 @@ Plans:
   3. Every superadmin write operation (company create, invite generate) produces a row in superadmin_audit_log with actor_id, action, old_value, and new_value
   4. A user without is_superadmin() returning true receives a 403 response when attempting any superadmin server action — company admin credentials cannot reach these routes
   5. The Kurulum Sihirbazi runs as a distinct Telegram bot with its own TELEGRAM_BOT_TOKEN_SIHIRBAZ env var and its own /api/telegram/sihirbaz/route.ts webhook endpoint
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — Backend infrastructure: provision_company RPC, superadmin guard, middleware update, Server Actions (createCompany + generateInviteLink), audit logging, Telegram send utility
+- [ ] 15-02-PLAN.md — Superadmin UI (route group, layout guard, create-company form) + Sihirbaz Telegram webhook route skeleton
 
 ### Phase 16: Kurulum Sihirbazi
 **Goal**: A new tenant owner can receive a Telegram invite link, open the Sihirbaz bot, complete a conversational onboarding flow, and arrive at a fully provisioned company with web panel credentials — without any manual superadmin intervention after the invite is sent
@@ -478,7 +482,7 @@ Phases 1-13 complete. v4.0 executes in strict dependency order: 14 → 15 → 16
 | 12. Extended Agent Ecosystem | v3.0 | 7/7 | Complete | 2026-03-04 |
 | 13. Production Readiness | v3.0 | 6/6 | Complete | 2026-03-05 |
 | 14. Database Schema Foundation | 2/2 | Complete    | 2026-03-06 | — |
-| 15. Company Creation Infrastructure | v4.0 | 0/? | Not started | — |
+| 15. Company Creation Infrastructure | v4.0 | 0/2 | Planned | — |
 | 16. Kurulum Sihirbazi | v4.0 | 0/? | Not started | — |
 | 17. Billing + Deneme Suresi | v4.0 | 0/? | Not started | — |
 | 18. Agent Access Gating + Dijital Ekibim | v4.0 | 0/? | Not started | — |
