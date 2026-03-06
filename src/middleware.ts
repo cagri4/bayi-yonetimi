@@ -78,7 +78,12 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    const redirectUrl = profile?.role === 'admin' ? '/admin' : '/catalog'
+    const redirectUrl =
+      profile?.role === 'superadmin'
+        ? '/superadmin'
+        : profile?.role === 'admin'
+          ? '/admin'
+          : '/catalog'
     const redirectResponse = NextResponse.redirect(new URL(redirectUrl, request.url))
     redirectResponse.headers.set('x-request-id', requestId)
     return redirectResponse
@@ -93,7 +98,12 @@ export async function middleware(request: NextRequest) {
         .eq('id', user.id)
         .single()
 
-      const redirectUrl = profile?.role === 'admin' ? '/admin' : '/catalog'
+      const redirectUrl =
+        profile?.role === 'superadmin'
+          ? '/superadmin'
+          : profile?.role === 'admin'
+            ? '/admin'
+            : '/catalog'
       const redirectResponse = NextResponse.redirect(new URL(redirectUrl, request.url))
       redirectResponse.headers.set('x-request-id', requestId)
       return redirectResponse
@@ -104,7 +114,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Admin route protection
+  // Admin route protection — allow both admin and superadmin through
   if (request.nextUrl.pathname.startsWith('/admin') && user) {
     const { data: profile } = await supabase
       .from('users')
@@ -112,8 +122,23 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (profile?.role !== 'admin') {
+    if (profile?.role !== 'admin' && profile?.role !== 'superadmin') {
       const redirectResponse = NextResponse.redirect(new URL('/catalog', request.url))
+      redirectResponse.headers.set('x-request-id', requestId)
+      return redirectResponse
+    }
+  }
+
+  // Superadmin route protection — only superadmin role may access /superadmin/*
+  if (request.nextUrl.pathname.startsWith('/superadmin') && user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'superadmin') {
+      const redirectResponse = NextResponse.redirect(new URL('/admin', request.url))
       redirectResponse.headers.set('x-request-id', requestId)
       return redirectResponse
     }
