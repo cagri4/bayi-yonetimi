@@ -134,13 +134,13 @@
 
 ### Kurulum Sihirbazi (Onboarding Wizard)
 
-- [ ] **KS-01**: Firma sahibi davet linkine tikladiginda Telegram'da Kurulum Sihirbazi botu acilir
-- [ ] **KS-02**: Sihirbaz davet tokenini dogrular (tek kullanimlik, suresi gecmemis) ve Telegram chat_id'yi firmaya baglar
-- [ ] **KS-03**: Sihirbaz firma bilgilerini conversational olarak toplar (firma adi, sektor, urun sayisi, bayi sayisi, beklentiler)
-- [ ] **KS-04**: Sihirbaz 12 dijital calisani sirayla tanitir (her biri icin kisa Turkce aciklama — canli demo yok)
+- [x] **KS-01**: Firma sahibi davet linkine tikladiginda Telegram'da Kurulum Sihirbazi botu acilir
+- [x] **KS-02**: Sihirbaz davet tokenini dogrular (tek kullanimlik, suresi gecmemis) ve Telegram chat_id'yi firmaya baglar
+- [x] **KS-03**: Sihirbaz firma bilgilerini conversational olarak toplar (firma adi, sektor, urun sayisi, bayi sayisi, beklentiler)
+- [x] **KS-04**: Sihirbaz 12 dijital calisani sirayla tanitir (her biri icin kisa Turkce aciklama — canli demo yok)
 - [x] **KS-05**: Sihirbaz toplanan bilgilerle sistemi tek atomik islemde kurar (company + users + agent_definitions + subscription)
 - [x] **KS-06**: Kurulum tamamlaninca firma sahibine web panel linki ve gecici sifre gonderilir
-- [ ] **KS-07**: Sihirbaz durumu onboarding_sessions tablosunda tutar (kullanici Telegram'i kapatip acsa bile devam edebilir)
+- [x] **KS-07**: Sihirbaz durumu onboarding_sessions tablosunda tutar (kullanici Telegram'i kapatip acsa bile devam edebilir)
 - [x] **KS-08**: Sihirbaz ayri bir Telegram botu olarak calisir (kendi token'i, kendi webhook route'u)
 
 ### Agent Aktivasyon ve Marketplace

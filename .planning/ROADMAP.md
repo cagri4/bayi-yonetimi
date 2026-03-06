@@ -258,7 +258,7 @@ Plans:
 
 - [x] **Phase 14: Database Schema Foundation** - All new tables + column additions that every v4.0 feature depends on (completed 2026-03-06)
 - [x] **Phase 15: Company Creation Infrastructure** - Superadmin create-company action, invite link generation, atomic tenant provisioning (completed 2026-03-06)
-- [ ] **Phase 16: Kurulum Sihirbazi** - 13th Telegram bot, WizardOrchestrator FSM, conversational onboarding flow
+- [x] **Phase 16: Kurulum Sihirbazi** - 13th Telegram bot, WizardOrchestrator FSM, conversational onboarding flow (completed 2026-03-06)
 - [ ] **Phase 17: Billing + Deneme Suresi** - Mollie integration, subscription lifecycle, trial period with countdown notifications
 - [ ] **Phase 18: Agent Access Gating + Dijital Ekibim** - subscription-guard.ts in all 12 webhook routes, admin marketplace page
 - [ ] **Phase 19: Superadmin Panel Dashboard + Trial Notifications** - Companies dashboard, trial extension, audit log UI
@@ -487,7 +487,7 @@ Phases 1-13 complete. v4.0 executes in strict dependency order: 14 → 15 → 16
 | 13. Production Readiness | v3.0 | 6/6 | Complete | 2026-03-05 |
 | 14. Database Schema Foundation | 2/2 | Complete    | 2026-03-06 | — |
 | 15. Company Creation Infrastructure | 2/2 | Complete    | 2026-03-06 | — |
-| 16. Kurulum Sihirbazi | 1/2 | In Progress|  | — |
+| 16. Kurulum Sihirbazi | 2/2 | Complete   | 2026-03-06 | — |
 | 17. Billing + Deneme Suresi | v4.0 | 0/? | Not started | — |
 | 18. Agent Access Gating + Dijital Ekibim | v4.0 | 0/? | Not started | — |
 | 19. Superadmin Panel Dashboard + Trial Notifications | v4.0 | 0/? | Not started | — |

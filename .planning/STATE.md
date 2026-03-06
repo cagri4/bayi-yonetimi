@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 ## Current Position
 
 Phase: 16 — Kurulum Sihirbazi
-Plan: 01 complete
-Status: Plan 01 complete — WizardOrchestrator FSM core (agents.ts, session.ts, steps.ts) built with token validation, 5-step data collection, 12-agent intro, confirmation, and temp password provisioning
-Last activity: 2026-03-06 — Phase 16 Plan 01 executed (wizard FSM core modules)
+Plan: 02 complete
+Status: Plan 02 complete — Wizard dispatcher wired into sihirbaz webhook route; dispatchSihirbazUpdate connects webhook to FSM; Phase 15 stub replaced; pnpm build passes
+Last activity: 2026-03-06 — Phase 16 Plan 02 executed (dispatcher wiring)
 
 ## Milestones
 
@@ -232,6 +232,12 @@ Last activity: 2026-03-06 — Phase 16 Plan 01 executed (wizard FSM core modules
 - (serviceClient as any) cast for RPC and new table inserts — consistent with Phase 10-12 pattern; custom RPC not in TS client types
 - generateInviteLink is both inline (in createCompany) and standalone Server Action — Phase 16 wizard uses standalone for regeneration
 
+### Phase 16 Decisions (from Plan 16-02)
+- BOT_TOKEN read by dispatcher (not route) — dispatcher owns Telegram credential; route is token-agnostic consistent with handleStep signature
+- Two distinct Turkish null-session messages: /start gets token-specific rejection; non-/start gets helpful invite-link explanation
+- Terminal state checks (completed, expired) in dispatcher before handleStep — handleStep only handles active sessions
+- Error catch in dispatchSihirbazUpdate sends Turkish user-facing error + logs to console — silent failures prevented
+
 ### Phase 16 Decisions (from Plan 16-01)
 - Resume check (session by deep_link_token) precedes invite used_at validation — prevents wrongly rejecting returning users whose invite is already used
 - Fresh temp password at wizard completion via auth.admin.updateUserById — original createCompany temp password is ephemeral and never stored; resetting here gives owner a clean credential at the moment they need it
@@ -294,9 +300,9 @@ Last activity: 2026-03-06 — Phase 16 Plan 01 executed (wizard FSM core modules
 
 ## Session Continuity
 
-Last session: 2026-03-06 (Phase 16 Plan 01 executed)
-Stopped at: Completed 16-01-PLAN.md — wizard FSM core (agents.ts, session.ts, steps.ts) built and TypeScript verified
-Resume file: None — Phase 16 Plan 01 complete, continue with Plan 02 (dispatcher wiring)
+Last session: 2026-03-06 (Phase 16 Plan 02 executed)
+Stopped at: Completed 16-02-PLAN.md — wizard dispatcher (dispatcher.ts) created and wired into sihirbaz webhook route; pnpm build passes
+Resume file: None — Phase 16 Plan 02 complete; all Phase 16 plans complete
 
 ---
 ### Phase 12 Decisions (from Plan 12-07)
