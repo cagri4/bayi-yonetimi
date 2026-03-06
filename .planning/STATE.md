@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 ## Current Position
 
-Phase: 14 — Database Schema Foundation
-Plan: 02 complete, moving to Phase 15
-Status: Plan 02 complete — v4.0 schema executed in live Supabase DB, build verified passing
-Last activity: 2026-03-06 — Phase 14 Plan 02 executed (migration run + build verification)
+Phase: 15 — Company Creation Infrastructure
+Plan: 01 complete, moving to Plan 02
+Status: Plan 01 complete — provision_company RPC + superadmin guard + createCompany + generateInviteLink Server Actions built, build verified passing
+Last activity: 2026-03-06 — Phase 15 Plan 01 executed (backend infrastructure for superadmin company creation)
 
 ## Milestones
 
@@ -223,6 +223,15 @@ Last activity: 2026-03-06 — Phase 14 Plan 02 executed (migration run + build v
 - pnpm build passed with exit code 0 — nullable columns (trial_ends_at, subscription_tier) cause zero breaking TypeScript changes across all 38 routes
 - Task 2 is verification-only: no source files modified; SQL was already in DB from Task 1 human-action
 
+### Phase 15 Decisions (from Plan 15-01)
+- provision_company clones agent_definitions from companies WHERE slug='default'; fallback to minimal definition (claude-haiku-4-5, empty system_prompt) if no default template exists
+- Auth user rollback is explicit: serviceClient.auth.admin.deleteUser() called if provision_company RPC fails — auth.users is NOT in same Postgres TX as public schema tables
+- SHA-256 hash via crypto.subtle.digest (Web Crypto API) — Edge-compatible without Node.js crypto import
+- assertSuperadmin() guard: first line of every superadmin Server Action, try/catch returns { error, status: 403 }
+- superadmin allowed through /admin routes (not just /superadmin) — superadmin needs admin UI access; /superadmin panel is separate
+- (serviceClient as any) cast for RPC and new table inserts — consistent with Phase 10-12 pattern; custom RPC not in TS client types
+- generateInviteLink is both inline (in createCompany) and standalone Server Action — Phase 16 wizard uses standalone for regeneration
+
 ### Phase 14 Decisions (from Plan 14-01)
 - agent_marketplace seed uses actual AgentRole enum values (egitimci, satis_temsilcisi, etc.) not English placeholders — 12 roles excluding destek (placeholderTools only, intentional)
 - onboarding_sessions.company_id is nullable — wizard session must exist before company is provisioned; NOT NULL would block wizard from starting
@@ -270,9 +279,9 @@ Last activity: 2026-03-06 — Phase 14 Plan 02 executed (migration run + build v
 
 ## Session Continuity
 
-Last session: 2026-03-06 (Phase 14 Plan 02 executed)
-Stopped at: Completed 14-02-PLAN.md — v4.0 schema live in Supabase, build verified
-Resume file: None — continue with Phase 15 (Company Creation)
+Last session: 2026-03-06 (Phase 15 Plan 01 executed)
+Stopped at: Completed 15-01-PLAN.md — company creation backend infrastructure built and build verified
+Resume file: None — continue with Phase 15 Plan 02
 
 ---
 ### Phase 12 Decisions (from Plan 12-07)

@@ -125,12 +125,12 @@
 
 ### Superadmin Panel
 
-- [ ] **SA-01**: Superadmin yeni firma olusturabilir (firma adi, sektor, admin email, plan secimi)
-- [ ] **SA-02**: Superadmin firma olusturunca tek kullanimlik Telegram davet linki uretilir (UUID token, 7 gun gecerlilik)
+- [x] **SA-01**: Superadmin yeni firma olusturabilir (firma adi, sektor, admin email, plan secimi)
+- [x] **SA-02**: Superadmin firma olusturunca tek kullanimlik Telegram davet linki uretilir (UUID token, 7 gun gecerlilik)
 - [ ] **SA-03**: Superadmin tum firmalari dashboard'da gorebilir (firma adi, trial durumu, aktif agent sayisi, son aktivite)
 - [ ] **SA-04**: Superadmin firma deneme suresini tek tikla uzatabilir (trial_ends_at guncelleme + kullaniciya bildirim)
-- [ ] **SA-05**: Superadmin tum islemleri audit log'a kaydedilir (kim, ne, ne zaman, eski/yeni deger)
-- [ ] **SA-06**: Superadmin paneli is_superadmin() kontrolu ile korunur (normal admin erisemez)
+- [x] **SA-05**: Superadmin tum islemleri audit log'a kaydedilir (kim, ne, ne zaman, eski/yeni deger)
+- [x] **SA-06**: Superadmin paneli is_superadmin() kontrolu ile korunur (normal admin erisemez)
 
 ### Kurulum Sihirbazi (Onboarding Wizard)
 
@@ -138,8 +138,8 @@
 - [ ] **KS-02**: Sihirbaz davet tokenini dogrular (tek kullanimlik, suresi gecmemis) ve Telegram chat_id'yi firmaya baglar
 - [ ] **KS-03**: Sihirbaz firma bilgilerini conversational olarak toplar (firma adi, sektor, urun sayisi, bayi sayisi, beklentiler)
 - [ ] **KS-04**: Sihirbaz 12 dijital calisani sirayla tanitir (her biri icin kisa Turkce aciklama — canli demo yok)
-- [ ] **KS-05**: Sihirbaz toplanan bilgilerle sistemi tek atomik islemde kurar (company + users + agent_definitions + subscription)
-- [ ] **KS-06**: Kurulum tamamlaninca firma sahibine web panel linki ve gecici sifre gonderilir
+- [x] **KS-05**: Sihirbaz toplanan bilgilerle sistemi tek atomik islemde kurar (company + users + agent_definitions + subscription)
+- [x] **KS-06**: Kurulum tamamlaninca firma sahibine web panel linki ve gecici sifre gonderilir
 - [ ] **KS-07**: Sihirbaz durumu onboarding_sessions tablosunda tutar (kullanici Telegram'i kapatip acsa bile devam edebilir)
 - [ ] **KS-08**: Sihirbaz ayri bir Telegram botu olarak calisir (kendi token'i, kendi webhook route'u)
 
