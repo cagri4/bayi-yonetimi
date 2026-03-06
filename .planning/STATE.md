@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 ## Current Position
 
-Phase: 15 — Company Creation Infrastructure
-Plan: 02 complete, phase complete
-Status: Plan 02 complete — superadmin route group (/superadmin/*) + create-company UI + Sihirbaz webhook skeleton built, build verified passing
-Last activity: 2026-03-06 — Phase 15 Plan 02 executed (superadmin UI and Sihirbaz webhook route)
+Phase: 16 — Kurulum Sihirbazi
+Plan: 01 complete
+Status: Plan 01 complete — WizardOrchestrator FSM core (agents.ts, session.ts, steps.ts) built with token validation, 5-step data collection, 12-agent intro, confirmation, and temp password provisioning
+Last activity: 2026-03-06 — Phase 16 Plan 01 executed (wizard FSM core modules)
 
 ## Milestones
 
@@ -232,6 +232,13 @@ Last activity: 2026-03-06 — Phase 15 Plan 02 executed (superadmin UI and Sihir
 - (serviceClient as any) cast for RPC and new table inserts — consistent with Phase 10-12 pattern; custom RPC not in TS client types
 - generateInviteLink is both inline (in createCompany) and standalone Server Action — Phase 16 wizard uses standalone for regeneration
 
+### Phase 16 Decisions (from Plan 16-01)
+- Resume check (session by deep_link_token) precedes invite used_at validation — prevents wrongly rejecting returning users whose invite is already used
+- Fresh temp password at wizard completion via auth.admin.updateUserById — original createCompany temp password is ephemeral and never stored; resetting here gives owner a clean credential at the moment they need it
+- Agent intros sent as single Telegram message (or two if >3800 chars) — satisfies "sequential order" KS-04 without 12 separate API calls
+- Step 5 dual responsibility: saves beklentiler AND sends 12 agent intros + confirmation prompt; step 6 is purely evet/hayir handler — keeps FSM linear
+- (supabase as any) cast on onboarding_sessions, onboarding_invites, companies, users — consistent with Phase 10-15 pattern for tables not fully exposed by TS client
+
 ### Phase 15 Decisions (from Plan 15-02)
 - useActionState (React 19, not deprecated useFormState) used in create-company-form.tsx — matches v3.0 React 19 stack
 - Superadmin layout redirects non-superadmin to /admin (not /catalog or /login) — superadmins need admin UI access
@@ -287,9 +294,9 @@ Last activity: 2026-03-06 — Phase 15 Plan 02 executed (superadmin UI and Sihir
 
 ## Session Continuity
 
-Last session: 2026-03-06 (Phase 15 Plan 02 executed)
-Stopped at: Completed 15-02-PLAN.md — superadmin UI (route group, layout guard, create-company form, sihirbaz webhook) built and build verified
-Resume file: None — Phase 15 complete, continue with Phase 16 (Wizard FSM)
+Last session: 2026-03-06 (Phase 16 Plan 01 executed)
+Stopped at: Completed 16-01-PLAN.md — wizard FSM core (agents.ts, session.ts, steps.ts) built and TypeScript verified
+Resume file: None — Phase 16 Plan 01 complete, continue with Plan 02 (dispatcher wiring)
 
 ---
 ### Phase 12 Decisions (from Plan 12-07)
